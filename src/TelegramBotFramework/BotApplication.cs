@@ -24,6 +24,8 @@ public class BotApplication : IBotApplicationBuilder, IUpdateHandlerBuilder
         UseDefaultPipes();
     }
 
+    public IHost Host { get; }
+
     public IBotApplicationBuilder Use(Func<BotRequestDelegate, BotRequestDelegate> pipe)
     {
         _pipelineBuilder.Use(pipe);
@@ -36,8 +38,6 @@ public class BotApplication : IBotApplicationBuilder, IUpdateHandlerBuilder
         _pipeline = _pipelineBuilder.Build();
         return _pipeline;
     }
-
-    public IHost Host { get; }
 
     internal void RunBot()
     {
@@ -82,6 +82,7 @@ public class BotApplication : IBotApplicationBuilder, IUpdateHandlerBuilder
             {
                 await command.ExecuteAsync(ctx);
             }
+
             await next(ctx);
         });
     }
