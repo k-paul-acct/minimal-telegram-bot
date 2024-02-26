@@ -1,0 +1,33 @@
+using Telegram.Bot;
+
+namespace TelegramBotFramework.Services;
+
+internal class BotInitService
+{
+    private readonly TelegramBotClient _client;
+    private readonly ILogger<BotApplication> _logger;
+
+    public BotInitService(ILogger<BotApplication> logger, TelegramBotClient client)
+    {
+        _logger = logger;
+        _client = client;
+    }
+
+    private static string Fullname(string? firstname, string? lastname)
+    {
+        return (string.IsNullOrEmpty(firstname), string.IsNullOrEmpty(lastname)) switch
+        {
+            (false, false) => $"{firstname} {lastname}",
+            (false, true) => firstname!,
+            (true, false) => lastname!,
+            (true, true) => "N/A",
+        };
+    }
+
+    public async Task InitBot()
+    {
+        var bot = await _client.GetMeAsync();
+        _logger.LogInformation("Polling started for bot @{BotUsername} ({BotFullname}) with ID = {BotId}",
+            bot.Username, Fullname(bot.FirstName, bot.LastName), bot.Id);
+    }
+}
