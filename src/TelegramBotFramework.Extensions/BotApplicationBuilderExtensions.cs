@@ -10,7 +10,7 @@ namespace TelegramBotFramework.Extensions;
 public static class BotApplicationBuilderExtensions
 {
     public static BotApplicationBuilder AddLocalizer<TUserLocaleProvider>(this BotApplicationBuilder builder,
-        IEnumerable<string> languageCodes)  where TUserLocaleProvider : class, IUserLocaleProvider<long>
+        IEnumerable<string> languageCodes) where TUserLocaleProvider : class, IUserLocaleProvider<long>
     {
         Locale.Default = Locale.FromLanguageCode("ru");
         var repository = new InMemoryLocaleStringSetRepository();

@@ -6,19 +6,19 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-      <UserSecretsId>9472c635-226c-4655-9a3a-f483324350ae</UserSecretsId>
-  </PropertyGroup>
+        <UserSecretsId>9472c635-226c-4655-9a3a-f483324350ae</UserSecretsId>
+    </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Telegram.Bot" Version="19.0.0" />
+        <PackageReference Include="Telegram.Bot" Version="19.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TelegramBotFramework.Abstractions\TelegramBotFramework.Abstractions.csproj" />
-        <ProjectReference Include="..\TelegramBotFramework.Localization.Abstractions\TelegramBotFramework.Localization.Abstractions.csproj" />
-        <ProjectReference Include="..\TelegramBotFramework.Localization\TelegramBotFramework.Localization.csproj" />
-        <ProjectReference Include="..\TelegramBotFramework.StateMachine.Abstractions\TelegramBotFramework.StateMachine.Abstractions.csproj" />
-        <ProjectReference Include="..\TelegramBotFramework.StateMachine\TelegramBotFramework.StateMachine.csproj" />
+        <ProjectReference Include="..\TelegramBotFramework.Abstractions\TelegramBotFramework.Abstractions.csproj"/>
+        <ProjectReference Include="..\TelegramBotFramework.Localization.Abstractions\TelegramBotFramework.Localization.Abstractions.csproj"/>
+        <ProjectReference Include="..\TelegramBotFramework.Localization\TelegramBotFramework.Localization.csproj"/>
+        <ProjectReference Include="..\TelegramBotFramework.StateMachine.Abstractions\TelegramBotFramework.StateMachine.Abstractions.csproj"/>
+        <ProjectReference Include="..\TelegramBotFramework.StateMachine\TelegramBotFramework.StateMachine.csproj"/>
     </ItemGroup>
 
 </Project>

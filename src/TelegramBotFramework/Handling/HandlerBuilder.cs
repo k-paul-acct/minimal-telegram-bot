@@ -6,7 +6,7 @@ public class HandlerBuilder : IHandlerBuilder
 {
     private static readonly object LockObj = new();
     private readonly List<Handler> _handlers = [];
-    
+
     public Handler Handle(HandlerDelegate handlerDelegate)
     {
         lock (LockObj)
@@ -118,7 +118,7 @@ internal static class RequestDelegateHelper
             return resultHandler(invocationResult);
         };
     }
-    
+
     public static Func<BotRequestContext, Task<IResult>> ValueTaskDelegateWrapper(Func<BotRequestContext,
         ValueTask> delegateInvocation)
     {

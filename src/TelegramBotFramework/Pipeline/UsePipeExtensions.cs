@@ -11,7 +11,7 @@ public static class UsePipeExtensions
     {
         return app.Use((ctx, next) =>
         {
-            var pipeService = (IPipe)ServiceProviderServiceExtensions.GetRequiredService(ctx.Services, pipeType);
+            var pipeService = (IPipe)ctx.Services.GetRequiredService(pipeType);
             return pipeService.InvokeAsync(ctx, next);
         });
     }
