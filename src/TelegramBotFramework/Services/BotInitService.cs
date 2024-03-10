@@ -13,15 +13,9 @@ internal class BotInitService
         _client = client;
     }
 
-    private static string Fullname(string? firstname, string? lastname)
+    private static string Fullname(string firstname, string? lastname)
     {
-        return (string.IsNullOrEmpty(firstname), string.IsNullOrEmpty(lastname)) switch
-        {
-            (false, false) => $"{firstname} {lastname}",
-            (false, true) => firstname!,
-            (true, false) => lastname!,
-            (true, true) => "N/A",
-        };
+        return lastname is null ? firstname : $"{firstname} {lastname}";
     }
 
     public async Task InitBot()

@@ -6,6 +6,8 @@ internal class PipelineBuilder : IBotApplicationBuilder
 
     private readonly List<Func<BotRequestDelegate, BotRequestDelegate>> _pipes = [];
 
+    public IDictionary<string, object?> Properties { get; } = new Dictionary<string, object?>();
+
     public IBotApplicationBuilder Use(Func<BotRequestDelegate, BotRequestDelegate> pipe)
     {
         _pipes.Add(pipe);
@@ -18,7 +20,7 @@ internal class PipelineBuilder : IBotApplicationBuilder
         {
             if (!context.UpdateHandlingStarted)
             {
-                context.Items[RequestUnhandledKey] = true;
+                context.Data[RequestUnhandledKey] = true;
             }
 
             return Task.CompletedTask;

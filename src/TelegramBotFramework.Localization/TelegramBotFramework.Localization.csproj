@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\TelegramBotFramework.Abstractions\TelegramBotFramework.Abstractions.csproj"/>
+        <ProjectReference Include="..\TelegramBotFramework.Localization.Abstractions\TelegramBotFramework.Localization.Abstractions.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
+        <PackageReference Include="YamlDotNet" Version="15.1.2"/>
+    </ItemGroup>
+
+</Project>

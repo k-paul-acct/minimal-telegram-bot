@@ -1,30 +1,36 @@
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramBotFramework.Commands;
-using TelegramBotFramework.Extensions;
+using TelegramBotFramework.Handling;
+using TelegramBotFramework.Localization.Abstractions;
 using TelegramBotFramework.Pipeline;
-using TelegramBotFramework.Pipeline.Default;
 using TelegramBotFramework.Services;
+using TelegramBotFramework.Settings;
+using TelegramBotFramework.StateMachine.Abstractions;
 
 namespace TelegramBotFramework;
 
-public class BotApplication : IBotApplicationBuilder, IUpdateHandlerBuilder
+public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 {
     private readonly TelegramBotClient _client;
+    private readonly IHandlerBuilder _handlerBuilder;
     private readonly BotApplicationOptions _options;
     private readonly PipelineBuilder _pipelineBuilder = new();
     private BotRequestDelegate? _pipeline;
 
-    internal BotApplication(IHost host, TelegramBotClient client, BotApplicationOptions options)
+    internal BotApplication(IHost host, TelegramBotClient client, BotApplicationOptions options,
+        IHandlerBuilder handlerBuilder)
     {
         Host = host;
         _client = client;
         _options = options;
+        _handlerBuilder = handlerBuilder;
 
-        UseDefaultPipes();
+        UseDefaultOuterPipes();
     }
 
     public IHost Host { get; }
+
+    public IDictionary<string, object?> Properties => _pipelineBuilder.Properties;
 
     public IBotApplicationBuilder Use(Func<BotRequestDelegate, BotRequestDelegate> pipe)
     {
@@ -34,9 +40,28 @@ public class BotApplication : IBotApplicationBuilder, IUpdateHandlerBuilder
 
     BotRequestDelegate IBotApplicationBuilder.Build()
     {
-        UseCommandPipe();
         _pipeline = _pipelineBuilder.Build();
         return _pipeline;
+    }
+
+    public Handler Handle(HandlerDelegate handlerDelegate)
+    {
+        return _handlerBuilder.Handle(handlerDelegate);
+    }
+
+    public Handler Handle(Delegate handlerDelegate)
+    {
+        return _handlerBuilder.Handle(handlerDelegate);
+    }
+
+    public Handler Handle(Func<BotRequestContext, Task> func)
+    {
+        return _handlerBuilder.Handle(func);
+    }
+
+    public Handler? TryResolveHandler(BotRequestContext ctx)
+    {
+        return _handlerBuilder.TryResolveHandler(ctx);
     }
 
     internal void RunBot()
@@ -68,23 +93,9 @@ public class BotApplication : IBotApplicationBuilder, IUpdateHandlerBuilder
 
     public void Run()
     {
+        if (Properties.ContainsKey("CallbackAutoAnsweringAdded")) this.UsePipe<CallbackAutoAnsweringPipe>();
+        this.UsePipe<HandlerResolverPipe>();
         BotApplicationRunner.Run(this);
-    }
-
-    private void UseCommandPipe()
-    {
-        _pipelineBuilder.Use(async (ctx, next) =>
-        {
-            var text = ctx.Update.Message?.Text;
-            if (text is null) return;
-            var command = ctx.ServiceProvider.GetKeyedService<ICommand>(text);
-            if (command is not null)
-            {
-                await command.ExecuteAsync(ctx);
-            }
-
-            await next(ctx);
-        });
     }
 
     private Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
@@ -97,26 +108,42 @@ public class BotApplication : IBotApplicationBuilder, IUpdateHandlerBuilder
     {
         using var scope = Host.Services.CreateScope();
 
-        var ctx = new BotRequestContext
-        {
-            Client = client,
-            Update = update,
-            ServiceProvider = scope.ServiceProvider,
-        };
+        var chatId = update.Message?.Chat.Id ?? update.CallbackQuery?.Message?.Chat.Id ?? 0;
+        if (chatId == 0) return;
 
-        await _pipeline!(ctx);
+        var messageText = update.Message?.Text;
+        var callbackData = update.CallbackQuery?.Data;
+
+        var stateMachine = scope.ServiceProvider.GetRequiredService<IStateMachine>();
+        var localizer = scope.ServiceProvider.GetService<ILocalizer>();
+        var localeService = scope.ServiceProvider.GetService<IUserLocaleService<long>>();
+        var context = scope.ServiceProvider.GetRequiredService<BotRequestContext>();
+        var locale = localeService is null ? null : await localeService.GetFromRepositoryOrUpdateWithProviderAsync(chatId);
+
+        context.Client = client;
+        context.Update = update;
+        context.ChatId = chatId;
+        context.MessageText = messageText;
+        context.CallbackData = callbackData;
+        context.UserLocale = locale;
+        context.Services = scope.ServiceProvider;
+        context.StateMachine = stateMachine;
+        context.Localizer = localizer;
+        context.UserState = stateMachine.GetState(chatId);
+
+        await _pipeline!(context);
     }
 
     private Task PollingErrorHandler(ITelegramBotClient client, Exception e, CancellationToken cancellationToken)
     {
         using var scope = Host.Services.CreateScope();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<BotApplication>>();
-        logger.LogError(e, "Bot error: {Error}", e.Message);
+        logger.LogError(500, e, "Bot error: {Error}", e.Message);
 
         return Task.CompletedTask;
     }
 
-    private void UseDefaultPipes()
+    private void UseDefaultOuterPipes()
     {
         this.UsePipe<ExceptionHandlerPipe>();
         this.UsePipe<UpdateLoggerPipe>();

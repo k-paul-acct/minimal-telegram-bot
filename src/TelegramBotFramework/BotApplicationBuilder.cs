@@ -1,9 +1,9 @@
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Telegram.Bot;
-using TelegramBotFramework.Commands;
-using TelegramBotFramework.Pipeline.Default;
+using TelegramBotFramework.Handling;
+using TelegramBotFramework.Pipeline;
 using TelegramBotFramework.Services;
+using TelegramBotFramework.Settings;
+using TelegramBotFramework.StateMachine.Extensions;
 
 namespace TelegramBotFramework;
 
@@ -14,7 +14,6 @@ public class BotApplicationBuilder
     internal BotApplicationBuilder(string[]? args)
     {
         HostBuilder = args is not null ? Host.CreateApplicationBuilder(args) : Host.CreateApplicationBuilder();
-        AddDefaultServices();
         AddDefaultPipeServices();
     }
 
@@ -37,53 +36,29 @@ public class BotApplicationBuilder
         return this;
     }
 
-    public BotApplicationBuilder AddCommands()
-    {
-        _options.CommandsAssembly = Assembly.GetCallingAssembly();
-        return this;
-    }
-
     public BotApplication Build()
     {
         _options.Validate();
 
-        if (_options.CommandsAssembly is not null)
-        {
-            FindAndApplyCommands(_options.CommandsAssembly);
-        }
-
         var client = new TelegramBotClient(_options.Token!);
+        var handlerBuilder = new HandlerBuilder();
+
         HostBuilder.Services.AddSingleton(client);
+        HostBuilder.Services.AddSingleton<BotInitService>();
+        HostBuilder.Services.AddSingleton<IHandlerBuilder>(handlerBuilder);
+        HostBuilder.Services.AddStateMachine<TelegramUserIdProvider>();
+        HostBuilder.Services.AddScoped<BotRequestContext>();
+
         var host = HostBuilder.Build();
 
-        return new BotApplication(host, client, new BotApplicationOptions(_options));
-    }
-
-    private void FindAndApplyCommands(Assembly assembly)
-    {
-        var commandTypes = assembly
-            .GetTypes()
-            .Where(x => x.IsClass && typeof(ICommand).IsAssignableFrom(x));
-
-        foreach (var commandType in commandTypes)
-        {
-            if (Attribute.GetCustomAttribute(commandType, typeof(CommandAttribute)) is not CommandAttribute attribute)
-            {
-                throw new Exception("No command specified");
-            }
-
-            HostBuilder.Services.AddKeyedScoped(typeof(ICommand), attribute.Command, commandType);
-        }
+        return new BotApplication(host, client, new BotApplicationOptions(_options), handlerBuilder);
     }
 
     private void AddDefaultPipeServices()
     {
-        HostBuilder.Services.TryAddScoped<ExceptionHandlerPipe>();
-        HostBuilder.Services.TryAddScoped<UpdateLoggerPipe>();
-    }
-
-    private void AddDefaultServices()
-    {
-        HostBuilder.Services.AddTransient<BotInitService>();
+        HostBuilder.Services.AddSingleton<UpdateLoggerPipe>();
+        HostBuilder.Services.AddSingleton<HandlerResolverPipe>();
+        HostBuilder.Services.AddSingleton<ExceptionHandlerPipe>();
+        HostBuilder.Services.AddSingleton<CallbackAutoAnsweringPipe>();
     }
 }
