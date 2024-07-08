@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageId>MinimalTelegramBot.StateMachine.Abstractions</PackageId>
+        <Version>0.0.2</Version>
+        <Authors>Pavel Kulakov</Authors>
+        <Title>Telegram Bot Framework State Machine Abstractions</Title>
+        <RepositoryUrl>https://github.com/k-paul-acct/telegram-bot-framework</RepositoryUrl>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+</Project>

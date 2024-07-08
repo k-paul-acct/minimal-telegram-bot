@@ -2,17 +2,19 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9EE18A62-A9F0-49C8-A7C6-80E01961A02B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotFramework", "src\TelegramBotFramework\TelegramBotFramework.csproj", "{371C5D0C-D217-4079-891F-BA0AFEDC513A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalTelegramBot", "src\MinimalTelegramBot\MinimalTelegramBot.csproj", "{371C5D0C-D217-4079-891F-BA0AFEDC513A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotFramework.UsageExample", "src\TelegramBotFramework.UsageExample\TelegramBotFramework.UsageExample.csproj", "{8E433FB6-3EE0-4784-A585-203690DA30DD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsageExample", "src\UsageExample\UsageExample.csproj", "{8E433FB6-3EE0-4784-A585-203690DA30DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotFramework.Localization.Abstractions", "src\TelegramBotFramework.Localization.Abstractions\TelegramBotFramework.Localization.Abstractions.csproj", "{4EDBF77C-84B2-4F36-AE0E-5CBE3905B3CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalTelegramBot.Localization.Abstractions", "src\MinimalTelegramBot.Localization.Abstractions\MinimalTelegramBot.Localization.Abstractions.csproj", "{4EDBF77C-84B2-4F36-AE0E-5CBE3905B3CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotFramework.Localization", "src\TelegramBotFramework.Localization\TelegramBotFramework.Localization.csproj", "{B40115BD-697E-4E5B-925E-9522C484F8AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalTelegramBot.Localization", "src\MinimalTelegramBot.Localization\MinimalTelegramBot.Localization.csproj", "{B40115BD-697E-4E5B-925E-9522C484F8AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotFramework.StateMachine", "src\TelegramBotFramework.StateMachine\TelegramBotFramework.StateMachine.csproj", "{8C617CE8-265A-4FC1-BA45-7A5BD49550C3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalTelegramBot.StateMachine", "src\MinimalTelegramBot.StateMachine\MinimalTelegramBot.StateMachine.csproj", "{8C617CE8-265A-4FC1-BA45-7A5BD49550C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotFramework.StateMachine.Abstractions", "src\TelegramBotFramework.StateMachine.Abstractions\TelegramBotFramework.StateMachine.Abstractions.csproj", "{DBFE92C2-2BDA-4A3B-9E00-0449BCAFE0BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalTelegramBot.StateMachine.Abstractions", "src\MinimalTelegramBot.StateMachine.Abstractions\MinimalTelegramBot.StateMachine.Abstractions.csproj", "{DBFE92C2-2BDA-4A3B-9E00-0449BCAFE0BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsageExample.Nuget", "src\UsageExample.Nuget\UsageExample.Nuget.csproj", "{0BA91910-7B4D-4180-B944-7F742A785C54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +28,7 @@ Global
 		{B40115BD-697E-4E5B-925E-9522C484F8AB} = {9EE18A62-A9F0-49C8-A7C6-80E01961A02B}
 		{8C617CE8-265A-4FC1-BA45-7A5BD49550C3} = {9EE18A62-A9F0-49C8-A7C6-80E01961A02B}
 		{DBFE92C2-2BDA-4A3B-9E00-0449BCAFE0BC} = {9EE18A62-A9F0-49C8-A7C6-80E01961A02B}
+		{0BA91910-7B4D-4180-B944-7F742A785C54} = {9EE18A62-A9F0-49C8-A7C6-80E01961A02B}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{371C5D0C-D217-4079-891F-BA0AFEDC513A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -52,5 +55,9 @@ Global
 		{DBFE92C2-2BDA-4A3B-9E00-0449BCAFE0BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBFE92C2-2BDA-4A3B-9E00-0449BCAFE0BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBFE92C2-2BDA-4A3B-9E00-0449BCAFE0BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BA91910-7B4D-4180-B944-7F742A785C54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BA91910-7B4D-4180-B944-7F742A785C54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BA91910-7B4D-4180-B944-7F742A785C54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BA91910-7B4D-4180-B944-7F742A785C54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
