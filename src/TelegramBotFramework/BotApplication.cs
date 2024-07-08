@@ -15,7 +15,7 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
     private readonly IHandlerBuilder _handlerBuilder;
     private readonly BotApplicationOptions _options;
     private readonly PipelineBuilder _pipelineBuilder = new();
-    private BotRequestDelegate? _pipeline;
+    private Func<BotRequestContext, Task>? _pipeline;
 
     internal BotApplication(IHost host, TelegramBotClient client, BotApplicationOptions options,
         IHandlerBuilder handlerBuilder)
@@ -32,13 +32,13 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 
     public IDictionary<string, object?> Properties => _pipelineBuilder.Properties;
 
-    public IBotApplicationBuilder Use(Func<BotRequestDelegate, BotRequestDelegate> pipe)
+    public IBotApplicationBuilder Use(Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>> pipe)
     {
         _pipelineBuilder.Use(pipe);
         return this;
     }
 
-    BotRequestDelegate IBotApplicationBuilder.Build()
+    Func<BotRequestContext, Task> IBotApplicationBuilder.Build()
     {
         _pipeline = _pipelineBuilder.Build();
         return _pipeline;
@@ -66,11 +66,7 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 
     internal void RunBot()
     {
-        _client.StartReceiving(
-            UpdateHandler,
-            PollingErrorHandler,
-            _options.ReceiverOptions);
-
+        _client.StartReceiving(UpdateHandler, PollingErrorHandler, _options.ReceiverOptions);
         using var scope = Host.Services.CreateScope();
         var botInitService = scope.ServiceProvider.GetRequiredService<BotInitService>();
         botInitService.InitBot().GetAwaiter().GetResult();
@@ -93,7 +89,11 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 
     public void Run()
     {
-        if (Properties.ContainsKey("CallbackAutoAnsweringAdded")) this.UsePipe<CallbackAutoAnsweringPipe>();
+        if (Properties.ContainsKey("CallbackAutoAnsweringAdded"))
+        {
+            this.UsePipe<CallbackAutoAnsweringPipe>();
+        }
+
         this.UsePipe<HandlerResolverPipe>();
         BotApplicationRunner.Run(this);
     }
@@ -109,7 +109,10 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         using var scope = Host.Services.CreateScope();
 
         var chatId = update.Message?.Chat.Id ?? update.CallbackQuery?.Message?.Chat.Id ?? 0;
-        if (chatId == 0) return;
+        if (chatId == 0)
+        {
+            return;
+        }
 
         var messageText = update.Message?.Text;
         var callbackData = update.CallbackQuery?.Data;
@@ -118,7 +121,9 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         var localizer = scope.ServiceProvider.GetService<ILocalizer>();
         var localeService = scope.ServiceProvider.GetService<IUserLocaleService<long>>();
         var context = scope.ServiceProvider.GetRequiredService<BotRequestContext>();
-        var locale = localeService is null ? null : await localeService.GetFromRepositoryOrUpdateWithProviderAsync(chatId);
+        var locale = localeService is null
+            ? null
+            : await localeService.GetFromRepositoryOrUpdateWithProviderAsync(chatId);
 
         context.Client = client;
         context.Update = update;

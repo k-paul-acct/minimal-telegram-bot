@@ -13,7 +13,7 @@ public static class UseExtensions
         return app.Use(next => context => pipe(context, () => next(context)));
     }
 
-    public static IBotApplicationBuilder Use(this IBotApplicationBuilder app, Func<BotRequestContext, BotRequestDelegate, Task> pipe)
+    public static IBotApplicationBuilder Use(this IBotApplicationBuilder app, Func<BotRequestContext, Func<BotRequestContext, Task>, Task> pipe)
     {
         return app.Use(next => context => pipe(context, next));
     }

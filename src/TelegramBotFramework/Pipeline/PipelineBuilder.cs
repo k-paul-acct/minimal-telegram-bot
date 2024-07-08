@@ -4,19 +4,19 @@ internal class PipelineBuilder : IBotApplicationBuilder
 {
     public const string RequestUnhandledKey = "RequestUnhandled";
 
-    private readonly List<Func<BotRequestDelegate, BotRequestDelegate>> _pipes = [];
+    private readonly List<Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>>> _pipes = [];
 
     public IDictionary<string, object?> Properties { get; } = new Dictionary<string, object?>();
 
-    public IBotApplicationBuilder Use(Func<BotRequestDelegate, BotRequestDelegate> pipe)
+    public IBotApplicationBuilder Use(Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>> pipe)
     {
         _pipes.Add(pipe);
         return this;
     }
 
-    public BotRequestDelegate Build()
+    public Func<BotRequestContext, Task> Build()
     {
-        BotRequestDelegate pipeline = context =>
+        Func<BotRequestContext, Task> pipeline = context =>
         {
             if (!context.UpdateHandlingStarted)
             {

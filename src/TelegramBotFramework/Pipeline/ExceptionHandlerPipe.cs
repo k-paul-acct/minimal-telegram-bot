@@ -9,7 +9,7 @@ public class ExceptionHandlerPipe : IPipe
         _logger = logger;
     }
 
-    public async Task InvokeAsync(BotRequestContext ctx, BotRequestDelegate next)
+    public async Task InvokeAsync(BotRequestContext ctx, Func<BotRequestContext, Task> next)
     {
         try
         {

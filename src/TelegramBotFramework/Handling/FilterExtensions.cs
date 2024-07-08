@@ -6,7 +6,7 @@ namespace TelegramBotFramework.Handling;
 public static class FilterExtensions
 {
     public const string CommandArgs = "CommandArgs";
-    public const string CallbackArgs = "CallbackDataArgs";
+    public const string CallbackDataArgs = "CallbackDataArgs";
 
     public static Handler FilterText(this Handler handler, Func<string, bool> filter)
     {
@@ -45,7 +45,7 @@ public static class FilterExtensions
         {
             if (ctx.CallbackData is null) return false;
             var parts = ctx.CallbackData.Split(' ');
-            ctx.Data[CallbackArgs] = parts[1..];
+            ctx.Data[CallbackDataArgs] = parts[1..];
             return filter(ctx.CallbackData);
         });
     }
