@@ -1,4 +1,3 @@
-using TelegramBotFramework.Abstractions;
 using TelegramBotFramework.StateMachine.Abstractions;
 
 namespace TelegramBotFramework.StateMachine;
@@ -7,12 +6,13 @@ namespace TelegramBotFramework.StateMachine;
 public class StateMachine : IStateMachine
 {
     private readonly IUserStateRepository _repository;
-    private readonly IUserIdProvider<long> _userIdProvider;
+    private readonly BotRequestContext _context;
 
-    public StateMachine(IUserStateRepository repository, IUserIdProvider<long> userIdProvider)
+    public StateMachine(IUserStateRepository repository, IBotRequestContextAccessor contextAccessor)
     {
         _repository = repository;
-        _userIdProvider = userIdProvider;
+        _context = contextAccessor.BotRequestContext ??
+                   throw new Exception($"No current context in {nameof(IBotRequestContextAccessor)}");
     }
 
     /// <inheritdoc />
@@ -24,7 +24,7 @@ public class StateMachine : IStateMachine
     /// <inheritdoc />
     public void SetState(State state)
     {
-        var userId = _userIdProvider.GetUserId();
+        var userId = _context.ChatId;
         SetState(userId, state);
     }
 
@@ -37,7 +37,7 @@ public class StateMachine : IStateMachine
     /// <inheritdoc />
     public State? GetState()
     {
-        var userId = _userIdProvider.GetUserId();
+        var userId = _context.ChatId;
         return GetState(userId);
     }
 
@@ -51,7 +51,7 @@ public class StateMachine : IStateMachine
     /// <inheritdoc />
     public bool CheckIfInState(State state)
     {
-        var userId = _userIdProvider.GetUserId();
+        var userId = _context.ChatId;
         return CheckIfInState(userId, state);
     }
 
@@ -64,7 +64,7 @@ public class StateMachine : IStateMachine
     /// <inheritdoc />
     public void DropState()
     {
-        var userId = _userIdProvider.GetUserId();
+        var userId = _context.ChatId;
         DropState(userId);
     }
 }

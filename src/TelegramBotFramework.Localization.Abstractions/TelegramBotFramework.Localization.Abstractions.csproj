@@ -7,8 +7,4 @@
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\TelegramBotFramework.Abstractions\TelegramBotFramework.Abstractions.csproj"/>
-    </ItemGroup>
-
 </Project>

@@ -9,7 +9,7 @@ public sealed class Locale : IEquatable<Locale>
         LanguageCode = languageCode.ToLowerInvariant();
         RegionCode = regionCode?.ToUpperInvariant();
         FullCode = RegionCode is null ? LanguageCode : $"{LanguageCode}-{RegionCode}";
-        CultureInfo = new CultureInfo(FullCode);
+        CultureInfo = CultureInfo.GetCultureInfo(FullCode);
     }
 
     public Locale(string fullCode)
@@ -28,7 +28,7 @@ public sealed class Locale : IEquatable<Locale>
         }
 
         FullCode = RegionCode is null ? LanguageCode : $"{LanguageCode}-{RegionCode}";
-        CultureInfo = new CultureInfo(FullCode);
+        CultureInfo = CultureInfo.GetCultureInfo(FullCode);
     }
 
     public string LanguageCode { get; }

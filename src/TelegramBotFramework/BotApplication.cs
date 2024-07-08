@@ -102,6 +102,10 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
     private async Task HandleUpdateInBackground(ITelegramBotClient client, Update update)
     {
         using var scope = Host.Services.CreateScope();
+        
+        var context = new BotRequestContext();
+        var contextAccessor = scope.ServiceProvider.GetRequiredService<IBotRequestContextAccessor>();
+        contextAccessor.BotRequestContext = context;
 
         var chatId = update.Message?.Chat.Id ?? update.CallbackQuery?.Message?.Chat.Id ?? 0;
         if (chatId == 0)
@@ -113,9 +117,7 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         var callbackData = update.CallbackQuery?.Data;
 
         var stateMachine = scope.ServiceProvider.GetRequiredService<IStateMachine>();
-        var localizer = scope.ServiceProvider.GetService<ILocalizer>();
-        var localeService = scope.ServiceProvider.GetService<IUserLocaleService<long>>();
-        var context = scope.ServiceProvider.GetRequiredService<BotRequestContext>();
+        var localeService = scope.ServiceProvider.GetService<IUserLocaleService>();
         var locale = localeService is null
             ? null
             : await localeService.GetFromRepositoryOrUpdateWithProviderAsync(chatId);
@@ -128,7 +130,6 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         context.UserLocale = locale;
         context.Services = scope.ServiceProvider;
         context.StateMachine = stateMachine;
-        context.Localizer = localizer;
         context.UserState = stateMachine.GetState(chatId);
 
         await _pipeline!(context);

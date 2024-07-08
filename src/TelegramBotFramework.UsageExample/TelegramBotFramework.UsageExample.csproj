@@ -11,7 +11,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TelegramBotFramework.Extensions\TelegramBotFramework.Extensions.csproj" />
+        <ProjectReference Include="..\TelegramBotFramework.Localization\TelegramBotFramework.Localization.csproj" />
+        <ProjectReference Include="..\TelegramBotFramework.StateMachine\TelegramBotFramework.StateMachine.csproj" />
         <ProjectReference Include="..\TelegramBotFramework\TelegramBotFramework.csproj"/>
     </ItemGroup>
 
@@ -20,6 +21,13 @@
       <Content Include="cat.jpeg">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Localization\ru.yaml" />
+      <Resource Include="Localization\ru.yaml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
     </ItemGroup>
 
 </Project>
