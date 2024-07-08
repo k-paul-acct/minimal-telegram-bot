@@ -2,7 +2,6 @@
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotFramework;
-using TelegramBotFramework.Extensions;
 using TelegramBotFramework.Handling;
 using TelegramBotFramework.Pipeline;
 using TelegramBotFramework.Settings;
@@ -35,10 +34,6 @@ builder.SetTokenFromConfiguration("BotToken");
 var app = builder.Build();
 
 app.UseCallbackAutoAnswering();
-
-var group = app.HandleGroup(x => x.Update.Type == UpdateType.Message);
-
-group.Handle(() => Results.MessageReply("I'm replied from group handler!"));
 
 app.Handle(() =>
 {

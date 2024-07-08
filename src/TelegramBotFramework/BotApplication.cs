@@ -44,11 +44,6 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         return _pipeline;
     }
 
-    public Handler Handle(HandlerDelegate handlerDelegate)
-    {
-        return _handlerBuilder.Handle(handlerDelegate);
-    }
-
     public Handler Handle(Delegate handlerDelegate)
     {
         return _handlerBuilder.Handle(handlerDelegate);

@@ -6,7 +6,7 @@ public class HandlerResolverPipe : IPipe
 {
     public async Task InvokeAsync(BotRequestContext ctx, Func<BotRequestContext, Task> next)
     {
-        var handlerBuilder = ctx.Services.GetRequiredService<IBotRequestDispatcher>();
+        var handlerBuilder = ctx.Services.GetRequiredService<IHandlerBuilder>();
         var handler = handlerBuilder.TryResolveHandler(ctx);
 
         if (handler is not null)

@@ -9,7 +9,7 @@ public class UpdateLoggerPipe : IPipe
         _logger = logger;
     }
 
-    public async Task InvokeAsync(BotRequestContext ctx, BotRequestDelegate next)
+    public async Task InvokeAsync(BotRequestContext ctx, Func<BotRequestContext, Task> next)
     {
         _logger.LogInformation(1, "Received update with ID = {UpdateId}", ctx.Update.Id);
         await next(ctx);

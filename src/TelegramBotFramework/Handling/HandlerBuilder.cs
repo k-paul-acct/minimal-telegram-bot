@@ -4,71 +4,23 @@ namespace TelegramBotFramework.Handling;
 
 public class HandlerBuilder : IHandlerBuilder
 {
-    private static readonly object LockObj = new();
     private readonly List<Handler> _handlers = [];
-
-    public Handler Handle(HandlerDelegate handlerDelegate)
-    {
-        lock (LockObj)
-        {
-            var handler = new Handler(handlerDelegate);
-            _handlers.Add(handler);
-            return handler;
-        }
-    }
 
     public Handler Handle(Delegate handlerDelegate)
     {
-        lock (LockObj)
-        {
-            var handler = new Handler(handlerDelegate);
-            _handlers.Add(handler);
-            return handler;
-        }
+        var handler = new Handler(handlerDelegate);
+        _handlers.Add(handler);
+        return handler;
     }
 
     public Handler Handle(Func<BotRequestContext, Task> func)
     {
-        return Handle((ctx, _) => func(ctx));
+        return Handle((Delegate)func);
     }
 
     public Handler? TryResolveHandler(BotRequestContext ctx)
     {
-        lock (LockObj)
-        {
-            return _handlers.FirstOrDefault(x => x.CanHandle(ctx));
-        }
-    }
-}
-
-internal static class AwaitableInfo
-{
-    public static bool IsTypeAwaitable(Type type, out Type? taskType, out Type? genericType)
-    {
-        taskType = null;
-        genericType = null;
-        if (type == typeof(Task))
-        {
-            taskType = typeof(Task);
-            return true;
-        }
-        if (type == typeof(ValueTask))
-        {
-            taskType = typeof(ValueTask);
-            return true;
-        }
-        if (!type.IsGenericType) return false;
-        var genericDefinition = type.GetGenericTypeDefinition();
-        if (genericDefinition == typeof(Task<>))
-        {
-            taskType = typeof(Task);
-            genericType = type.GenericTypeArguments[0];
-            return true;
-        }
-        if (genericDefinition != typeof(ValueTask<>)) return false;
-        taskType = typeof(ValueTask);
-        genericType = type.GenericTypeArguments[0];
-        return true;
+        return _handlers.FirstOrDefault(x => x.CanHandle(ctx));
     }
 }
 
