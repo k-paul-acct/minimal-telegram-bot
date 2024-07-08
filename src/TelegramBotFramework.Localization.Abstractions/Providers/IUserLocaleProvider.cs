@@ -1,6 +1,6 @@
 namespace TelegramBotFramework.Localization.Abstractions.Providers;
 
-public interface IUserLocaleProvider<in TUserId>
+public interface IUserLocaleProvider
 {
-    Task<Locale> GetUserLocaleAsync(TUserId userId);
+    Task<Locale> GetUserLocaleAsync(long userId);
 }

@@ -1,9 +1,9 @@
 namespace TelegramBotFramework.Localization.Abstractions;
 
-public interface IUserLocaleService<in TUserId>
+public interface IUserLocaleService
 {
-    Task<Locale> UpdateWithProviderAsync(TUserId userId);
-    ValueTask<Locale> GetFromRepositoryOrUpdateWithProviderAsync(TUserId userId);
-    void Update(TUserId userId, Locale locale);
-    Locale? GetFromRepository(TUserId userId);
+    Task<Locale> UpdateWithProviderAsync(long userId);
+    ValueTask<Locale> GetFromRepositoryOrUpdateWithProviderAsync(long userId);
+    void Update(long userId, Locale locale);
+    Locale? GetFromRepository(long userId);
 }

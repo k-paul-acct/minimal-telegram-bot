@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TelegramBotFramework.Abstractions\TelegramBotFramework.Abstractions.csproj"/>
         <ProjectReference Include="..\TelegramBotFramework.Localization.Abstractions\TelegramBotFramework.Localization.Abstractions.csproj"/>
+        <ProjectReference Include="..\TelegramBotFramework\TelegramBotFramework.csproj" />
     </ItemGroup>
 
     <ItemGroup>

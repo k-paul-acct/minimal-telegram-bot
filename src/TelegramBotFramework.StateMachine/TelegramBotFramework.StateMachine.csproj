@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\TelegramBotFramework.StateMachine.Abstractions\TelegramBotFramework.StateMachine.Abstractions.csproj"/>
+        <ProjectReference Include="..\TelegramBotFramework\TelegramBotFramework.csproj" />
     </ItemGroup>
 
     <ItemGroup>

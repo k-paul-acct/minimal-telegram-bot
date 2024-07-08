@@ -1,9 +1,9 @@
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Telegram.Bot;
 using TelegramBotFramework.Handling;
 using TelegramBotFramework.Pipeline;
 using TelegramBotFramework.Services;
 using TelegramBotFramework.Settings;
-using TelegramBotFramework.StateMachine.Extensions;
 
 namespace TelegramBotFramework;
 
@@ -46,8 +46,7 @@ public class BotApplicationBuilder
         HostBuilder.Services.AddSingleton(client);
         HostBuilder.Services.AddSingleton<BotInitService>();
         HostBuilder.Services.AddSingleton<IHandlerBuilder>(handlerBuilder);
-        HostBuilder.Services.AddStateMachine<TelegramUserIdProvider>();
-        HostBuilder.Services.AddScoped<BotRequestContext>();
+        HostBuilder.Services.TryAddSingleton<IBotRequestContextAccessor, BotRequestContextAccessor>();
 
         var host = HostBuilder.Build();
 

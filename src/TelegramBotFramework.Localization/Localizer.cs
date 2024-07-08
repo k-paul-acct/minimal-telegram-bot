@@ -1,19 +1,18 @@
-using TelegramBotFramework.Abstractions;
 using TelegramBotFramework.Localization.Abstractions;
 
 namespace TelegramBotFramework.Localization;
 
 /// <inheritdoc />
-public class Localizer<TUserId> : ILocalizer
+public class Localizer : ILocalizer
 {
-    private readonly IUserLocaleService<TUserId> _localeService;
+    private readonly IUserLocaleService _localeService;
+    private readonly BotRequestContext? _context;
     private readonly ILocaleStringSetRepository _localeStringSetRepository;
-    private readonly IUserIdProvider<TUserId> _userIdProvider;
 
-    public Localizer(IUserIdProvider<TUserId> userIdProvider, ILocaleStringSetRepository localeStringSetRepository,
-        IUserLocaleService<TUserId> localeService)
+    public Localizer(IBotRequestContextAccessor contextAccessor, ILocaleStringSetRepository localeStringSetRepository,
+        IUserLocaleService localeService)
     {
-        _userIdProvider = userIdProvider;
+        _context = contextAccessor.BotRequestContext;
         _localeStringSetRepository = localeStringSetRepository;
         _localeService = localeService;
     }
@@ -21,16 +20,21 @@ public class Localizer<TUserId> : ILocalizer
     /// <inheritdoc />
     public string GetLocalizedString(string key, params object?[] parameters)
     {
-        var userId = _userIdProvider.GetUserId();
+        if (_context is null)
+        {
+            throw new Exception($"{nameof(BotRequestContext)} is null");
+        }
+
+        var userId = _context.ChatId;
         var locale = _localeService.GetFromRepository(userId) ?? Locale.Default;
         var template = _localeStringSetRepository.GetString(key, locale.LanguageCode);
-        return parameters.Length == 0 ? template : string.Format(locale.StringFormatProvider, template, parameters);
+        return parameters.Length == 0 ? template : string.Format(locale.CultureInfo, template, parameters);
     }
 
     /// <inheritdoc />
     public string GetLocalizedString(Locale locale, string key, params object?[] parameters)
     {
         var template = _localeStringSetRepository.GetString(key, locale.LanguageCode);
-        return parameters.Length == 0 ? template : string.Format(locale.StringFormatProvider, template, parameters);
+        return parameters.Length == 0 ? template : string.Format(locale.CultureInfo, template, parameters);
     }
 }

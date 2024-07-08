@@ -2,42 +2,89 @@ using System.Globalization;
 
 namespace TelegramBotFramework.Localization.Abstractions;
 
-public record Locale
+public sealed class Locale : IEquatable<Locale>
 {
-    private Locale(string languageCode)
+    public Locale(string languageCode, string? regionCode)
     {
-        LanguageCode = languageCode;
+        LanguageCode = languageCode.ToLowerInvariant();
+        RegionCode = regionCode?.ToUpperInvariant();
+        FullCode = RegionCode is null ? LanguageCode : $"{LanguageCode}-{RegionCode}";
+        CultureInfo = CultureInfo.GetCultureInfo(FullCode);
+    }
+
+    public Locale(string fullCode)
+    {
+        var span = fullCode.AsSpan();
+        var hyphenIndex = span.IndexOf('-');
+
+        if (hyphenIndex == -1)
+        {
+            LanguageCode = fullCode.ToLowerInvariant();
+        }
+        else
+        {
+            LanguageCode = new string(span[..hyphenIndex]).ToLowerInvariant();
+            RegionCode = new string(span[(hyphenIndex + 1)..]).ToUpperInvariant();
+        }
+
+        FullCode = RegionCode is null ? LanguageCode : $"{LanguageCode}-{RegionCode}";
+        CultureInfo = CultureInfo.GetCultureInfo(FullCode);
     }
 
     public string LanguageCode { get; }
+    public string? RegionCode { get; }
+    public string FullCode { get; }
+    public CultureInfo CultureInfo { get; }
 
-    private static Locale Russian { get; } = new("ru");
-    private static Locale English { get; } = new("en");
-    private static Locale Chinese { get; } = new("zh");
-    private static Locale German { get; } = new("de");
-    private static Locale Kazakh { get; } = new("kk");
-    private static Locale Spain { get; } = new("es");
+    public static Locale Default { get; set; } = new("en", null);
 
-    public static Locale Default { get; set; } = Russian;
-
-    public IFormatProvider StringFormatProvider => new CultureInfo(LanguageCode);
-
-    public static Locale FromLanguageCode(string languageCode)
+    public bool Equals(Locale? other)
     {
-        return languageCode switch
+        if (other is null)
         {
-            "ru" => Russian,
-            "es" => Spain,
-            "kk" => Kazakh,
-            "de" => German,
-            "zh" => Chinese,
-            "en" => English,
-            _ => Default,
-        };
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return string.Equals(FullCode, other.FullCode, StringComparison.Ordinal);
     }
 
     public override string ToString()
     {
-        return LanguageCode;
+        return FullCode;
+    }
+
+    public override int GetHashCode()
+    {
+        return StringComparer.Ordinal.GetHashCode(FullCode);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null)
+        {
+            return false;
+        }
+
+        return obj is Locale other && Equals(other);
+    }
+
+    public static bool operator ==(Locale? a, Locale? b)
+    {
+        if (a is not null)
+        {
+            return a.Equals(b);
+        }
+
+        return b is null;
+    }
+
+    public static bool operator !=(Locale? a, Locale? b)
+    {
+        return !(a == b);
     }
 }

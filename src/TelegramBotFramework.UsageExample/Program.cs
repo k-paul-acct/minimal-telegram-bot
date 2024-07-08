@@ -3,8 +3,12 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotFramework;
 using TelegramBotFramework.Handling;
+using TelegramBotFramework.Localization.Abstractions;
+using TelegramBotFramework.Localization.Extensions;
 using TelegramBotFramework.Pipeline;
 using TelegramBotFramework.Settings;
+using TelegramBotFramework.StateMachine.Extensions;
+using TelegramBotFramework.UsageExample.Localization;
 using TelegramBotFramework.UsageExample.Services;
 using Results = TelegramBotFramework.Results.Results;
 
@@ -27,6 +31,12 @@ var builder = BotApplication.CreateBuilder(new BotApplicationBuilderOptions
     },
 });
 
+builder.HostBuilder.Services.AddStateMachine();
+builder.HostBuilder.Services.AddLocalizer<UserLocaleProvider>(x =>
+{
+    x.EnrichFromFile("Localization/ru.yaml", new Locale("ru"));
+});
+
 builder.HostBuilder.Services.AddScoped<WeatherService>();
 
 builder.SetTokenFromConfiguration("BotToken");
@@ -34,6 +44,20 @@ builder.SetTokenFromConfiguration("BotToken");
 var app = builder.Build();
 
 app.UseCallbackAutoAnswering();
+
+app.Handle((ILocalizer localizer) =>
+{
+    var helloText = localizer["HelloText"];
+    var helloButton = localizer["Button.Hello"];
+    var catButton = localizer["Button.Cat"];
+    var keyboard = new ReplyKeyboardMarkup(new []
+    {
+        new KeyboardButton(helloButton),
+        new KeyboardButton(catButton),
+    });
+
+    return Results.Message(helloText, keyboard);
+}).FilterCommand("/start");
 
 app.Handle(() =>
 {

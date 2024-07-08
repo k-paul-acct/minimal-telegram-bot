@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using TelegramBotFramework.Localization.Abstractions;
 
 namespace TelegramBotFramework.Localization;
@@ -5,7 +6,7 @@ namespace TelegramBotFramework.Localization;
 /// <inheritdoc />
 public class LocaleStringSetBuilder : ILocaleStringSetBuilder
 {
-    private readonly List<IDictionary<string, string>> _values = [];
+    private readonly List<IReadOnlyDictionary<string, string>> _values = [];
 
     public LocaleStringSetBuilder(Locale locale)
     {
@@ -18,7 +19,7 @@ public class LocaleStringSetBuilder : ILocaleStringSetBuilder
     /// <inheritdoc />
     public LocaleStringSet Build()
     {
-        var combined = _values.SelectMany(x => x).ToDictionary();
+        var combined = _values.SelectMany(x => x).ToFrozenDictionary();
         return new LocaleStringSet
         {
             Locale = Locale,
@@ -27,7 +28,7 @@ public class LocaleStringSetBuilder : ILocaleStringSetBuilder
     }
 
     /// <inheritdoc />
-    public ILocaleStringSetBuilder Enrich(IDictionary<string, string> stringSet)
+    public ILocaleStringSetBuilder Enrich(IReadOnlyDictionary<string, string> stringSet)
     {
         _values.Add(stringSet);
         return this;

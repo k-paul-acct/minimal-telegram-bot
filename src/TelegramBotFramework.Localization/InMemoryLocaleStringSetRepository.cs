@@ -5,7 +5,7 @@ namespace TelegramBotFramework.Localization;
 /// <inheritdoc />
 public class InMemoryLocaleStringSetRepository : ILocaleStringSetRepository
 {
-    private readonly Dictionary<string, IDictionary<string, string>> _translates = new();
+    private readonly Dictionary<string, IReadOnlyDictionary<string, string>> _translates = new();
 
     /// <inheritdoc />
     public string GetString(string key, string locale)
@@ -20,6 +20,6 @@ public class InMemoryLocaleStringSetRepository : ILocaleStringSetRepository
     /// <inheritdoc />
     public void AddLocaleStringSet(LocaleStringSet localeStringSet)
     {
-        _translates[localeStringSet.Locale.ToString()] = localeStringSet.Values.ToDictionary();
+        _translates[localeStringSet.Locale.ToString()] = localeStringSet.Values;
     }
 }
