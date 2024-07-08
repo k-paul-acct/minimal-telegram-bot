@@ -4,5 +4,5 @@ public interface ILocaleStringSetBuilder
 {
     Locale Locale { get; }
     LocaleStringSet Build();
-    ILocaleStringSetBuilder Enrich(IDictionary<string, string> stringSet);
+    ILocaleStringSetBuilder Enrich(IReadOnlyDictionary<string, string> stringSet);
 }

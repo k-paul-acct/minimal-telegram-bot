@@ -24,13 +24,13 @@ public class Localizer<TUserId> : ILocalizer
         var userId = _userIdProvider.GetUserId();
         var locale = _localeService.GetFromRepository(userId) ?? Locale.Default;
         var template = _localeStringSetRepository.GetString(key, locale.LanguageCode);
-        return parameters.Length == 0 ? template : string.Format(locale.StringFormatProvider, template, parameters);
+        return parameters.Length == 0 ? template : string.Format(locale.CultureInfo, template, parameters);
     }
 
     /// <inheritdoc />
     public string GetLocalizedString(Locale locale, string key, params object?[] parameters)
     {
         var template = _localeStringSetRepository.GetString(key, locale.LanguageCode);
-        return parameters.Length == 0 ? template : string.Format(locale.StringFormatProvider, template, parameters);
+        return parameters.Length == 0 ? template : string.Format(locale.CultureInfo, template, parameters);
     }
 }
