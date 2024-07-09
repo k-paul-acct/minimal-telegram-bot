@@ -11,18 +11,19 @@ namespace MinimalTelegramBot;
 
 public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 {
-    private readonly TelegramBotClient _client;
     private readonly IHandlerBuilder _handlerBuilder;
-    private readonly BotApplicationOptions _options;
     private readonly PipelineBuilder _pipelineBuilder = new();
     private Func<BotRequestContext, Task>? _pipeline;
+
+    internal readonly TelegramBotClient Client;
+    internal readonly BotApplicationOptions Options;
 
     internal BotApplication(IHost host, TelegramBotClient client, BotApplicationOptions options,
         IHandlerBuilder handlerBuilder)
     {
         Host = host;
-        _client = client;
-        _options = options;
+        Client = client;
+        Options = options;
         _handlerBuilder = handlerBuilder;
 
         UseDefaultOuterPipes();
@@ -59,12 +60,11 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         return _handlerBuilder.TryResolveHandler(ctx);
     }
 
-    internal void RunBot()
+    internal void InitBot(bool isWebhook)
     {
-        _client.StartReceiving(UpdateHandler, PollingErrorHandler, _options.ReceiverOptions);
         using var scope = Host.Services.CreateScope();
         var botInitService = scope.ServiceProvider.GetRequiredService<BotInitService>();
-        botInitService.InitBot().GetAwaiter().GetResult();
+        botInitService.InitBot(isWebhook).GetAwaiter().GetResult();
     }
 
     public static BotApplicationBuilder CreateBuilder()
@@ -93,16 +93,21 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         BotApplicationRunner.Run(this);
     }
 
+    internal void StartPolling()
+    {
+        Client.StartReceiving(UpdateHandler, PollingErrorHandler, Options.ReceiverOptions);
+    }
+
     private Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
     {
         _ = Task.Run(() => HandleUpdateInBackground(client, update), cancellationToken);
         return Task.CompletedTask;
     }
 
-    private async Task HandleUpdateInBackground(ITelegramBotClient client, Update update)
+    internal async Task HandleUpdateInBackground(ITelegramBotClient client, Update update)
     {
         using var scope = Host.Services.CreateScope();
-        
+
         var context = new BotRequestContext();
         var contextAccessor = scope.ServiceProvider.GetRequiredService<IBotRequestContextAccessor>();
         contextAccessor.BotRequestContext = context;

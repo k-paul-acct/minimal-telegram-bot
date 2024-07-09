@@ -1,4 +1,5 @@
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MinimalTelegramBot.Results.Extensions;
@@ -39,8 +40,10 @@ public sealed class MessageResult : IResult
 
     private async Task Reply(BotRequestContext context)
     {
-        int? messageId = _reply ? context.Update.Message!.MessageId : null;
-        await context.Client.SendTextMessageAsync(context.ChatId, _message, replyToMessageId: messageId,
+        var messageId = context.Update.Message!.MessageId;
+        var replyParameters = new ReplyParameters { ChatId = context.ChatId, MessageId = messageId, };
+
+        await context.Client.SendTextMessageAsync(context.ChatId, _message, replyParameters: replyParameters,
             replyMarkup: _replyMarkup);
     }
 

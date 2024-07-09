@@ -8,8 +8,11 @@ internal class BotApplicationOptions
     {
         Token = builderOptions.Token ?? throw new Exception("Bot token not specified");
         ReceiverOptions = builderOptions.ReceiverOptions;
+        Args = builderOptions.Args;
     }
 
+    public string[]? Args { get; set; }
     public string Token { get; set; }
     public ReceiverOptions? ReceiverOptions { get; set; }
+    public WebhookOptions? WebhookOptions { get; set; }
 }

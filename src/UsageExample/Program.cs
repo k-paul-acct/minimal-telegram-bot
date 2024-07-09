@@ -2,6 +2,7 @@
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using MinimalTelegramBot;
+using MinimalTelegramBot.Extensions;
 using MinimalTelegramBot.Handling;
 using MinimalTelegramBot.Localization.Abstractions;
 using MinimalTelegramBot.Localization.Extensions;
@@ -27,7 +28,7 @@ var builder = BotApplication.CreateBuilder(new BotApplicationBuilderOptions
     ReceiverOptions = new ReceiverOptions
     {
         AllowedUpdates = [UpdateType.Message, UpdateType.CallbackQuery,],
-        ThrowPendingUpdates = true,
+        DropPendingUpdates = true,
     },
 });
 
@@ -42,6 +43,9 @@ builder.HostBuilder.Services.AddScoped<WeatherService>();
 builder.SetTokenFromConfiguration("BotToken");
 
 var app = builder.Build();
+
+app.UsePolling();
+//app.UseWebhook(new WebhookOptions { Url = "", });
 
 app.UseCallbackAutoAnswering();
 

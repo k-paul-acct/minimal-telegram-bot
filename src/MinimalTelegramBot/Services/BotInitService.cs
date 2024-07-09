@@ -18,10 +18,12 @@ internal class BotInitService
         return lastname is null ? firstname : $"{firstname} {lastname}";
     }
 
-    public async Task InitBot()
+    public async Task InitBot(bool isWebhook)
     {
         var bot = await _client.GetMeAsync();
-        _logger.LogInformation("Polling started for bot @{BotUsername} ({BotFullname}) with ID = {BotId}",
+        var message = isWebhook ? "Getting updates via webhook" : "Polling";
+
+        _logger.LogInformation(message + " started for bot @{BotUsername} ({BotFullname}) with ID = {BotId}",
             bot.Username, Fullname(bot.FirstName, bot.LastName), bot.Id);
     }
 }
