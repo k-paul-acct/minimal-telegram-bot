@@ -31,14 +31,19 @@ public static class Results
     {
         return new PhotoResult(photoName, caption);
     }
-    
+
     public static IResult Photo(Stream photoStream, string? caption = null)
     {
         return new PhotoResult(photoStream, caption);
     }
 
-    public static IResult File()
+    public static IResult Document(string documentName, string? caption = null)
     {
-        throw new NotImplementedException();
+        return new DocumentResult(documentName, caption);
+    }
+
+    public static IResult Document(Stream documentStream, string? caption = null)
+    {
+        return new DocumentResult(documentStream, caption);
     }
 }
