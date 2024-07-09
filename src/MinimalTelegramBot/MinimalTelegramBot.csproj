@@ -10,10 +10,10 @@
 
     <PropertyGroup>
         <PackageId>MinimalTelegramBot</PackageId>
-        <Version>0.0.2</Version>
+        <Version>0.0.3</Version>
         <Authors>Pavel Kulakov</Authors>
-        <Title>Telegram Bot Framework</Title>
         <RepositoryUrl>https://github.com/k-paul-acct/telegram-bot-framework</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
 
