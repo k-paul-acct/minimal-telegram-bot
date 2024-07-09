@@ -6,34 +6,51 @@ public abstract class State : IEquatable<State>
     private readonly string _stateKey;
     public readonly IDictionary<string, object?> Data = new Dictionary<string, object?>();
 
-    protected State(string stateKey, int stateId)
+    protected State(int stateId)
     {
-        _stateKey = stateKey;
+        var type = GetType();
+        _stateKey = type.FullName ?? type.Name;
         _stateId = stateId;
     }
 
     public bool Equals(State? other)
     {
-        if (other is null) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return _stateKey == other._stateKey && _stateId == other._stateId;
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return _stateId == other._stateId && _stateKey == other._stateKey;
     }
 
     public override bool Equals(object? obj)
     {
-        if (obj is null) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        return obj.GetType() == GetType() && Equals((State)obj);
+        if (obj is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        return obj is State other && Equals(other);
     }
 
     public static bool operator ==(State? a, State? b)
     {
-        return (a is null, b is null) switch
+        if (a is not null)
         {
-            (true, true) => true,
-            (false, false) => a!.Equals(b),
-            _ => false,
-        };
+            return a.Equals(b);
+        }
+
+        return b is null;
     }
 
     public static bool operator !=(State? a, State? b)
@@ -43,6 +60,6 @@ public abstract class State : IEquatable<State>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(_stateKey, _stateId);
+        return HashCode.Combine(_stateId, _stateKey);
     }
 }
