@@ -22,9 +22,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="MinimalTelegramBot" Version="0.0.2"/>
-        <PackageReference Include="MinimalTelegramBot.Localization" Version="0.0.2"/>
-        <PackageReference Include="MinimalTelegramBot.StateMachine" Version="0.0.2"/>
+        <PackageReference Include="MinimalTelegramBot" Version="0.0.3"/>
+        <PackageReference Include="MinimalTelegramBot.Localization" Version="0.0.3"/>
+        <PackageReference Include="MinimalTelegramBot.StateMachine" Version="0.0.3"/>
     </ItemGroup>
 
 </Project>
