@@ -135,6 +135,7 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         context.UserLocale = locale;
         context.Services = scope.ServiceProvider;
         context.StateMachine = stateMachine;
+        context.Localizer = scope.ServiceProvider.GetService<ILocalizer>();
         context.UserState = stateMachine.GetState(chatId);
 
         await _pipeline!(context);
