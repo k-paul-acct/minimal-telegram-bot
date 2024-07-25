@@ -35,6 +35,14 @@ internal static class HandlerDelegateBuilder
                 return Expression.Property(contextParameter, nameof(BotRequestContext.CallbackData));
             }
 
+            var genericCallbackModel = typeof(ICallbackDataParser<>).MakeGenericType(x.ParameterType);
+
+            if (x.ParameterType.IsAssignableTo(genericCallbackModel))
+            {
+                var callbackExp = Expression.Property(contextParameter, nameof(BotRequestContext.CallbackData));
+                return Expression.Call(null, x.ParameterType.GetMethod("Parse")!, callbackExp);
+            }
+
             if (typeof(ITelegramBotClient).IsAssignableFrom(x.ParameterType))
             {
                 return Expression.Property(contextParameter, nameof(BotRequestContext.Client));
