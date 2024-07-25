@@ -2,7 +2,7 @@ namespace MinimalTelegramBot.Pipeline;
 
 internal class PipelineBuilder : IBotApplicationBuilder
 {
-    public const string RequestUnhandledKey = "RequestUnhandled";
+    public const string RequestUnhandledKey = "__RequestUnhandled";
 
     private readonly List<Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>>> _pipes = [];
 

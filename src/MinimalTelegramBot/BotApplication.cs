@@ -1,11 +1,11 @@
 using MinimalTelegramBot.Handling;
-using Telegram.Bot;
-using Telegram.Bot.Types;
 using MinimalTelegramBot.Localization.Abstractions;
 using MinimalTelegramBot.Pipeline;
 using MinimalTelegramBot.Services;
 using MinimalTelegramBot.Settings;
 using MinimalTelegramBot.StateMachine.Abstractions;
+using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace MinimalTelegramBot;
 
@@ -31,7 +31,7 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 
     public IHost Host { get; }
 
-    public IDictionary<string, object?> Properties => _pipelineBuilder.Properties;
+    IDictionary<string, object?> IBotApplicationBuilder.Properties => _pipelineBuilder.Properties;
 
     public IBotApplicationBuilder Use(Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>> pipe)
     {
@@ -55,7 +55,7 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         return _handlerBuilder.Handle(func);
     }
 
-    public Handler? TryResolveHandler(BotRequestContext ctx)
+    Handler? IHandlerBuilder.TryResolveHandler(BotRequestContext ctx)
     {
         return _handlerBuilder.TryResolveHandler(ctx);
     }
@@ -84,7 +84,7 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 
     public void Run()
     {
-        if (Properties.ContainsKey("CallbackAutoAnsweringAdded"))
+        if (_pipelineBuilder.Properties.ContainsKey("__CallbackAutoAnsweringAdded"))
         {
             this.UsePipe<CallbackAutoAnsweringPipe>();
         }

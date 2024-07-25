@@ -1,3 +1,4 @@
+using MinimalTelegramBot.Localization.Abstractions;
 using MinimalTelegramBot.StateMachine.Abstractions;
 using Telegram.Bot.Types.Enums;
 
@@ -15,7 +16,8 @@ public static class FilterExtensions
 
     public static Handler FilterTextWithLocalizer(this Handler handler, string key)
     {
-        return handler.Filter(ctx => ctx.Localizer![ctx.UserLocale!, key] == ctx.MessageText);
+        return handler.Filter(ctx => ctx.MessageText is not null &&
+                                     ctx.Localizer![ctx.UserLocale ?? Locale.Default, key] == ctx.MessageText);
     }
 
     public static Handler FilterCommand(this Handler handler, string command)
@@ -58,6 +60,11 @@ public static class FilterExtensions
 
             return filter(ctx.CallbackData);
         });
+    }
+
+    public static Handler FilterUpdateType(this Handler handler, UpdateType updateType)
+    {
+        return handler.Filter(ctx => ctx.Update.Type == updateType);
     }
 
     public static Handler FilterUpdateType(this Handler handler, Func<UpdateType, bool> filter)
