@@ -71,7 +71,7 @@ app.Handle((ILocalizer localizer) =>
     var backText = localizer["Button.Back"];
 
     var model = new PaginationModel { PageNumber = 1, };
-    var keyboard = model.PageKeyboard(backText, "Menu");
+    var keyboard = model.GetPageKeyboard(backText, "Menu");
 
     return Results.Message("Page 1", keyboard);
 }).FilterTextWithLocalizer("Button.Page");
@@ -80,7 +80,7 @@ app.Handle((PaginationModel model, ILocalizer localizer) =>
 {
     var backText = localizer["Button.Back"];
     var pageText = $"Page {model.PageNumber}";
-    var keyboard = model.PageKeyboard(backText, "Menu");
+    var keyboard = model.GetPageKeyboard(backText, "Menu");
 
     return keyboard is null
         ? Results.CallbackAnswer()

@@ -14,7 +14,7 @@ public class PaginationModel : ICallbackDataParser<PaginationModel>
         return Parse(callbackData.AsSpan());
     }
 
-    public InlineKeyboardMarkup? PageKeyboard(string backText, string backCallback)
+    public InlineKeyboardMarkup? GetPageKeyboard(string backText, string backCallback)
     {
         if (PageNumber == -1)
         {
