@@ -6,9 +6,6 @@ namespace MinimalTelegramBot.Handling;
 
 public static class FilterExtensions
 {
-    public const string CommandArgs = "CommandArgs";
-    public const string CallbackDataArgs = "CallbackDataArgs";
-
     public static Handler FilterText(this Handler handler, Func<string, bool> filter)
     {
         return handler.Filter(ctx => ctx.MessageText is not null && filter(ctx.MessageText));
@@ -29,10 +26,33 @@ public static class FilterExtensions
                 return false;
             }
 
-            var parts = ctx.MessageText.Split(' ');
-            ctx.Data[CommandArgs] = parts[1..];
+            var span = ctx.MessageText.AsSpan();
 
-            return parts[0] == command;
+            if (span.Length < 2 || span[0] != '/')
+            {
+                return false;
+            }
+
+            var commandEnd = 1;
+
+            foreach (var letter in span[1..])
+            {
+                var uLetter = (uint)letter;
+
+                if (uLetter - 'a' > 'z' - 'a' && uLetter - '0' > '9' - '0' && uLetter != '_')
+                {
+                    break;
+                }
+
+                commandEnd += 1;
+            }
+
+            if (commandEnd < 2)
+            {
+                return false;
+            }
+
+            return span[..commandEnd].SequenceEqual(command);
         });
     }
 
@@ -48,18 +68,7 @@ public static class FilterExtensions
 
     public static Handler FilterCallbackData(this Handler handler, Func<string, bool> filter)
     {
-        return handler.Filter(ctx =>
-        {
-            if (ctx.CallbackData is null)
-            {
-                return false;
-            }
-
-            var parts = ctx.CallbackData.Split(' ');
-            ctx.Data[CallbackDataArgs] = parts[1..];
-
-            return filter(ctx.CallbackData);
-        });
+        return handler.Filter(ctx => ctx.CallbackData is not null && filter(ctx.CallbackData));
     }
 
     public static Handler FilterUpdateType(this Handler handler, UpdateType updateType)

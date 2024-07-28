@@ -10,6 +10,7 @@ using MinimalTelegramBot.Pipeline;
 using MinimalTelegramBot.Settings;
 using MinimalTelegramBot.StateMachine.Extensions;
 using UsageExample.CallbackModels;
+using UsageExample.CommandModels;
 using UsageExample.Localization;
 using UsageExample.Services;
 using Results = MinimalTelegramBot.Results.Results;
@@ -40,6 +41,8 @@ builder.HostBuilder.Services.AddLocalizer<UserLocaleProvider>(x =>
 });
 
 builder.HostBuilder.Services.AddScoped<WeatherService>();
+builder.HostBuilder.Services.AddKeyedSingleton("FirstName", new NameService { Name = "First Name", });
+builder.HostBuilder.Services.AddKeyedSingleton("LastName", new NameService { Name = "Last Name", });
 
 builder.SetTokenFromConfiguration("BotToken");
 
@@ -57,6 +60,14 @@ app.Handle((ILocalizer localizer) =>
 
     return Results.Message(helloText, keyboard);
 }).FilterCommand("/start");
+
+app.Handle(([UseFormatProvider] AddCommandModel model, ILocalizer localizer) => model.IsError
+    ? localizer["ParsingError"]
+    : localizer["AddCommandTemplate", model.Result]).FilterCommand("/add");
+
+app.Handle(([FromKeyedServices("FirstName")] NameService nameService) => nameService.Name).FilterCommand("/firstname");
+
+app.Handle(([FromKeyedServices("LastName")] NameService nameService) => nameService.Name).FilterCommand("/lastname");
 
 app.Handle((ILocalizer localizer) =>
 {

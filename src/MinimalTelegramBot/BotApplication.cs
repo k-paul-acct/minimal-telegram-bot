@@ -110,19 +110,27 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 
         var context = new BotRequestContext();
         var contextAccessor = scope.ServiceProvider.GetRequiredService<IBotRequestContextAccessor>();
+
         contextAccessor.BotRequestContext = context;
 
-        var chatId = update.Message?.Chat.Id ?? update.CallbackQuery?.Message?.Chat.Id ?? 0;
-        if (chatId == 0)
-        {
-            return;
-        }
+        var chatId = update.Message?.Chat.Id ??
+                     update.CallbackQuery?.Message?.Chat.Id ??
+                     update.EditedMessage?.Chat.Id ??
+                     update.ChannelPost?.Chat.Id ??
+                     update.EditedChannelPost?.Chat.Id ??
+                     update.MessageReaction?.Chat.Id ??
+                     update.MessageReactionCount?.Chat.Id ??
+                     update.ChatBoost?.Chat.Id ??
+                     update.RemovedChatBoost?.Chat.Id ??
+                     0;
 
         var messageText = update.Message?.Text;
         var callbackData = update.CallbackQuery?.Data;
 
         var stateMachine = scope.ServiceProvider.GetRequiredService<IStateMachine>();
-        var localeService = scope.ServiceProvider.GetService<IUserLocaleService>();
+        var state = chatId != 0 ? stateMachine.GetState(chatId) : null;
+        var localizer = scope.ServiceProvider.GetService<ILocalizer>();
+        var localeService = chatId != 0 ? scope.ServiceProvider.GetService<IUserLocaleService>() : null;
         var locale = localeService is null
             ? null
             : await localeService.GetFromRepositoryOrUpdateWithProviderAsync(chatId);
@@ -135,8 +143,8 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         context.UserLocale = locale;
         context.Services = scope.ServiceProvider;
         context.StateMachine = stateMachine;
-        context.Localizer = scope.ServiceProvider.GetService<ILocalizer>();
-        context.UserState = stateMachine.GetState(chatId);
+        context.Localizer = localizer;
+        context.UserState = state;
 
         await _pipeline!(context);
     }
@@ -146,7 +154,6 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         using var scope = Host.Services.CreateScope();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<BotApplication>>();
         logger.LogError(500, e, "Bot error: {Error}", e.Message);
-
         return Task.CompletedTask;
     }
 
