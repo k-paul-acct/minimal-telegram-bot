@@ -14,12 +14,7 @@ public class BotApplicationBuilder
     internal BotApplicationBuilder(string[]? args)
     {
         HostBuilder = Host.CreateApplicationBuilder(args);
-
-        _options = new BotApplicationBuilderOptions
-        {
-            Args = args,
-        };
-
+        _options = new BotApplicationBuilderOptions { Args = args, };
         AddDefaultPipeServices();
     }
 

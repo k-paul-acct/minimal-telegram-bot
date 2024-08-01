@@ -1,7 +1,4 @@
-﻿using Telegram.Bot.Polling;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
-using MinimalTelegramBot;
+﻿using MinimalTelegramBot;
 using MinimalTelegramBot.Extensions;
 using MinimalTelegramBot.Handling;
 using MinimalTelegramBot.Localization.Abstractions;
@@ -9,6 +6,9 @@ using MinimalTelegramBot.Localization.Extensions;
 using MinimalTelegramBot.Pipeline;
 using MinimalTelegramBot.Settings;
 using MinimalTelegramBot.StateMachine.Extensions;
+using Telegram.Bot.Polling;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using UsageExample.CallbackModels;
 using UsageExample.CommandModels;
 using UsageExample.Localization;
@@ -126,7 +126,7 @@ ReplyKeyboardMarkup MenuKeyboard(ILocalizer localizer)
     var catButton = localizer["Button.Cat"];
     var pagesButton = localizer["Button.Page"];
 
-    return new ReplyKeyboardMarkup(new []
+    return new ReplyKeyboardMarkup(new[]
     {
         new KeyboardButton(helloButton),
         new KeyboardButton(catButton),

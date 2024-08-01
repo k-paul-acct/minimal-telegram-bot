@@ -1,6 +1,6 @@
 namespace MinimalTelegramBot;
 
-internal class TelegramWebHookSecretTokenFilter : IEndpointFilter
+internal sealed class TelegramWebHookSecretTokenFilter : IEndpointFilter
 {
     private const string SecretTokenHeaderName = "X-Telegram-Bot-Api-Secret-Token";
 

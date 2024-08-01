@@ -1,3 +1,4 @@
+using System.Globalization;
 using MinimalTelegramBot.Handling;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -28,7 +29,7 @@ public class PaginationModel : ICallbackDataParser<PaginationModel>
             navigation.Add(InlineKeyboardButton.WithCallbackData("<", $"{CallbackPrefix}_{PageNumber - 1}"));
         }
 
-        navigation.Add(InlineKeyboardButton.WithCallbackData(PageNumber.ToString(),
+        navigation.Add(InlineKeyboardButton.WithCallbackData(PageNumber.ToString(CultureInfo.InvariantCulture),
             $"{CallbackPrefix}_-1"));
 
         navigation.Add(InlineKeyboardButton.WithCallbackData(">",
@@ -45,11 +46,7 @@ public class PaginationModel : ICallbackDataParser<PaginationModel>
     {
         var index = callbackData.IndexOf('_');
         var sNumber = callbackData[(index + 1)..];
-        var number = int.Parse(sNumber);
-
-        return new PaginationModel
-        {
-            PageNumber = number,
-        };
+        var number = int.Parse(sNumber, CultureInfo.InvariantCulture);
+        return new PaginationModel { PageNumber = number, };
     }
 }
