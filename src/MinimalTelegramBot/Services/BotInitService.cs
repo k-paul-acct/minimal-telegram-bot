@@ -4,10 +4,10 @@ namespace MinimalTelegramBot.Services;
 
 internal sealed class BotInitService
 {
-    private readonly TelegramBotClient _client;
+    private readonly ITelegramBotClient _client;
     private readonly ILogger<BotApplication> _logger;
 
-    public BotInitService(ILogger<BotApplication> logger, TelegramBotClient client)
+    public BotInitService(ILogger<BotApplication> logger, ITelegramBotClient client)
     {
         _logger = logger;
         _client = client;

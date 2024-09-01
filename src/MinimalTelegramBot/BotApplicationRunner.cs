@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Http.Json;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using JsonSerializerOptionsProvider = Telegram.Bot.Serialization.JsonSerializerOptionsProvider;
 
 namespace MinimalTelegramBot;
 
@@ -59,7 +58,7 @@ internal static class BotApplicationRunner
 
         webAppBuilder.Services.Configure<JsonOptions>(o =>
         {
-            JsonSerializerOptionsProvider.Configure(o.SerializerOptions);
+            JsonBotAPI.Configure(o.SerializerOptions);
         });
 
         webAppBuilder.Services.AddHttpClient("tgwebhook")

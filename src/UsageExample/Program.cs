@@ -45,6 +45,11 @@ builder.HostBuilder.Services.AddKeyedSingleton("FirstName", new NameService { Na
 builder.HostBuilder.Services.AddKeyedSingleton("LastName", new NameService { Name = "Last Name", });
 
 builder.SetTokenFromConfiguration("BotToken");
+builder.ConfigureTelegramBotClientOptions(options =>
+{
+    options.RetryThreshold = 60;
+    options.RetryCount = 3;
+});
 
 var app = builder.Build();
 

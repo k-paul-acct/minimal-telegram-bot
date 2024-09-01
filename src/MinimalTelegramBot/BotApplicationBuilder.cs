@@ -39,14 +39,23 @@ public class BotApplicationBuilder
         return this;
     }
 
+    public BotApplicationBuilder ConfigureTelegramBotClientOptions(Action<TelegramBotClientOptions> configure)
+    {
+        _options.TelegramBotClientOptionsConfigure = configure;
+        return this;
+    }
+
     public BotApplication Build()
     {
         _options.Validate();
 
-        var client = new TelegramBotClient(_options.Token!);
+        var telegramBotClientOptions = new TelegramBotClientOptions(_options.Token!);
+        _options.TelegramBotClientOptionsConfigure?.Invoke(telegramBotClientOptions);
+
+        var client = new TelegramBotClient(telegramBotClientOptions);
         var handlerBuilder = new HandlerBuilder();
 
-        HostBuilder.Services.AddSingleton(client);
+        HostBuilder.Services.AddSingleton<ITelegramBotClient>(client);
         HostBuilder.Services.AddSingleton<BotInitService>();
         HostBuilder.Services.AddSingleton<IHandlerBuilder>(handlerBuilder);
         HostBuilder.Services.TryAddSingleton<IBotRequestContextAccessor, BotRequestContextAccessor>();
