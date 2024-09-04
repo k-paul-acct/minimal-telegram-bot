@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <PackageId>MinimalTelegramBot.Localization</PackageId>
-    <Version>0.0.5</Version>
+    <Version>0.0.8</Version>
     <Authors>Pavel Kulakov</Authors>
     <RepositoryUrl>https://github.com/k-paul-acct/minimal-telegram-bot</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
-    <PackageReference Include="YamlDotNet" Version="16.0.0"/>
+    <PackageReference Include="YamlDotNet" Version="16.1.0"/>
   </ItemGroup>
 
 </Project>
