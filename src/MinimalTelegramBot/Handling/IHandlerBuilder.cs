@@ -1,5 +1,3 @@
-using MinimalTelegramBot.Handling.Filters;
-
 namespace MinimalTelegramBot.Handling;
 
 public interface IHandlerBuilder

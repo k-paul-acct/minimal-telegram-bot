@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using MinimalTelegramBot.Handling.Filters;
 
 namespace MinimalTelegramBot.Handling;
 

@@ -1,5 +1,3 @@
-using MinimalTelegramBot.Handling.Filters;
-
 namespace MinimalTelegramBot.Pipeline;
 
 internal sealed class HandlerResolverPipe : IPipe
