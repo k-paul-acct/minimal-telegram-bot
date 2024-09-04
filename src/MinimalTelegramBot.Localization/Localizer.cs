@@ -1,40 +1,34 @@
-using MinimalTelegramBot.Localization.Abstractions;
-
 namespace MinimalTelegramBot.Localization;
 
 /// <inheritdoc />
-public class Localizer : ILocalizer
+internal sealed class Localizer : ILocalizer
 {
-    private readonly IUserLocaleService _localeService;
-    private readonly BotRequestContext? _context;
     private readonly ILocaleStringSetRepository _localeStringSetRepository;
+    private readonly IBotRequestContextAccessor _contextAccessor;
 
-    public Localizer(IBotRequestContextAccessor contextAccessor, ILocaleStringSetRepository localeStringSetRepository,
-        IUserLocaleService localeService)
+    public Localizer(ILocaleStringSetRepository localeStringSetRepository, IBotRequestContextAccessor contextAccessor)
     {
-        _context = contextAccessor.BotRequestContext;
         _localeStringSetRepository = localeStringSetRepository;
-        _localeService = localeService;
+        _contextAccessor = contextAccessor;
     }
 
     /// <inheritdoc />
     public string GetLocalizedString(string key, params object?[] parameters)
     {
-        if (_context is null)
+        if (_contextAccessor.BotRequestContext is null)
         {
             throw new Exception($"{nameof(BotRequestContext)} is null");
         }
 
-        var userId = _context.ChatId;
-        var locale = _localeService.GetFromRepository(userId) ?? Locale.Default;
-        var template = _localeStringSetRepository.GetString(key, locale.LanguageCode);
+        var locale = _contextAccessor.BotRequestContext.UserLocale;
+        var template = _localeStringSetRepository.GetString(key, locale);
         return parameters.Length == 0 ? template : string.Format(locale.CultureInfo, template, parameters);
     }
 
     /// <inheritdoc />
     public string GetLocalizedString(Locale locale, string key, params object?[] parameters)
     {
-        var template = _localeStringSetRepository.GetString(key, locale.LanguageCode);
+        var template = _localeStringSetRepository.GetString(key, locale);
         return parameters.Length == 0 ? template : string.Format(locale.CultureInfo, template, parameters);
     }
 }

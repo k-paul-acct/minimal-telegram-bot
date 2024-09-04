@@ -1,9 +1,7 @@
-using MinimalTelegramBot.StateMachine.Abstractions;
-
 namespace MinimalTelegramBot.StateMachine;
 
 /// <inheritdoc />
-public class StateMachine : IStateMachine
+internal sealed class StateMachine : IStateMachine
 {
     private readonly IUserStateRepository _repository;
     private readonly BotRequestContext _context;

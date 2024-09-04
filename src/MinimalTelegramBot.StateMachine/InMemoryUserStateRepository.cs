@@ -1,10 +1,9 @@
 using System.Collections.Concurrent;
-using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine;
 
 /// <inheritdoc />
-public class InMemoryUserStateRepository : IUserStateRepository
+internal sealed class InMemoryUserStateRepository : IUserStateRepository
 {
     private readonly ConcurrentDictionary<long, State> _states = new();
 

@@ -3,7 +3,7 @@ using Telegram.Bot.Types;
 
 namespace MinimalTelegramBot.Results.Extensions;
 
-public sealed class DocumentResult : FileResult
+internal sealed class DocumentResult : FileResult
 {
     public DocumentResult(Stream documentStream, string? caption = null) : base(documentStream, caption)
     {

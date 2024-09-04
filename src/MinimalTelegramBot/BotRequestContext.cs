@@ -12,11 +12,10 @@ public class BotRequestContext
     public long ChatId { get; set; }
     public string? MessageText { get; set; }
     public string? CallbackData { get; set; }
-    public Locale? UserLocale { get; set; }
-    public State? UserState { get; set; }
     public IServiceProvider Services { get; set; } = null!;
-    public IStateMachine StateMachine { get; set; } = null!;
-    public ILocalizer? Localizer { get; set; }
     public IDictionary<string, object?> Data { get; } = new Dictionary<string, object?>();
+    public Locale UserLocale { get; internal set; } = Locale.Default;
+    public State? UserState { get; internal set; }
+
     internal bool UpdateHandlingStarted { get; set; }
 }

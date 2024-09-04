@@ -8,7 +8,7 @@ internal static class BotApplicationRunner
 {
     public static void Run(BotApplication app)
     {
-        var appBuilder = (IBotApplicationBuilder)app;
+        IBotApplicationBuilder appBuilder = app;
 
         appBuilder.Build();
 
@@ -42,19 +42,19 @@ internal static class BotApplicationRunner
 
     private static async Task DeleteWebhook(BotApplication app)
     {
-        await app.Client.DeleteWebhookAsync(app.Options.ReceiverOptions?.DropPendingUpdates ?? false);
+        await app._client.DeleteWebhookAsync(app._options.ReceiverOptions?.DropPendingUpdates ?? false);
     }
 
     private static async Task<WebApplication> SetupWebhooks(BotApplication app)
     {
-        var options = app.Options.WebhookOptions ??
+        var options = app._options.WebhookOptions ??
                       throw new Exception("No webhook options was specified to use webhook");
 
-        await app.Client.SetWebhookAsync(options.Url, options.Certificate, options.IpAddress, options.MaxConnections,
-            app.Options.ReceiverOptions?.AllowedUpdates, app.Options.ReceiverOptions?.DropPendingUpdates ?? false,
+        await app._client.SetWebhookAsync(options.Url, options.Certificate, options.IpAddress, options.MaxConnections,
+            app._options.ReceiverOptions?.AllowedUpdates, app._options.ReceiverOptions?.DropPendingUpdates ?? false,
             options.SecretToken);
 
-        var webAppBuilder = WebApplication.CreateSlimBuilder(app.Options.Args ?? []);
+        var webAppBuilder = WebApplication.CreateSlimBuilder(app._options.Args ?? []);
 
         webAppBuilder.Services.Configure<JsonOptions>(o =>
         {
@@ -63,7 +63,7 @@ internal static class BotApplicationRunner
 
         webAppBuilder.Services.AddHttpClient("tgwebhook")
             .RemoveAllLoggers()
-            .AddTypedClient(httpClient => new TelegramBotClient(app.Options.Token, httpClient));
+            .AddTypedClient(httpClient => new TelegramBotClient(app._options.Token, httpClient));
 
         var webApp = webAppBuilder.Build();
 

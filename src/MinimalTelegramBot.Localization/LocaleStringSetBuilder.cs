@@ -1,10 +1,9 @@
 using System.Collections.Frozen;
-using MinimalTelegramBot.Localization.Abstractions;
 
 namespace MinimalTelegramBot.Localization;
 
 /// <inheritdoc />
-public class LocaleStringSetBuilder : ILocaleStringSetBuilder
+internal sealed class LocaleStringSetBuilder : ILocaleStringSetBuilder
 {
     private readonly List<IReadOnlyDictionary<string, string>> _values = [];
 

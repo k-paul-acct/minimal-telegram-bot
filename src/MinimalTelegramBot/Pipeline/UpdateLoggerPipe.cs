@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace MinimalTelegramBot.Pipeline;
 
-public class UpdateLoggerPipe : IPipe
+internal sealed class UpdateLoggerPipe : IPipe
 {
     private readonly ILogger<BotApplication> _logger;
 

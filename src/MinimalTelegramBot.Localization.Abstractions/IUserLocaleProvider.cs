@@ -1,4 +1,4 @@
-namespace MinimalTelegramBot.Localization.Abstractions.Providers;
+namespace MinimalTelegramBot.Localization.Abstractions;
 
 public interface IUserLocaleProvider
 {

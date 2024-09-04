@@ -1,6 +1,5 @@
-using MinimalTelegramBot.Handling;
+using MinimalTelegramBot.Handling.Filters;
 using MinimalTelegramBot.Localization.Abstractions;
-using MinimalTelegramBot.Pipeline;
 using MinimalTelegramBot.Services;
 using MinimalTelegramBot.Settings;
 using MinimalTelegramBot.StateMachine.Abstractions;
@@ -15,15 +14,15 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
     private readonly PipelineBuilder _pipelineBuilder = new();
     private Func<BotRequestContext, Task>? _pipeline;
 
-    internal readonly TelegramBotClient Client;
-    internal readonly BotApplicationOptions Options;
+    internal readonly TelegramBotClient _client;
+    internal readonly BotApplicationOptions _options;
 
     internal BotApplication(IHost host, TelegramBotClient client, BotApplicationOptions options,
         IHandlerBuilder handlerBuilder)
     {
         Host = host;
-        Client = client;
-        Options = options;
+        _client = client;
+        _options = options;
         _handlerBuilder = handlerBuilder;
 
         UseDefaultOuterPipes();
@@ -31,10 +30,14 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 
     public IHost Host { get; }
 
+    public IServiceProvider Services => Host.Services;
+
     IDictionary<string, object?> IBotApplicationBuilder.Properties => _pipelineBuilder.Properties;
 
     public IBotApplicationBuilder Use(Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>> pipe)
     {
+        ArgumentNullException.ThrowIfNull(pipe);
+
         _pipelineBuilder.Use(pipe);
         return this;
     }
@@ -47,15 +50,19 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 
     public Handler Handle(Delegate handlerDelegate)
     {
+        ArgumentNullException.ThrowIfNull(handlerDelegate);
+
         return _handlerBuilder.Handle(handlerDelegate);
     }
 
     public Handler Handle(Func<BotRequestContext, Task> func)
     {
+        ArgumentNullException.ThrowIfNull(func);
+
         return _handlerBuilder.Handle(func);
     }
 
-    Handler? IHandlerBuilder.TryResolveHandler(BotRequestContext ctx)
+    ValueTask<Handler?> IHandlerBuilder.TryResolveHandler(BotRequestFilterContext ctx)
     {
         return _handlerBuilder.TryResolveHandler(ctx);
     }
@@ -69,15 +76,35 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 
     public static BotApplicationBuilder CreateBuilder()
     {
-        return new BotApplicationBuilder(args: null);
+        return CreateBuilder(new BotApplicationBuilderOptions());
     }
 
     public static BotApplicationBuilder CreateBuilder(string[] args)
     {
-        return new BotApplicationBuilder(args);
+        ArgumentNullException.ThrowIfNull(args);
+
+        return CreateBuilder(new BotApplicationBuilderOptions
+        {
+            Args = args,
+            HostApplicationBuilderSettings = new HostApplicationBuilderSettings
+            {
+                Args = args,
+            },
+        });
     }
 
-    public static BotApplicationBuilder CreateBuilder(BotApplicationBuilderOptions options)
+    public static BotApplicationBuilder CreateBuilder(HostApplicationBuilderSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+
+        return CreateBuilder(new BotApplicationBuilderOptions
+        {
+            Args = settings.Args,
+            HostApplicationBuilderSettings = settings,
+        });
+    }
+
+    private static BotApplicationBuilder CreateBuilder(BotApplicationBuilderOptions options)
     {
         return new BotApplicationBuilder(options);
     }
@@ -95,7 +122,7 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 
     internal void StartPolling()
     {
-        Client.StartReceiving(UpdateHandler, PollingErrorHandler, Options.ReceiverOptions);
+        _client.StartReceiving(UpdateHandler, PollingErrorHandler, _options.ReceiverOptions);
     }
 
     private Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
@@ -127,24 +154,26 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         var messageText = update.Message?.Text;
         var callbackData = update.CallbackQuery?.Data;
 
-        var stateMachine = scope.ServiceProvider.GetRequiredService<IStateMachine>();
-        var state = chatId != 0 ? stateMachine.GetState(chatId) : null;
-        var localizer = scope.ServiceProvider.GetService<ILocalizer>();
-        var localeService = chatId != 0 ? scope.ServiceProvider.GetService<IUserLocaleService>() : null;
-        var locale = localeService is null
-            ? null
-            : await localeService.GetFromRepositoryOrUpdateWithProviderAsync(chatId);
-
         context.Client = client;
         context.Update = update;
         context.ChatId = chatId;
         context.MessageText = messageText;
         context.CallbackData = callbackData;
-        context.UserLocale = locale;
         context.Services = scope.ServiceProvider;
-        context.StateMachine = stateMachine;
-        context.Localizer = localizer;
-        context.UserState = state;
+
+        var localeProvider = scope.ServiceProvider.GetService<IUserLocaleProvider>();
+        if (localeProvider is not null)
+        {
+            var locale = await localeProvider.GetUserLocaleAsync(context.ChatId);
+            context.UserLocale = locale;
+        }
+
+        var stateMachine = scope.ServiceProvider.GetService<IStateMachine>();
+        if (stateMachine is not null)
+        {
+            var state = stateMachine.GetState(context.ChatId);
+            context.UserState = state;
+        }
 
         await _pipeline!(context);
     }

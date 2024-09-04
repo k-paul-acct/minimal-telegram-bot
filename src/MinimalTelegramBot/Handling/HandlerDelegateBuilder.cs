@@ -5,7 +5,6 @@ using MinimalTelegramBot.Results;
 using MinimalTelegramBot.StateMachine.Abstractions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using IResult = MinimalTelegramBot.Results.IResult;
 
 namespace MinimalTelegramBot.Handling;
 
@@ -80,6 +79,11 @@ internal static class HandlerDelegateBuilder
             if (x.ParameterType == typeof(long) && x.Name is "chatId" or "chatID")
             {
                 return Expression.Property(contextParameter, nameof(BotRequestContext.ChatId));
+            }
+
+            if (typeof(Locale).IsAssignableFrom(x.ParameterType))
+            {
+                return Expression.Property(contextParameter, nameof(BotRequestContext.UserLocale));
             }
 
             if (typeof(State).IsAssignableFrom(x.ParameterType))

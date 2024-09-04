@@ -4,7 +4,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MinimalTelegramBot.Results.Extensions;
 
-public sealed class MessageResult : IResult
+internal sealed class MessageResult : IResult
 {
     private readonly bool _edit;
     private readonly string _message;

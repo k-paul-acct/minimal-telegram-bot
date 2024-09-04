@@ -1,17 +1,15 @@
 ﻿using MinimalTelegramBot;
+using MinimalTelegramBot.Builder;
 using MinimalTelegramBot.Extensions;
-using MinimalTelegramBot.Handling;
+using MinimalTelegramBot.Handling.Filters;
 using MinimalTelegramBot.Localization.Abstractions;
 using MinimalTelegramBot.Localization.Extensions;
 using MinimalTelegramBot.Pipeline;
-using MinimalTelegramBot.Settings;
 using MinimalTelegramBot.StateMachine.Extensions;
-using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using UsageExample.CallbackModels;
 using UsageExample.CommandModels;
-using UsageExample.Localization;
 using UsageExample.Services;
 using Results = MinimalTelegramBot.Results.Results;
 
@@ -24,32 +22,28 @@ using Results = MinimalTelegramBot.Results.Results;
 // TODO: Bot info after startup.
 // TODO: Different persistence and builder options in builders (Locale Service, State Machine, Notification Service).
 
-var builder = BotApplication.CreateBuilder(new BotApplicationBuilderOptions
+var builder = BotApplication.CreateBuilder(args);
+
+builder.SetBotToken(builder.Configuration["BotToken"]!);
+
+builder.ConfigureReceiverOptions(options =>
 {
-    Args = args,
-    ReceiverOptions = new ReceiverOptions
-    {
-        AllowedUpdates = [UpdateType.Message, UpdateType.CallbackQuery,],
-        DropPendingUpdates = true,
-    },
+    options.AllowedUpdates = [UpdateType.Message, UpdateType.CallbackQuery,];
+    options.DropPendingUpdates = true;
 });
 
-builder.HostBuilder.Services.AddStateMachine();
-builder.HostBuilder.Services.AddLocalizer<UserLocaleProvider>(x =>
-{
-    x.EnrichFromFile("Localization/ru.yaml", new Locale("ru"));
-});
-
-builder.HostBuilder.Services.AddScoped<WeatherService>();
-builder.HostBuilder.Services.AddKeyedSingleton("FirstName", new NameService { Name = "First Name", });
-builder.HostBuilder.Services.AddKeyedSingleton("LastName", new NameService { Name = "Last Name", });
-
-builder.SetTokenFromConfiguration("BotToken");
 builder.ConfigureTelegramBotClientOptions(options =>
 {
     options.RetryThreshold = 60;
     options.RetryCount = 3;
 });
+
+builder.Services.AddStateMachine();
+builder.Services.AddSingleLocale(new Locale("ru"), locale => locale.EnrichFromFile("Localization/ru.yaml"));
+
+builder.Services.AddScoped<WeatherService>();
+builder.Services.AddKeyedSingleton("FirstName", new NameService { Name = "First Name", });
+builder.Services.AddKeyedSingleton("LastName", new NameService { Name = "Last Name", });
 
 var app = builder.Build();
 

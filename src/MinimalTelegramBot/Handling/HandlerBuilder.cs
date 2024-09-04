@@ -1,4 +1,4 @@
-using IResult = MinimalTelegramBot.Results.IResult;
+using MinimalTelegramBot.Handling.Filters;
 
 namespace MinimalTelegramBot.Handling;
 
@@ -8,6 +8,8 @@ public class HandlerBuilder : IHandlerBuilder
 
     public Handler Handle(Delegate handlerDelegate)
     {
+        ArgumentNullException.ThrowIfNull(handlerDelegate);
+
         var handler = new Handler(handlerDelegate);
         _handlers.Add(handler);
         return handler;
@@ -15,12 +17,24 @@ public class HandlerBuilder : IHandlerBuilder
 
     public Handler Handle(Func<BotRequestContext, Task> func)
     {
+        ArgumentNullException.ThrowIfNull(func);
+
         return Handle((Delegate)func);
     }
 
-    public Handler? TryResolveHandler(BotRequestContext ctx)
+    public async ValueTask<Handler?> TryResolveHandler(BotRequestFilterContext ctx)
     {
-        return _handlers.FirstOrDefault(x => x.CanHandle(ctx));
+        ArgumentNullException.ThrowIfNull(ctx);
+
+        foreach (var handler in _handlers)
+        {
+            if (await handler.CanHandle(ctx))
+            {
+                return handler;
+            }
+        }
+
+        return null;
     }
 }
 

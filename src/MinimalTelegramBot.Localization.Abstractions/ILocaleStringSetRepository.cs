@@ -9,7 +9,7 @@ public interface ILocaleStringSetRepository
     /// <param name="locale">Locale.</param>
     /// <returns>Locale specific string.</returns>
     /// <exception cref="Exception">String with key for given locale not found.</exception>
-    string GetString(string key, string locale);
+    string GetString(string key, Locale locale);
 
     void AddLocaleStringSet(LocaleStringSet localeStringSet);
 }

@@ -3,7 +3,7 @@ using Telegram.Bot.Types;
 
 namespace MinimalTelegramBot.Results.Extensions;
 
-public sealed class PhotoResult : FileResult
+internal sealed class PhotoResult : FileResult
 {
     public PhotoResult(Stream photoStream, string? caption = null) : base(photoStream, caption)
     {

@@ -1,13 +1,14 @@
-using MinimalTelegramBot.Handling;
+using MinimalTelegramBot.Handling.Filters;
 
 namespace MinimalTelegramBot.Pipeline;
 
-public class HandlerResolverPipe : IPipe
+internal sealed class HandlerResolverPipe : IPipe
 {
     public async Task InvokeAsync(BotRequestContext ctx, Func<BotRequestContext, Task> next)
     {
         var handlerBuilder = ctx.Services.GetRequiredService<IHandlerBuilder>();
-        var handler = handlerBuilder.TryResolveHandler(ctx);
+        var filterContext = new BotRequestFilterContext(ctx);
+        var handler = await handlerBuilder.TryResolveHandler(filterContext);
 
         if (handler is not null)
         {

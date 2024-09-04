@@ -5,8 +5,8 @@ namespace MinimalTelegramBot.Results;
 
 internal sealed class ResultHelper
 {
-    private static readonly Type MessageInlineKeyboardPair = typeof(ValueTuple<string, InlineKeyboardMarkup>);
-    private static readonly Type MessageReplyKeyboardPair = typeof(ValueTuple<string, ReplyKeyboardMarkup>);
+    private static readonly Type _messageInlineKeyboardPair = typeof(ValueTuple<string, InlineKeyboardMarkup>);
+    private static readonly Type _messageReplyKeyboardPair = typeof(ValueTuple<string, ReplyKeyboardMarkup>);
 
     public static Func<T, IResult> FromType<T>()
     {
@@ -15,7 +15,7 @@ internal sealed class ResultHelper
             return x => Results.Message((x as string)!);
         }
 
-        if (typeof(T) == MessageReplyKeyboardPair || typeof(T) == MessageInlineKeyboardPair)
+        if (typeof(T) == _messageReplyKeyboardPair || typeof(T) == _messageInlineKeyboardPair)
         {
             return x =>
             {

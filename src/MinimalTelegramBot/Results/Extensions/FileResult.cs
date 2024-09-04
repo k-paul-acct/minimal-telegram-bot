@@ -3,7 +3,7 @@ using File = System.IO.File;
 
 namespace MinimalTelegramBot.Results.Extensions;
 
-public abstract class FileResult : IResult
+internal abstract class FileResult : IResult
 {
     private readonly string? _fileName;
     private readonly Stream? _fileStream;

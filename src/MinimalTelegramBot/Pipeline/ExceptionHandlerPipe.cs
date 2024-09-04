@@ -1,6 +1,6 @@
 namespace MinimalTelegramBot.Pipeline;
 
-public class ExceptionHandlerPipe : IPipe
+internal sealed class ExceptionHandlerPipe : IPipe
 {
     private readonly ILogger<ExceptionHandlerPipe> _logger;
 

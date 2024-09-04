@@ -6,7 +6,9 @@ public static class BotApplicationExtensions
 {
     public static void UsePolling(this BotApplication app, bool deleteWebhook = false)
     {
-        var appBuilder = (IBotApplicationBuilder)app;
+        ArgumentNullException.ThrowIfNull(app);
+
+        IBotApplicationBuilder appBuilder = app;
 
         if (appBuilder.Properties.ContainsKey("__WebhookEnabled"))
         {
@@ -19,7 +21,10 @@ public static class BotApplicationExtensions
 
     public static void UseWebhook(this BotApplication app, WebhookOptions options)
     {
-        var appBuilder = (IBotApplicationBuilder)app;
+        ArgumentNullException.ThrowIfNull(app);
+        ArgumentNullException.ThrowIfNull(options);
+
+        IBotApplicationBuilder appBuilder = app;
 
         if (appBuilder.Properties.ContainsKey("__PollingEnabled"))
         {
@@ -27,6 +32,6 @@ public static class BotApplicationExtensions
         }
 
         appBuilder.Properties.TryAdd("__WebhookEnabled", true);
-        app.Options.WebhookOptions = options;
+        app._options.WebhookOptions = options;
     }
 }

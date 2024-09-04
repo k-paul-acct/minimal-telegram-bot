@@ -3,7 +3,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace MinimalTelegramBot.Results.Extensions;
 
-public class CallbackAnswerResult : IResult
+internal sealed class CallbackAnswerResult : IResult
 {
     public async Task ExecuteAsync(BotRequestContext context)
     {

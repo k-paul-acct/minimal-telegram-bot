@@ -1,32 +1,30 @@
-using MinimalTelegramBot.Localization.Abstractions;
-using MinimalTelegramBot.StateMachine.Abstractions;
 using Telegram.Bot.Types.Enums;
 
-namespace MinimalTelegramBot.Handling;
+namespace MinimalTelegramBot.Handling.Filters;
 
 public static class FilterExtensions
 {
     public static Handler FilterText(this Handler handler, Func<string, bool> filter)
     {
-        return handler.Filter(ctx => ctx.MessageText is not null && filter(ctx.MessageText));
-    }
+        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(filter);
 
-    public static Handler FilterTextWithLocalizer(this Handler handler, string key)
-    {
-        return handler.Filter(ctx => ctx.MessageText is not null &&
-                                     ctx.Localizer![ctx.UserLocale ?? Locale.Default, key] == ctx.MessageText);
+        return handler.Filter(ctx => ctx.BotRequestContext.MessageText is not null && filter(ctx.BotRequestContext.MessageText));
     }
 
     public static Handler FilterCommand(this Handler handler, string command)
     {
+        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(command);
+
         return handler.Filter(ctx =>
         {
-            if (ctx.MessageText is null)
+            if (ctx.BotRequestContext.MessageText is null)
             {
                 return false;
             }
 
-            var span = ctx.MessageText.AsSpan();
+            var span = ctx.BotRequestContext.MessageText.AsSpan();
 
             if (span.Length < 2 || span[0] != '/')
             {
@@ -56,28 +54,26 @@ public static class FilterExtensions
         });
     }
 
-    public static Handler FilterState(this Handler handler, State state)
-    {
-        return handler.Filter(ctx => ctx.UserState == state);
-    }
-
-    public static Handler FilterState(this Handler handler, Func<State, bool> filter)
-    {
-        return handler.Filter(ctx => ctx.UserState is not null && filter(ctx.UserState));
-    }
-
     public static Handler FilterCallbackData(this Handler handler, Func<string, bool> filter)
     {
-        return handler.Filter(ctx => ctx.CallbackData is not null && filter(ctx.CallbackData));
+        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(filter);
+
+        return handler.Filter(ctx => ctx.BotRequestContext.CallbackData is not null && filter(ctx.BotRequestContext.CallbackData));
     }
 
     public static Handler FilterUpdateType(this Handler handler, UpdateType updateType)
     {
-        return handler.Filter(ctx => ctx.Update.Type == updateType);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        return handler.Filter(ctx => ctx.BotRequestContext.Update.Type == updateType);
     }
 
     public static Handler FilterUpdateType(this Handler handler, Func<UpdateType, bool> filter)
     {
-        return handler.Filter(ctx => filter(ctx.Update.Type));
+        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(filter);
+
+        return handler.Filter(ctx => filter(ctx.BotRequestContext.Update.Type));
     }
 }

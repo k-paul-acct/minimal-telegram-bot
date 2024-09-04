@@ -3,14 +3,16 @@ using Telegram.Bot.Polling;
 
 namespace MinimalTelegramBot.Settings;
 
-public class BotApplicationBuilderOptions
+internal sealed class BotApplicationBuilderOptions
 {
     public string[]? Args { get; set; }
     public string? Token { get; set; }
-    public ReceiverOptions? ReceiverOptions { get; set; }
-    internal Action<TelegramBotClientOptions>? TelegramBotClientOptionsConfigure { get; set; }
+    public HostApplicationBuilderSettings? HostApplicationBuilderSettings { get; set; }
+    public ReceiverOptions ReceiverOptions { get; set; } = new();
 
-    internal void Validate()
+    public Action<TelegramBotClientOptions>? TelegramBotClientOptionsConfigure { get; set; }
+
+    public void Validate()
     {
         if (Token is null)
         {

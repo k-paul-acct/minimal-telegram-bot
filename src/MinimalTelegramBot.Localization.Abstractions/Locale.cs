@@ -6,6 +6,8 @@ public sealed class Locale : IEquatable<Locale>
 {
     public Locale(string languageCode, string? regionCode)
     {
+        ArgumentNullException.ThrowIfNull(languageCode);
+
         LanguageCode = languageCode.ToLowerInvariant();
         RegionCode = regionCode?.ToUpperInvariant();
         FullCode = RegionCode is null ? LanguageCode : $"{LanguageCode}-{RegionCode}";
@@ -14,6 +16,8 @@ public sealed class Locale : IEquatable<Locale>
 
     public Locale(string fullCode)
     {
+        ArgumentNullException.ThrowIfNull(fullCode);
+
         var span = fullCode.AsSpan();
         var hyphenIndex = span.IndexOf('-');
 

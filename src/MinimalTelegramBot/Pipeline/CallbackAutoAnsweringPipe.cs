@@ -3,7 +3,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace MinimalTelegramBot.Pipeline;
 
-public class CallbackAutoAnsweringPipe : IPipe
+internal sealed class CallbackAutoAnsweringPipe : IPipe
 {
     public async Task InvokeAsync(BotRequestContext ctx, Func<BotRequestContext, Task> next)
     {

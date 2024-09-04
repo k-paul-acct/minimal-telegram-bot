@@ -1,6 +1,6 @@
 namespace MinimalTelegramBot;
 
-public sealed class BotRequestContextAccessor : IBotRequestContextAccessor
+internal sealed class BotRequestContextAccessor : IBotRequestContextAccessor
 {
     private static readonly AsyncLocal<BotRequestContextHolder> BotRequestContextCurrent = new();
 
