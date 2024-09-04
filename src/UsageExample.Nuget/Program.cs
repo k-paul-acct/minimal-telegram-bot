@@ -1,36 +1,20 @@
-using MinimalTelegramBot;
-using MinimalTelegramBot.Handling;
-using MinimalTelegramBot.Localization.Abstractions;
-using MinimalTelegramBot.Localization.Extensions;
-using MinimalTelegramBot.Pipeline;
-using MinimalTelegramBot.Settings;
-using MinimalTelegramBot.StateMachine.Extensions;
-using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
-using UsageExample.Nuget.Localization;
 using UsageExample.Nuget.Services;
-using Results = MinimalTelegramBot.Results.Results;
 
-var builder = BotApplication.CreateBuilder(new BotApplicationBuilderOptions
+var builder = BotApplication.CreateBuilder(args);
+
+builder.SetBotToken(builder.Configuration["BotToken"]!);
+
+builder.ConfigureReceiverOptions(options =>
 {
-    Args = args,
-    ReceiverOptions = new ReceiverOptions
-    {
-        AllowedUpdates = [UpdateType.Message, UpdateType.CallbackQuery,],
-        DropPendingUpdates = true,
-    },
+    options.AllowedUpdates = [UpdateType.Message, UpdateType.CallbackQuery,];
+    options.DropPendingUpdates = true;
 });
 
-builder.HostBuilder.Services.AddStateMachine();
-builder.HostBuilder.Services.AddLocalizer<UserLocaleProvider>(x =>
-{
-    x.EnrichFromFile("Localization/ru.yaml", new Locale("ru"));
-});
-
-builder.HostBuilder.Services.AddScoped<WeatherService>();
-
-builder.SetTokenFromConfiguration("BotToken");
+builder.Services.AddStateMachine();
+builder.Services.AddSingleLocale(new Locale("ru"), locale => locale.EnrichFromFile("Localization/ru.yaml"));
+builder.Services.AddScoped<WeatherService>();
 
 var app = builder.Build();
 
@@ -41,11 +25,7 @@ app.Handle((ILocalizer localizer) =>
     var helloText = localizer["HelloText"];
     var helloButton = localizer["Button.Hello"];
     var catButton = localizer["Button.Cat"];
-    var keyboard = new ReplyKeyboardMarkup(new[]
-    {
-        new KeyboardButton(helloButton),
-        new KeyboardButton(catButton),
-    });
+    var keyboard = new ReplyKeyboardMarkup(new KeyboardButton(helloButton), new KeyboardButton(catButton)) { ResizeKeyboard = true, };
 
     return Results.Message(helloText, keyboard);
 }).FilterCommand("/start");
@@ -56,7 +36,8 @@ app.Handle(() =>
     return Results.MessageEdit("Button pressed", keyboard);
 }).FilterCallbackData(x => x == "Hello");
 
-app.Handle(() => Results.Photo("cat.jpeg", "Little cat")).FilterCallbackData(x => x == "Photo");
+app.Handle(() => Results.Photo("cat.jpeg", "Little cat"))
+    .FilterCallbackData(x => x == "Photo");
 
 app.Handle(() => Results.MessageReply("I'm replied!"))
     .FilterText(x => x.Equals("reply", StringComparison.OrdinalIgnoreCase));

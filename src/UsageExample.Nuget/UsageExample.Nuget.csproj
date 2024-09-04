@@ -16,15 +16,15 @@
 
   <ItemGroup>
     <None Remove="Localization\ru.yaml"/>
-    <Resource Include="Localization\ru.yaml">
+    <Content Include="Localization\ru.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MinimalTelegramBot" Version="0.0.3"/>
-    <PackageReference Include="MinimalTelegramBot.Localization" Version="0.0.3"/>
-    <PackageReference Include="MinimalTelegramBot.StateMachine" Version="0.0.3"/>
+    <PackageReference Include="MinimalTelegramBot" Version="0.0.8"/>
+    <PackageReference Include="MinimalTelegramBot.Localization" Version="0.0.8"/>
+    <PackageReference Include="MinimalTelegramBot.StateMachine" Version="0.0.8"/>
   </ItemGroup>
 
 </Project>
