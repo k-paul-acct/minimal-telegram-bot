@@ -6,7 +6,7 @@ using Telegram.Bot;
 
 namespace MinimalTelegramBot.Builder;
 
-public class BotApplicationBuilder
+public class BotApplicationBuilder : IHostApplicationBuilder
 {
     private readonly HostApplicationBuilder _hostBuilder;
 
@@ -19,11 +19,19 @@ public class BotApplicationBuilder
         AddDefaultPipeServices();
     }
 
-    public ConfigurationManager Configuration => _hostBuilder.Configuration;
+    public IConfigurationManager Configuration => _hostBuilder.Configuration;
     public IServiceCollection Services => _hostBuilder.Services;
     public ILoggingBuilder Logging => _hostBuilder.Logging;
     public IHostEnvironment Environment => _hostBuilder.Environment;
     public IMetricsBuilder Metrics => _hostBuilder.Metrics;
+
+    IDictionary<object, object> IHostApplicationBuilder.Properties => ((IHostApplicationBuilder)_hostBuilder).Properties;
+
+    public void ConfigureContainer<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory, Action<TContainerBuilder>? configure = null)
+        where TContainerBuilder : notnull
+    {
+        _hostBuilder.ConfigureContainer(factory, configure);
+    }
 
     public BotApplication Build()
     {

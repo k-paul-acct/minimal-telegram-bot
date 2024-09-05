@@ -6,7 +6,7 @@ namespace MinimalTelegramBot;
 
 internal static class BotApplicationRunner
 {
-    public static void Run(BotApplication app)
+    public static async Task RunAsync(BotApplication app, CancellationToken cancellationToken)
     {
         IBotApplicationBuilder appBuilder = app;
 
@@ -18,41 +18,41 @@ internal static class BotApplicationRunner
 
         if (deleteWebhook is true)
         {
-            DeleteWebhook(app).GetAwaiter().GetResult();
+            await DeleteWebhook(app, cancellationToken);
         }
 
-        var host = isWebhook ? SetupWebhooks(app).GetAwaiter().GetResult() : app.Host;
+        var host = isWebhook ? await SetupWebhooks(app, cancellationToken) : app.Host;
 
         if (!isWebhook)
         {
             app.StartPolling();
         }
 
-        app.InitBot(isWebhook);
+        await app.InitBot(isWebhook, cancellationToken);
 
         if (isWebhook)
         {
-            ((WebApplication)host).Run();
+            await ((WebApplication)host).RunAsync(cancellationToken);
         }
         else
         {
-            host.Run();
+            await host.RunAsync(cancellationToken);
         }
     }
 
-    private static async Task DeleteWebhook(BotApplication app)
+    private static async Task DeleteWebhook(BotApplication app, CancellationToken cancellationToken)
     {
-        await app._client.DeleteWebhookAsync(app._options.ReceiverOptions?.DropPendingUpdates ?? false);
+        await app._client.DeleteWebhookAsync(app._options.ReceiverOptions?.DropPendingUpdates ?? false, cancellationToken);
     }
 
-    private static async Task<WebApplication> SetupWebhooks(BotApplication app)
+    private static async Task<WebApplication> SetupWebhooks(BotApplication app, CancellationToken cancellationToken)
     {
         var options = app._options.WebhookOptions ??
                       throw new Exception("No webhook options was specified to use webhook");
 
         await app._client.SetWebhookAsync(options.Url, options.Certificate, options.IpAddress, options.MaxConnections,
             app._options.ReceiverOptions?.AllowedUpdates, app._options.ReceiverOptions?.DropPendingUpdates ?? false,
-            options.SecretToken);
+            options.SecretToken, cancellationToken);
 
         var webAppBuilder = WebApplication.CreateSlimBuilder(app._options.Args ?? []);
 

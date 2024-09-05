@@ -7,7 +7,7 @@ using Telegram.Bot.Types;
 
 namespace MinimalTelegramBot;
 
-public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
+public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IHost
 {
     private readonly IHandlerBuilder _handlerBuilder;
     private readonly PipelineBuilder _pipelineBuilder = new();
@@ -28,6 +28,16 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
     }
 
     public IHost Host { get; }
+
+    Task IHost.StartAsync(CancellationToken cancellationToken)
+    {
+        throw new NotSupportedException();
+    }
+
+    Task IHost.StopAsync(CancellationToken cancellationToken)
+    {
+        throw new NotSupportedException();
+    }
 
     public IServiceProvider Services => Host.Services;
 
@@ -66,11 +76,11 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
         return _handlerBuilder.TryResolveHandler(ctx);
     }
 
-    internal void InitBot(bool isWebhook)
+    internal async Task InitBot(bool isWebhook, CancellationToken cancellationToken)
     {
         using var scope = Host.Services.CreateScope();
         var botInitService = scope.ServiceProvider.GetRequiredService<BotInitService>();
-        botInitService.InitBot(isWebhook).GetAwaiter().GetResult();
+        await botInitService.InitBot(isWebhook, cancellationToken);
     }
 
     public static BotApplicationBuilder CreateBuilder()
@@ -110,13 +120,18 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
 
     public void Run()
     {
+        RunAsync().GetAwaiter().GetResult();
+    }
+
+    public async Task RunAsync(CancellationToken cancellationToken = default)
+    {
         if (_pipelineBuilder.Properties.ContainsKey("__CallbackAutoAnsweringAdded"))
         {
             this.UsePipe<CallbackAutoAnsweringPipe>();
         }
 
         this.UsePipe<HandlerResolverPipe>();
-        BotApplicationRunner.Run(this);
+        await BotApplicationRunner.RunAsync(this, cancellationToken);
     }
 
     internal void StartPolling()
@@ -189,5 +204,10 @@ public class BotApplication : IBotApplicationBuilder, IHandlerBuilder
     {
         this.UsePipe<ExceptionHandlerPipe>();
         this.UsePipe<UpdateLoggerPipe>();
+    }
+
+    public void Dispose()
+    {
+        Host.Dispose();
     }
 }

@@ -18,9 +18,9 @@ internal sealed class BotInitService
         return lastname is null ? firstname : $"{firstname} {lastname}";
     }
 
-    public async Task InitBot(bool isWebhook)
+    public async Task InitBot(bool isWebhook, CancellationToken cancellationToken = default)
     {
-        var bot = await _client.GetMeAsync();
+        var bot = await _client.GetMeAsync(cancellationToken);
         var message = isWebhook ? "Getting updates via webhook" : "Polling";
 
         _logger.LogInformation(message + " started for bot @{BotUsername} ({BotFullname}) with ID = {BotId}",
