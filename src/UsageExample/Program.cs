@@ -14,13 +14,11 @@ using UsageExample.Services;
 using Results = MinimalTelegramBot.Results.Results;
 
 // TODO: Group filtering.
-// TODO: Generic typed filters.
 // TODO: More Result templates.
 // TODO: More efficient handler resolving.
 // TODO: Different state models.
 // TODO: Notifications.
-// TODO: Bot info after startup.
-// TODO: Different persistence and builder options in builders (Locale Service, State Machine, Notification Service).
+// TODO: Different persistence and builder options in builders (State Machine, Notification Service).
 
 var builder = BotApplication.CreateBuilder(args);
 
