@@ -8,7 +8,7 @@ internal sealed class LocaleStringSetRepositoryBuilder : ILocaleStringSetReposit
     public ILocaleStringSetBuilder AddLocale(Locale locale)
     {
         var setBuilder = new LocaleStringSetBuilder(locale);
-        _setBuilders.Add(locale,setBuilder);
+        _setBuilders.Add(locale, setBuilder);
         return setBuilder;
     }
 

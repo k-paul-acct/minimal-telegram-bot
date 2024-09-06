@@ -56,10 +56,7 @@ internal static class BotApplicationRunner
 
         var webAppBuilder = WebApplication.CreateSlimBuilder(app._options.Args ?? []);
 
-        webAppBuilder.Services.Configure<JsonOptions>(o =>
-        {
-            JsonBotAPI.Configure(o.SerializerOptions);
-        });
+        webAppBuilder.Services.Configure<JsonOptions>(o => JsonBotAPI.Configure(o.SerializerOptions));
 
         webAppBuilder.Services.AddHttpClient("tgwebhook")
             .RemoveAllLoggers()
