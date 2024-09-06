@@ -11,10 +11,11 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
 {
     private readonly IHandlerBuilder _handlerBuilder;
     private readonly PipelineBuilder _pipelineBuilder = new();
-    private Func<BotRequestContext, Task>? _pipeline;
 
     internal readonly TelegramBotClient _client;
     internal readonly BotApplicationOptions _options;
+
+    private Func<BotRequestContext, Task>? _pipeline;
 
     internal BotApplication(IHost host, TelegramBotClient client, BotApplicationOptions options,
         IHandlerBuilder handlerBuilder)
@@ -28,60 +29,8 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
     }
 
     public IHost Host { get; }
-
-    Task IHost.StartAsync(CancellationToken cancellationToken)
-    {
-        throw new NotSupportedException();
-    }
-
-    Task IHost.StopAsync(CancellationToken cancellationToken)
-    {
-        throw new NotSupportedException();
-    }
-
     public IServiceProvider Services => Host.Services;
-
     IDictionary<string, object?> IBotApplicationBuilder.Properties => _pipelineBuilder.Properties;
-
-    public IBotApplicationBuilder Use(Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>> pipe)
-    {
-        ArgumentNullException.ThrowIfNull(pipe);
-
-        _pipelineBuilder.Use(pipe);
-        return this;
-    }
-
-    Func<BotRequestContext, Task> IBotApplicationBuilder.Build()
-    {
-        _pipeline = _pipelineBuilder.Build();
-        return _pipeline;
-    }
-
-    public Handler Handle(Delegate handlerDelegate)
-    {
-        ArgumentNullException.ThrowIfNull(handlerDelegate);
-
-        return _handlerBuilder.Handle(handlerDelegate);
-    }
-
-    public Handler Handle(Func<BotRequestContext, Task> func)
-    {
-        ArgumentNullException.ThrowIfNull(func);
-
-        return _handlerBuilder.Handle(func);
-    }
-
-    ValueTask<Handler?> IHandlerBuilder.TryResolveHandler(BotRequestFilterContext ctx)
-    {
-        return _handlerBuilder.TryResolveHandler(ctx);
-    }
-
-    internal async Task InitBot(bool isWebhook, CancellationToken cancellationToken)
-    {
-        using var scope = Host.Services.CreateScope();
-        var botInitService = scope.ServiceProvider.GetRequiredService<BotInitService>();
-        await botInitService.InitBot(isWebhook, cancellationToken);
-    }
 
     public static BotApplicationBuilder CreateBuilder()
     {
@@ -118,6 +67,54 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
         return new BotApplicationBuilder(options);
     }
 
+    public IBotApplicationBuilder Use(Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>> pipe)
+    {
+        ArgumentNullException.ThrowIfNull(pipe);
+
+        _pipelineBuilder.Use(pipe);
+        return this;
+    }
+
+    Func<BotRequestContext, Task> IBotApplicationBuilder.Build()
+    {
+        _pipeline = _pipelineBuilder.Build();
+        return _pipeline;
+    }
+
+    public Handler Handle(Delegate handlerDelegate)
+    {
+        ArgumentNullException.ThrowIfNull(handlerDelegate);
+
+        return _handlerBuilder.Handle(handlerDelegate);
+    }
+
+    public Handler Handle(Func<BotRequestContext, Task> func)
+    {
+        ArgumentNullException.ThrowIfNull(func);
+
+        return _handlerBuilder.Handle(func);
+    }
+
+    ValueTask<Handler?> IHandlerBuilder.TryResolveHandler(BotRequestFilterContext ctx)
+    {
+        return _handlerBuilder.TryResolveHandler(ctx);
+    }
+
+    Task IHost.StartAsync(CancellationToken cancellationToken)
+    {
+        throw new NotSupportedException();
+    }
+
+    Task IHost.StopAsync(CancellationToken cancellationToken)
+    {
+        throw new NotSupportedException();
+    }
+
+    public void Dispose()
+    {
+        Host.Dispose();
+    }
+
     public void Run()
     {
         RunAsync().GetAwaiter().GetResult();
@@ -134,15 +131,16 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
         await BotApplicationRunner.RunAsync(this, cancellationToken);
     }
 
+    internal async Task InitBot(bool isWebhook, CancellationToken cancellationToken)
+    {
+        using var scope = Host.Services.CreateScope();
+        var botInitService = scope.ServiceProvider.GetRequiredService<BotInitService>();
+        await botInitService.InitBot(isWebhook, cancellationToken);
+    }
+
     internal void StartPolling()
     {
         _client.StartReceiving(UpdateHandler, PollingErrorHandler, _options.ReceiverOptions);
-    }
-
-    private Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
-    {
-        _ = Task.Run(() => HandleUpdateInBackground(client, update), cancellationToken);
-        return Task.CompletedTask;
     }
 
     internal async Task HandleUpdateInBackground(ITelegramBotClient client, Update update)
@@ -192,6 +190,12 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
         await _pipeline!(context);
     }
 
+    private Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
+    {
+        _ = Task.Run(() => HandleUpdateInBackground(client, update), cancellationToken);
+        return Task.CompletedTask;
+    }
+
     private Task PollingErrorHandler(ITelegramBotClient client, Exception e, CancellationToken cancellationToken)
     {
         using var scope = Host.Services.CreateScope();
@@ -204,10 +208,5 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
     {
         this.UsePipe<ExceptionHandlerPipe>();
         this.UsePipe<UpdateLoggerPipe>();
-    }
-
-    public void Dispose()
-    {
-        Host.Dispose();
     }
 }
