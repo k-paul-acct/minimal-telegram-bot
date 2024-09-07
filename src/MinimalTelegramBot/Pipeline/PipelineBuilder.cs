@@ -6,7 +6,14 @@ internal sealed class PipelineBuilder : IBotApplicationBuilder
 
     private readonly List<Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>>> _pipes = [];
 
-    public IDictionary<string, object?> Properties { get; } = new Dictionary<string, object?>();
+    public PipelineBuilder(IServiceProvider services, IDictionary<string, object?> properties)
+    {
+        Services = services;
+        Properties = properties;
+    }
+
+    public IServiceProvider Services { get; }
+    public IDictionary<string, object?> Properties { get; }
 
     public IBotApplicationBuilder Use(Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>> pipe)
     {
