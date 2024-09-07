@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace MinimalTelegramBot.Pipeline;
 
 public static class UseExtensions
@@ -26,7 +28,7 @@ public static class UseExtensions
         return app.Use(next => context => pipe(context, next));
     }
 
-    public static IBotApplicationBuilder UsePipe<TPipe>(this IBotApplicationBuilder app) where TPipe : IPipe
+    public static IBotApplicationBuilder UsePipe<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TPipe>(this IBotApplicationBuilder app) where TPipe : IPipe
     {
         ArgumentNullException.ThrowIfNull(app);
 
@@ -35,13 +37,10 @@ public static class UseExtensions
 
     private static IBotApplicationBuilder UsePipe(this IBotApplicationBuilder app, Type pipeType)
     {
-        ArgumentNullException.ThrowIfNull(app);
-        ArgumentNullException.ThrowIfNull(pipeType);
-
-        return app.Use((ctx, next) =>
+        return app.Use(next => context =>
         {
-            var pipeService = (IPipe)ctx.Services.GetRequiredService(pipeType);
-            return pipeService.InvokeAsync(ctx, next);
+            var instance = (IPipe)ActivatorUtilities.CreateInstance(app.Services, pipeType);
+            return instance.InvokeAsync(context, next);
         });
     }
 }

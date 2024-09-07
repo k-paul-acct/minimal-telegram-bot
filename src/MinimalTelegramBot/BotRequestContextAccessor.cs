@@ -2,14 +2,14 @@ namespace MinimalTelegramBot;
 
 internal sealed class BotRequestContextAccessor : IBotRequestContextAccessor
 {
-    private static readonly AsyncLocal<BotRequestContextHolder> BotRequestContextCurrent = new();
+    private static readonly AsyncLocal<BotRequestContextHolder> _botRequestContextCurrent = new();
 
     public BotRequestContext? BotRequestContext
     {
-        get => BotRequestContextCurrent.Value?.Context;
+        get => _botRequestContextCurrent.Value?.Context;
         set
         {
-            var holder = BotRequestContextCurrent.Value;
+            var holder = _botRequestContextCurrent.Value;
             if (holder is not null)
             {
                 holder.Context = null;
@@ -17,7 +17,7 @@ internal sealed class BotRequestContextAccessor : IBotRequestContextAccessor
 
             if (value is not null)
             {
-                BotRequestContextCurrent.Value = new BotRequestContextHolder { Context = value, };
+                _botRequestContextCurrent.Value = new BotRequestContextHolder { Context = value, };
             }
         }
     }

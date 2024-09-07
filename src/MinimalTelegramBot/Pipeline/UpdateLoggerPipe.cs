@@ -4,9 +4,9 @@ namespace MinimalTelegramBot.Pipeline;
 
 internal sealed class UpdateLoggerPipe : IPipe
 {
-    private readonly ILogger<BotApplication> _logger;
+    private readonly ILogger<UpdateLoggerPipe> _logger;
 
-    public UpdateLoggerPipe(ILogger<BotApplication> logger)
+    public UpdateLoggerPipe(ILogger<UpdateLoggerPipe> logger)
     {
         _logger = logger;
     }
@@ -15,9 +15,7 @@ internal sealed class UpdateLoggerPipe : IPipe
     {
         _logger.LogInformation(1, "Received update with ID = {UpdateId}", ctx.Update.Id);
 
-        var stopWatch = new Stopwatch();
-
-        stopWatch.Start();
+        var stopWatch = Stopwatch.StartNew();
 
         await next(ctx);
 

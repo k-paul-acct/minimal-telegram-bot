@@ -15,6 +15,5 @@ internal sealed class BotApplicationOptions
     public string[]? Args { get; set; }
     public string Token { get; set; }
     public ReceiverOptions? ReceiverOptions { get; set; }
-    public WebhookOptions? WebhookOptions { get; set; }
     public BotApplicationBuilderOptions? BuilderOptions { get; set; }
 }

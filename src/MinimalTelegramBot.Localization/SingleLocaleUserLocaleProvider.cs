@@ -9,7 +9,7 @@ internal sealed class SingleLocaleUserLocaleProvider : IUserLocaleProvider
         _locale = locale;
     }
 
-    public Task<Locale> GetUserLocaleAsync(long userId)
+    public Task<Locale> GetUserLocaleAsync(long userId, CancellationToken cancellationToken = default)
     {
         return Task.FromResult(_locale);
     }

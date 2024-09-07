@@ -1,36 +1,33 @@
-using MinimalTelegramBot.Localization.Abstractions;
-using MinimalTelegramBot.Services;
+using MinimalTelegramBot.Runner;
 using MinimalTelegramBot.Settings;
-using MinimalTelegramBot.StateMachine.Abstractions;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace MinimalTelegramBot;
 
 public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IHost
 {
     private readonly IHandlerBuilder _handlerBuilder;
-    private readonly PipelineBuilder _pipelineBuilder = new();
+    private readonly PipelineBuilder _pipelineBuilder;
+    private readonly Dictionary<string, object?> _properties;
 
+    internal readonly IHost _host;
     internal readonly TelegramBotClient _client;
     internal readonly BotApplicationOptions _options;
 
-    private Func<BotRequestContext, Task>? _pipeline;
-
-    internal BotApplication(IHost host, TelegramBotClient client, BotApplicationOptions options,
-        IHandlerBuilder handlerBuilder)
+    internal BotApplication(IHost host, TelegramBotClient client, BotApplicationOptions options, IHandlerBuilder handlerBuilder)
     {
-        Host = host;
+        _host = host;
         _client = client;
         _options = options;
         _handlerBuilder = handlerBuilder;
+        _properties = new Dictionary<string, object?>();
+        _pipelineBuilder = new PipelineBuilder(Services, _properties);
 
         UseDefaultOuterPipes();
     }
 
-    public IHost Host { get; }
-    public IServiceProvider Services => Host.Services;
-    IDictionary<string, object?> IBotApplicationBuilder.Properties => _pipelineBuilder.Properties;
+    public IServiceProvider Services => _host.Services;
+    IDictionary<string, object?> IBotApplicationBuilder.Properties => _properties;
 
     public static BotApplicationBuilder CreateBuilder()
     {
@@ -77,8 +74,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
 
     Func<BotRequestContext, Task> IBotApplicationBuilder.Build()
     {
-        _pipeline = _pipelineBuilder.Build();
-        return _pipeline;
+        return _pipelineBuilder.Build();
     }
 
     public Handler Handle(Delegate handlerDelegate)
@@ -100,19 +96,19 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
         return _handlerBuilder.TryResolveHandler(ctx);
     }
 
-    Task IHost.StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotSupportedException();
+        return _host.StartAsync(cancellationToken);
     }
 
-    Task IHost.StopAsync(CancellationToken cancellationToken)
+    public Task StopAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotSupportedException();
+        return _host.StopAsync(cancellationToken);
     }
 
     public void Dispose()
     {
-        Host.Dispose();
+        _host.Dispose();
     }
 
     public void Run()
@@ -120,7 +116,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
         RunAsync().GetAwaiter().GetResult();
     }
 
-    public async Task RunAsync(CancellationToken cancellationToken = default)
+    public Task RunAsync(CancellationToken cancellationToken = default)
     {
         if (_pipelineBuilder.Properties.ContainsKey("__CallbackAutoAnsweringAdded"))
         {
@@ -128,80 +124,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
         }
 
         this.UsePipe<HandlerResolverPipe>();
-        await BotApplicationRunner.RunAsync(this, cancellationToken);
-    }
-
-    internal async Task InitBot(bool isWebhook, CancellationToken cancellationToken)
-    {
-        using var scope = Host.Services.CreateScope();
-        var botInitService = scope.ServiceProvider.GetRequiredService<BotInitService>();
-        await botInitService.InitBot(isWebhook, cancellationToken);
-    }
-
-    internal void StartPolling()
-    {
-        _client.StartReceiving(UpdateHandler, PollingErrorHandler, _options.ReceiverOptions);
-    }
-
-    internal async Task HandleUpdateInBackground(ITelegramBotClient client, Update update)
-    {
-        using var scope = Host.Services.CreateScope();
-
-        var context = new BotRequestContext();
-        var contextAccessor = scope.ServiceProvider.GetRequiredService<IBotRequestContextAccessor>();
-
-        contextAccessor.BotRequestContext = context;
-
-        var chatId = update.Message?.Chat.Id ??
-                     update.CallbackQuery?.Message?.Chat.Id ??
-                     update.EditedMessage?.Chat.Id ??
-                     update.ChannelPost?.Chat.Id ??
-                     update.EditedChannelPost?.Chat.Id ??
-                     update.MessageReaction?.Chat.Id ??
-                     update.MessageReactionCount?.Chat.Id ??
-                     update.ChatBoost?.Chat.Id ??
-                     update.RemovedChatBoost?.Chat.Id ??
-                     0;
-
-        var messageText = update.Message?.Text;
-        var callbackData = update.CallbackQuery?.Data;
-
-        context.Client = client;
-        context.Update = update;
-        context.ChatId = chatId;
-        context.MessageText = messageText;
-        context.CallbackData = callbackData;
-        context.Services = scope.ServiceProvider;
-
-        var localeProvider = scope.ServiceProvider.GetService<IUserLocaleProvider>();
-        if (localeProvider is not null)
-        {
-            var locale = await localeProvider.GetUserLocaleAsync(context.ChatId);
-            context.UserLocale = locale;
-        }
-
-        var stateMachine = scope.ServiceProvider.GetService<IStateMachine>();
-        if (stateMachine is not null)
-        {
-            var state = stateMachine.GetState(context.ChatId);
-            context.UserState = state;
-        }
-
-        await _pipeline!(context);
-    }
-
-    private Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
-    {
-        _ = Task.Run(() => HandleUpdateInBackground(client, update), cancellationToken);
-        return Task.CompletedTask;
-    }
-
-    private Task PollingErrorHandler(ITelegramBotClient client, Exception e, CancellationToken cancellationToken)
-    {
-        using var scope = Host.Services.CreateScope();
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<BotApplication>>();
-        logger.LogError(500, e, "Bot error: {Error}", e.Message);
-        return Task.CompletedTask;
+        return BotApplicationRunner.RunAsync(this, cancellationToken);
     }
 
     private void UseDefaultOuterPipes()
