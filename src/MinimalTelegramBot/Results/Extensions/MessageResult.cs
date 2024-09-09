@@ -29,26 +29,27 @@ internal sealed class MessageResult : IResult
         return _reply ? Reply(context) : Send(context);
     }
 
-    private async Task Edit(BotRequestContext context)
+    private Task<Message> Edit(BotRequestContext context)
     {
-        if (_replyMarkup is InlineKeyboardMarkup inline)
+        if (_replyMarkup is not null and not InlineKeyboardMarkup)
         {
-            var messageId = context.Update.CallbackQuery!.Message!.MessageId;
-            await context.Client.EditMessageTextAsync(context.ChatId, messageId, _message, replyMarkup: inline);
+            throw new InvalidOperationException($"Cannot edit message using not {nameof(InlineKeyboardMarkup)}");
         }
+
+        var inline = (InlineKeyboardMarkup?)_replyMarkup;
+        var messageId = context.Update.CallbackQuery!.Message!.MessageId;
+        return context.Client.EditMessageTextAsync(context.ChatId, messageId, _message, replyMarkup: inline);
     }
 
-    private async Task Reply(BotRequestContext context)
+    private Task<Message> Reply(BotRequestContext context)
     {
         var messageId = context.Update.Message!.MessageId;
         var replyParameters = new ReplyParameters { ChatId = context.ChatId, MessageId = messageId, };
-
-        await context.Client.SendTextMessageAsync(context.ChatId, _message, replyParameters: replyParameters,
-            replyMarkup: _replyMarkup);
+        return context.Client.SendTextMessageAsync(context.ChatId, _message, replyParameters: replyParameters, replyMarkup: _replyMarkup);
     }
 
-    private async Task Send(BotRequestContext context)
+    private Task<Message> Send(BotRequestContext context)
     {
-        await context.Client.SendTextMessageAsync(context.ChatId, _message, replyMarkup: _replyMarkup);
+        return context.Client.SendTextMessageAsync(context.ChatId, _message, replyMarkup: _replyMarkup);
     }
 }

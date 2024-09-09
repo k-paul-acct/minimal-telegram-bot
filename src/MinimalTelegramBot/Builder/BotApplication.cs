@@ -1,32 +1,35 @@
+using MinimalTelegramBot.Pipeline.TypedPipes;
 using MinimalTelegramBot.Runner;
 using MinimalTelegramBot.Settings;
 using Telegram.Bot;
+using Telegram.Bot.Types.Enums;
 
-namespace MinimalTelegramBot;
+namespace MinimalTelegramBot.Builder;
 
-public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IHost
+public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher, IHost
 {
-    private readonly IHandlerBuilder _handlerBuilder;
     private readonly PipelineBuilder _pipelineBuilder;
     private readonly Dictionary<string, object?> _properties;
+    private readonly IHandlerDispatcher _handlerDispatcher;
 
     internal readonly IHost _host;
     internal readonly TelegramBotClient _client;
     internal readonly BotApplicationOptions _options;
 
-    internal BotApplication(IHost host, TelegramBotClient client, BotApplicationOptions options, IHandlerBuilder handlerBuilder)
+    internal BotApplication(IHost host, TelegramBotClient client, BotApplicationOptions options)
     {
         _host = host;
         _client = client;
         _options = options;
-        _handlerBuilder = handlerBuilder;
         _properties = new Dictionary<string, object?>();
         _pipelineBuilder = new PipelineBuilder(Services, _properties);
+        _handlerDispatcher = new RootHandlerDispatcher(Services);
 
-        UseDefaultOuterPipes();
+        this.UsePipe<UpdateLoggerPipe>();
     }
 
     public IServiceProvider Services => _host.Services;
+    ICollection<HandlerSource> IHandlerDispatcher.HandlerSources => _handlerDispatcher.HandlerSources;
     IDictionary<string, object?> IBotApplicationBuilder.Properties => _properties;
 
     public static BotApplicationBuilder CreateBuilder()
@@ -61,10 +64,11 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
 
     private static BotApplicationBuilder CreateBuilder(BotApplicationBuilderOptions options)
     {
+        options.ReceiverOptions.AllowedUpdates ??= [UpdateType.Message, UpdateType.CallbackQuery,];
         return new BotApplicationBuilder(options);
     }
 
-    public IBotApplicationBuilder Use(Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>> pipe)
+    public IBotApplicationBuilder Use(Func<BotRequestDelegate, BotRequestDelegate> pipe)
     {
         ArgumentNullException.ThrowIfNull(pipe);
 
@@ -72,28 +76,16 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
         return this;
     }
 
-    Func<BotRequestContext, Task> IBotApplicationBuilder.Build()
+    BotRequestDelegate IBotApplicationBuilder.Build()
     {
-        return _pipelineBuilder.Build();
-    }
+        var handlerResolver = new HandlerResolver(_handlerDispatcher.HandlerSources);
+        var fullPipeline = handlerResolver.BuildFullPipeline();
 
-    public Handler Handle(Delegate handlerDelegate)
-    {
-        ArgumentNullException.ThrowIfNull(handlerDelegate);
+        this.Use(next => context => fullPipeline(context, next));
 
-        return _handlerBuilder.Handle(handlerDelegate);
-    }
+        var pipeline = _pipelineBuilder.Build();
 
-    public Handler Handle(Func<BotRequestContext, Task> func)
-    {
-        ArgumentNullException.ThrowIfNull(func);
-
-        return _handlerBuilder.Handle(func);
-    }
-
-    ValueTask<Handler?> IHandlerBuilder.TryResolveHandler(BotRequestFilterContext ctx)
-    {
-        return _handlerBuilder.TryResolveHandler(ctx);
+        return pipeline;
     }
 
     public Task StartAsync(CancellationToken cancellationToken = default)
@@ -120,16 +112,9 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerBuilder, IH
     {
         if (_pipelineBuilder.Properties.ContainsKey("__CallbackAutoAnsweringAdded"))
         {
-            this.UsePipe<CallbackAutoAnsweringPipe>();
+            this.UsePipe(new CallbackAutoAnsweringPipe());
         }
 
-        this.UsePipe<HandlerResolverPipe>();
         return BotApplicationRunner.RunAsync(this, cancellationToken);
-    }
-
-    private void UseDefaultOuterPipes()
-    {
-        this.UsePipe<ExceptionHandlerPipe>();
-        this.UsePipe<UpdateLoggerPipe>();
     }
 }

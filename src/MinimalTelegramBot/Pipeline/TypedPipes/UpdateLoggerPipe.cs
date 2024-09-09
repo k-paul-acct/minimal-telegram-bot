@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace MinimalTelegramBot.Pipeline;
+namespace MinimalTelegramBot.Pipeline.TypedPipes;
 
 internal sealed class UpdateLoggerPipe : IPipe
 {
@@ -11,7 +11,7 @@ internal sealed class UpdateLoggerPipe : IPipe
         _logger = logger;
     }
 
-    public async Task InvokeAsync(BotRequestContext ctx, Func<BotRequestContext, Task> next)
+    public async Task InvokeAsync(BotRequestContext ctx, BotRequestDelegate next)
     {
         _logger.LogInformation(1, "Received update with ID = {UpdateId}", ctx.Update.Id);
 
@@ -21,14 +21,13 @@ internal sealed class UpdateLoggerPipe : IPipe
 
         stopWatch.Stop();
 
-        if (ctx.Data.TryGetValue(PipelineBuilder.RequestUnhandledKey, out var unhandled) && (bool)unhandled!)
+        if (!ctx.UpdateHandlingStarted)
         {
             _logger.LogInformation(2, "Update with ID = {UpdateId} is not handled", ctx.Update.Id);
         }
         else
         {
-            _logger.LogInformation(3, "Update with ID = {UpdateId} is handled. Duration {Milliseconds} ms",
-                ctx.Update.Id, stopWatch.ElapsedMilliseconds);
+            _logger.LogInformation(3, "Update with ID = {UpdateId} is handled. Duration {Milliseconds} ms", ctx.Update.Id, stopWatch.ElapsedMilliseconds);
         }
     }
 }

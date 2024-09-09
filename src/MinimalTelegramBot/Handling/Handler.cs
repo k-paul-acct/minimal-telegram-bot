@@ -1,80 +1,53 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace MinimalTelegramBot.Handling;
 
-public class Handler
+public sealed class Handler
 {
-    private readonly List<(Func<BotRequestFilterContext, ValueTask<bool>> Delegate, IList<object?>? Arguments)> _filterDelegates = [];
-    private readonly Func<BotRequestContext, Task<IResult>> _handlerDelegate;
+    private readonly Dictionary<Type, object[]> _metadata;
 
-    public Handler(Delegate handlerDelegate)
+    public Handler(BotRequestDelegate requestDelegate, Dictionary<Type, object[]> metadata)
     {
-        ArgumentNullException.ThrowIfNull(handlerDelegate);
-
-        _handlerDelegate = HandlerDelegateBuilder.Build(handlerDelegate);
+        RequestDelegate = requestDelegate;
+        _metadata = metadata;
     }
 
-    public Handler Filter(Func<BotRequestFilterContext, bool> filterDelegate)
+    public BotRequestDelegate RequestDelegate { get; }
+
+    public bool SatisfyRequirements(ICollection<UpdateHandlingRequirement> requirements)
     {
-        ArgumentNullException.ThrowIfNull(filterDelegate);
-
-        _filterDelegates.Add((context => ValueTask.FromResult(filterDelegate(context)), null));
-        return this;
-    }
-
-    public Handler Filter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>() where TFilter : class, IHandlerFilter
-    {
-        return FilterWithFactory<TFilter>(null);
-    }
-
-    public Handler Filter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(object?[] arguments) where TFilter : class, IHandlerFilter
-    {
-        return FilterWithFactory<TFilter>(arguments);
-    }
-
-    private Handler FilterWithFactory<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(object?[]? arguments) where TFilter : class, IHandlerFilter
-    {
-        ObjectFactory filterFactory;
-
-        try
+        foreach (var requirement in requirements)
         {
-            filterFactory = ActivatorUtilities.CreateFactory(typeof(TFilter), [typeof(BotRequestFilterContext),]);
-        }
-        catch (InvalidOperationException)
-        {
-            filterFactory = ActivatorUtilities.CreateFactory(typeof(TFilter), []);
-        }
+            var requirementType = requirement.Requirement.GetType();
 
-        _filterDelegates.Add((filterContext =>
-        {
-            var filter = (IHandlerFilter)filterFactory(filterContext.Services, [filterContext,]);
-            return filter.Filter(filterContext);
-        }, arguments));
-
-        return this;
-    }
-
-    internal async ValueTask<bool> CanHandle(BotRequestFilterContext context)
-    {
-        foreach (var (filterDelegate, arguments) in _filterDelegates)
-        {
-            if (arguments is not null)
-            {
-                context.FilterArguments = arguments;
-            }
-
-            if (!await filterDelegate(context))
+            if (!_metadata.TryGetValue(requirementType, out var objects))
             {
                 return false;
+            }
+
+            if (requirementType == typeof(UpdateTypeAttribute))
+            {
+                var updateTypeAttribute = (UpdateTypeAttribute)requirement.Requirement;
+                var pass = CheckUpdateTypeRequirement(objects, updateTypeAttribute);
+                if (!pass)
+                {
+                    return false;
+                }
             }
         }
 
         return true;
     }
 
-    internal async Task Handle(BotRequestContext context)
+    private static bool CheckUpdateTypeRequirement(object[] metadata, UpdateTypeAttribute requirement)
     {
-        var result = await _handlerDelegate(context);
-        await result.ExecuteAsync(context);
+        foreach (var obj in metadata)
+        {
+            var updateTypeMetadata = (UpdateTypeAttribute)obj;
+            if (updateTypeMetadata.UpdateType == requirement.UpdateType)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

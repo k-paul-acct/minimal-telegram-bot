@@ -1,15 +1,13 @@
 namespace MinimalTelegramBot.Handling.Filters;
 
-public class BotRequestFilterContext
+public sealed class BotRequestFilterContext
 {
     public BotRequestFilterContext(BotRequestContext context)
     {
-        ArgumentNullException.ThrowIfNull(context);
-
         BotRequestContext = context;
     }
 
-    public IList<object?> FilterArguments { get; internal set; } = [];
-    public BotRequestContext BotRequestContext { get; set; }
+    public List<object?> FilterArguments { get; } = [];
+    public BotRequestContext BotRequestContext { get; }
     public IServiceProvider Services => BotRequestContext.Services;
 }

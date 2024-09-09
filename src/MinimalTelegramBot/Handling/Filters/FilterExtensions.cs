@@ -1,34 +1,99 @@
+using System.Diagnostics.CodeAnalysis;
 using Telegram.Bot.Types.Enums;
 
 namespace MinimalTelegramBot.Handling.Filters;
 
 public static class FilterExtensions
 {
-    public static Handler FilterText(this Handler handler, Func<string, bool> filter)
+    public static IHandlerConventionBuilder Filter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(this IHandlerConventionBuilder builder)
+        where TFilter : IHandlerFilter
     {
-        ArgumentNullException.ThrowIfNull(handler);
-        ArgumentNullException.ThrowIfNull(filter);
+        ArgumentNullException.ThrowIfNull(builder);
 
-        return handler.Filter(ctx => ctx.BotRequestContext.MessageText is not null && filter(ctx.BotRequestContext.MessageText));
+        ObjectFactory filterFactory;
+
+        try
+        {
+            filterFactory = ActivatorUtilities.CreateFactory(typeof(TFilter), [typeof(BotRequestFilterFactoryContext),]);
+        }
+        catch (InvalidOperationException)
+        {
+            filterFactory = ActivatorUtilities.CreateFactory(typeof(TFilter), []);
+        }
+
+        builder.AddFilterFactory((factoryContext, next) =>
+        {
+            return filterContext =>
+            {
+                var filter = (IHandlerFilter)filterFactory(factoryContext.Services, [factoryContext,]);
+                return filter.InvokeAsync(filterContext, next);
+            };
+        });
+
+        return builder;
     }
 
-    public static Handler FilterCommand(this Handler handler, string command)
+    public static IHandlerConventionBuilder Filter(this IHandlerConventionBuilder builder, Func<BotRequestFilterContext, BotRequestFilterDelegate, ValueTask<IResult>> filter)
     {
-        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(filter);
+
+        builder.AddFilterFactory((_, next) => filterContext => filter(filterContext, next));
+
+        return builder;
+    }
+
+    public static IHandlerConventionBuilder Filter(this IHandlerConventionBuilder builder, Func<BotRequestFilterContext, IResult> filterDelegate)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static IHandlerConventionBuilder Filter(this IHandlerConventionBuilder builder, Func<BotRequestFilterContext, ValueTask<IResult>> filterDelegate)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static IHandlerConventionBuilder Filter(this IHandlerConventionBuilder builder, Func<BotRequestFilterContext, bool> filterDelegate)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static IHandlerConventionBuilder Filter(this IHandlerConventionBuilder builder, Func<BotRequestFilterContext, ValueTask<bool>> filterDelegate)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static IHandlerConventionBuilder AddFilterFactory(this IHandlerConventionBuilder builder, Func<BotRequestFilterFactoryContext, BotRequestFilterDelegate, BotRequestFilterDelegate> factory)
+    {
+        builder.Add(handlerBuilder => handlerBuilder.FilterFactories.Add(factory));
+        return builder;
+    }
+
+    public static IHandlerConventionBuilder FilterText(this IHandlerConventionBuilder builder, Func<string, bool> filter)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(filter);
+
+        return builder.Filter(ctx => ctx.BotRequestContext.MessageText is not null && filter(ctx.BotRequestContext.MessageText));
+    }
+
+    public static IHandlerConventionBuilder FilterCommand(this IHandlerConventionBuilder builder, string command)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(command);
 
-        return handler.Filter(ctx =>
+        builder.Filter((context, next) =>
         {
-            if (ctx.BotRequestContext.MessageText is null)
+            if (context.BotRequestContext.MessageText is null)
             {
-                return false;
+                return new ValueTask<IResult>(Results.Results.Empty);
             }
 
-            var span = ctx.BotRequestContext.MessageText.AsSpan();
+            var span = context.BotRequestContext.MessageText.AsSpan();
 
             if (span.Length < 2 || span[0] != '/')
             {
-                return false;
+                return new ValueTask<IResult>(Results.Results.Empty);
             }
 
             var commandEnd = 1;
@@ -45,35 +110,42 @@ public static class FilterExtensions
                 commandEnd += 1;
             }
 
-            if (commandEnd < 2)
-            {
-                return false;
-            }
-
-            return span[..commandEnd].SequenceEqual(command);
+            return span[..commandEnd].SequenceEqual(command) ? next(context) : new ValueTask<IResult>(Results.Results.Empty);
         });
+
+        var metadata = new UpdateTypeAttribute(UpdateType.Message);
+        builder.Add(handlerBuilder => handlerBuilder.Metadata.Add(metadata));
+
+        return builder;
     }
 
-    public static Handler FilterCallbackData(this Handler handler, Func<string, bool> filter)
+    public static IHandlerConventionBuilder FilterCallbackData(this IHandlerConventionBuilder builder, Func<string, bool> filter)
     {
-        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(filter);
 
-        return handler.Filter(ctx => ctx.BotRequestContext.CallbackData is not null && filter(ctx.BotRequestContext.CallbackData));
+        return builder.Filter(ctx => ctx.BotRequestContext.CallbackData is not null && filter(ctx.BotRequestContext.CallbackData));
     }
 
-    public static Handler FilterUpdateType(this Handler handler, UpdateType updateType)
+    public static IHandlerConventionBuilder FilterUpdateType(this IHandlerConventionBuilder builder, UpdateType updateType)
     {
-        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(builder);
 
-        return handler.Filter(ctx => ctx.BotRequestContext.Update.Type == updateType);
+        builder.Filter((context, next) => context.BotRequestContext.Update.Type == updateType
+            ? next(context)
+            : new ValueTask<IResult>(Results.Results.Empty));
+
+        var metadata = new UpdateTypeAttribute(updateType);
+        builder.Add(handlerBuilder => handlerBuilder.Metadata.Add(metadata));
+
+        return builder;
     }
 
-    public static Handler FilterUpdateType(this Handler handler, Func<UpdateType, bool> filter)
+    public static IHandlerConventionBuilder FilterUpdateType(this IHandlerConventionBuilder builder, Func<UpdateType, bool> filter)
     {
-        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(filter);
 
-        return handler.Filter(ctx => filter(ctx.BotRequestContext.Update.Type));
+        return builder.Filter(ctx => filter(ctx.BotRequestContext.Update.Type));
     }
 }

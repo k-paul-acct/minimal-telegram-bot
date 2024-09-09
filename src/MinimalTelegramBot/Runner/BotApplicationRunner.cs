@@ -1,3 +1,4 @@
+using MinimalTelegramBot.Logging;
 using Telegram.Bot;
 
 namespace MinimalTelegramBot.Runner;
@@ -8,14 +9,15 @@ internal static partial class BotApplicationRunner
     {
         var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
         var logger = loggerFactory.CreateLogger("MinimalTelegramBot.Runner");
+        var infrastructureLogger = new InfrastructureLogger(loggerFactory);
 
         IBotApplicationBuilder builder = app;
         var pipeline = builder.Build();
-        var updateProcessor = new UpdateHandler(builder.Services, pipeline);
+        var updateHandler = new UpdateHandler(builder.Services, pipeline, infrastructureLogger);
         var isWebhook = builder.Properties.ContainsKey("__WebhookEnabled");
 
         await app.HandleDeleteWebhookFeature(cancellationToken);
-        var host = await (isWebhook ? app.StartWebhook(updateProcessor, cancellationToken) : app.StartPolling(updateProcessor, cancellationToken));
+        var host = await (isWebhook ? app.StartWebhook(updateHandler, cancellationToken) : app.StartPolling(updateHandler, cancellationToken));
 
         var gettingUpdatesVia = isWebhook ? "Webhook" : "Polling";
         var client = app.Services.GetRequiredService<ITelegramBotClient>();

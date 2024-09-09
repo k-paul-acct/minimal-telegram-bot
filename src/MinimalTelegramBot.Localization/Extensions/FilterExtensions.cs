@@ -5,11 +5,11 @@ namespace MinimalTelegramBot.Localization.Extensions;
 
 public static class FilterExtensions
 {
-    public static Handler FilterTextWithLocalizer(this Handler handler, string key)
+    public static IHandlerConventionBuilder FilterTextWithLocalizer(this IHandlerConventionBuilder builder, string key)
     {
-        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(key);
 
-        return handler.Filter<LocalizedTextFilter>([key,]);
+        return handler.Filter<LocalizedTextFilter>();
     }
 }

@@ -12,16 +12,13 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(build);
 
-        services.TryAddScoped<IUserLocaleProvider, TUserLocaleProvider>();
-        services.TryAddScoped<ILocalizer, Localizer>();
-
         var builder = new LocaleStringSetRepositoryBuilder();
-
         build(builder);
-
         var repository = builder.Build();
 
         services.TryAddSingleton(repository);
+        services.TryAddSingleton<ILocalizer, Localizer>();
+        services.TryAddScoped<IUserLocaleProvider, TUserLocaleProvider>();
 
         return services;
     }
@@ -32,18 +29,15 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(locale);
         ArgumentNullException.ThrowIfNull(build);
 
-        services.TryAddSingleton<IUserLocaleProvider>(new SingleLocaleUserLocaleProvider(locale));
-        services.TryAddScoped<ILocalizer, Localizer>();
-
         var builder = new LocaleStringSetBuilder(locale);
-
         build(builder);
-
         var set = builder.Build();
         var repository = new InMemoryLocaleStringSetRepository();
-
         repository.AddLocaleStringSet(set);
+
+        services.TryAddSingleton<ILocalizer, Localizer>();
         services.TryAddSingleton<ILocaleStringSetRepository>(repository);
+        services.TryAddSingleton<IUserLocaleProvider>(new SingleLocaleUserLocaleProvider(locale));
 
         return services;
     }

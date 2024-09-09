@@ -5,7 +5,7 @@ namespace MinimalTelegramBot.Results;
 
 public static class Results
 {
-    internal static IResult Empty => new MessageResult(string.Empty);
+    public static IResult Empty { get; } = new EmptyResult();
 
     public static IResult Message(string message, IReplyMarkup? keyboard = null)
     {

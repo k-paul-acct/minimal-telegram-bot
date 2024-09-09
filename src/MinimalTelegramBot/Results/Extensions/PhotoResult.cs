@@ -13,7 +13,7 @@ internal sealed class PhotoResult : FileResult
     {
     }
 
-    protected override Task Send(BotRequestContext context, InputFile inputFile)
+    protected override Task<Message> Send(BotRequestContext context, InputFile inputFile)
     {
         return context.Client.SendPhotoAsync(context.ChatId, inputFile, caption: Caption);
     }

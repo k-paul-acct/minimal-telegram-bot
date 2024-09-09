@@ -1,4 +1,5 @@
 using MinimalTelegramBot.Localization.Abstractions;
+using MinimalTelegramBot.Logging;
 using MinimalTelegramBot.StateMachine.Abstractions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -9,13 +10,15 @@ internal sealed class UpdateHandler
 {
     private readonly ITelegramBotClient _client;
     private readonly IBotRequestContextAccessor _contextAccessor;
-    private readonly Func<BotRequestContext, Task> _pipeline;
+    private readonly InfrastructureLogger _logger;
+    private readonly BotRequestDelegate _pipeline;
     private readonly IServiceProvider _services;
 
-    public UpdateHandler(IServiceProvider services, Func<BotRequestContext, Task> pipeline)
+    public UpdateHandler(IServiceProvider services, BotRequestDelegate pipeline, InfrastructureLogger logger)
     {
         _services = services;
         _pipeline = pipeline;
+        _logger = logger;
         _client = _services.GetRequiredService<ITelegramBotClient>();
         _contextAccessor = _services.GetRequiredService<IBotRequestContextAccessor>();
     }
@@ -49,20 +52,27 @@ internal sealed class UpdateHandler
         context.CallbackData = callbackData;
         context.Services = scope.ServiceProvider;
 
-        var localeProvider = scope.ServiceProvider.GetService<IUserLocaleProvider>();
-        if (localeProvider is not null)
+        try
         {
-            var locale = await localeProvider.GetUserLocaleAsync(chatId);
-            context.UserLocale = locale;
-        }
+            var localeProvider = scope.ServiceProvider.GetService<IUserLocaleProvider>();
+            if (localeProvider is not null)
+            {
+                var locale = await localeProvider.GetUserLocaleAsync(chatId);
+                context.UserLocale = locale;
+            }
 
-        var stateMachine = scope.ServiceProvider.GetService<IStateMachine>();
-        if (stateMachine is not null)
+            var stateMachine = scope.ServiceProvider.GetService<IStateMachine>();
+            if (stateMachine is not null)
+            {
+                var state = stateMachine.GetState(chatId);
+                context.UserState = state;
+            }
+
+            await _pipeline(context);
+        }
+        catch (Exception ex)
         {
-            var state = stateMachine.GetState(chatId);
-            context.UserState = state;
+            _logger.ApplicationError(ex);
         }
-
-        await _pipeline(context);
     }
 }

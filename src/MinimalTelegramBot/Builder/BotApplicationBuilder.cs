@@ -5,7 +5,7 @@ using Telegram.Bot;
 
 namespace MinimalTelegramBot.Builder;
 
-public class BotApplicationBuilder : IHostApplicationBuilder
+public sealed class BotApplicationBuilder : IHostApplicationBuilder
 {
     private readonly HostApplicationBuilder _hostBuilder;
 
@@ -39,14 +39,12 @@ public class BotApplicationBuilder : IHostApplicationBuilder
         _options.TelegramBotClientOptionsConfigure?.Invoke(telegramBotClientOptions);
 
         var client = new TelegramBotClient(telegramBotClientOptions);
-        var handlerBuilder = new HandlerBuilder();
 
         Services.TryAddSingleton<ITelegramBotClient>(client);
-        Services.TryAddSingleton<IHandlerBuilder>(handlerBuilder);
         Services.TryAddSingleton<IBotRequestContextAccessor, BotRequestContextAccessor>();
 
         var host = _hostBuilder.Build();
 
-        return new BotApplication(host, client, new BotApplicationOptions(_options), handlerBuilder);
+        return new BotApplication(host, client, new BotApplicationOptions(_options));
     }
 }

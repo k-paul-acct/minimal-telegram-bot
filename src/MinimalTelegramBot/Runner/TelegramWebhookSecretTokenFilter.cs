@@ -1,4 +1,4 @@
-namespace MinimalTelegramBot;
+namespace MinimalTelegramBot.Runner;
 using HttpResults = Microsoft.AspNetCore.Http.Results;
 
 internal sealed class TelegramWebhookSecretTokenFilter : IEndpointFilter

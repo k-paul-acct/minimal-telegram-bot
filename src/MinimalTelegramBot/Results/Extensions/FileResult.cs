@@ -42,5 +42,5 @@ internal abstract class FileResult : IResult
         }
     }
 
-    protected abstract Task Send(BotRequestContext context, InputFile inputFile);
+    protected abstract Task<Message> Send(BotRequestContext context, InputFile inputFile);
 }

@@ -2,7 +2,6 @@
 
 global using MinimalTelegramBot;
 global using MinimalTelegramBot.Builder;
-global using MinimalTelegramBot.Extensions;
 global using MinimalTelegramBot.Handling;
 global using MinimalTelegramBot.Handling.Filters;
 global using MinimalTelegramBot.Pipeline;

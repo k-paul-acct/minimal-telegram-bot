@@ -5,12 +5,15 @@ namespace MinimalTelegramBot.Results.Extensions;
 
 internal sealed class CallbackAnswerResult : IResult
 {
-    public async Task ExecuteAsync(BotRequestContext context)
+    public Task ExecuteAsync(BotRequestContext context)
     {
-        if (context.Update.Type == UpdateType.CallbackQuery && !context.Data.ContainsKey("__CallbackAnswered"))
+        if (context.Update.Type != UpdateType.CallbackQuery || context.Data.ContainsKey("__CallbackAnswered"))
         {
-            context.Data["__CallbackAnswered"] = true;
-            await context.Client.AnswerCallbackQueryAsync(context.Update.CallbackQuery!.Id);
+            return Task.CompletedTask;
         }
+
+        context.Data["__CallbackAnswered"] = true;
+
+        return context.Client.AnswerCallbackQueryAsync(context.Update.CallbackQuery!.Id);
     }
 }

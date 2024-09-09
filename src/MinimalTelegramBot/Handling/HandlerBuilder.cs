@@ -1,111 +1,76 @@
 namespace MinimalTelegramBot.Handling;
 
-public class HandlerBuilder : IHandlerBuilder
+public sealed class HandlerBuilder : IHandlerConventionBuilder
 {
-    private readonly List<Handler> _handlers = [];
+    private readonly List<Action<HandlerBuilder>> _conventions;
+    private readonly IHandlerDispatcher _handlerDispatcher;
+    private readonly Delegate _handler;
 
-    public Handler Handle(Delegate handlerDelegate)
+    public HandlerBuilder(IHandlerDispatcher handlerDispatcher, Delegate handler, BotRequestDelegate? botRequestDelegate)
     {
-        ArgumentNullException.ThrowIfNull(handlerDelegate);
+        _handlerDispatcher = handlerDispatcher;
+        _handler = handler;
+        _conventions = [];
+        Metadata = [];
+        BotRequestDelegate = botRequestDelegate;
+        FilterFactories = [];
 
-        var handler = new Handler(handlerDelegate);
-        _handlers.Add(handler);
-        return handler;
+        _handlerDispatcher.HandlerSources.Add(new SingleHandlerHandlerSource(this));
     }
 
-    public Handler Handle(Func<BotRequestContext, Task> func)
-    {
-        ArgumentNullException.ThrowIfNull(func);
+    public List<object> Metadata { get; }
+    public BotRequestDelegate? BotRequestDelegate { get; set; }
+    public List<Func<BotRequestFilterFactoryContext, BotRequestFilterDelegate, BotRequestFilterDelegate>> FilterFactories { get; }
 
-        return Handle((Delegate)func);
+    void IHandlerConventionBuilder.Add(Action<HandlerBuilder> convention)
+    {
+        _conventions.Add(convention);
     }
 
-    public async ValueTask<Handler?> TryResolveHandler(BotRequestFilterContext ctx)
+    public Handler Build(ICollection<Action<HandlerBuilder>> outerConventions)
     {
-        ArgumentNullException.ThrowIfNull(ctx);
+        throw new NotImplementedException();
+    }
 
-        foreach (var handler in _handlers)
+    private sealed class SingleHandlerHandlerSource : HandlerSource
+    {
+        private readonly HandlerBuilder _handlerBuilder;
+
+        public SingleHandlerHandlerSource(HandlerBuilder handlerBuilder)
         {
-            if (await handler.CanHandle(ctx))
-            {
-                return handler;
-            }
+            _handlerBuilder = handlerBuilder;
         }
 
-        return null;
-    }
-}
+        public override IReadOnlyCollection<Handler> Handlers => GetHandlers();
 
-internal static class RequestDelegateHelper
-{
-    public static Func<BotRequestContext, Task<IResult>> VoidDelegateWrapper(Action<BotRequestContext> delegateInvocation)
-    {
-        return context =>
+        private List<Handler> GetHandlers()
         {
-            delegateInvocation(context);
-            return Task.FromResult(Results.Results.Empty);
-        };
-    }
+            foreach (var convention in _handlerBuilder._conventions)
+            {
+                convention(_handlerBuilder);
+            }
 
-    public static Func<BotRequestContext, Task<IResult>> ResultDelegateWrapper(
-        Func<BotRequestContext, IResult> delegateInvocation)
-    {
-        return context => Task.FromResult(delegateInvocation(context));
-    }
+            var metadata = ConstructHandlerMetadata();
+            var handlerDelegate = HandlerDelegateBuilder.Build(_handlerBuilder._handler);
+            var options = new BotRequestDelegateFactoryOptions
+            {
+                Services = _handlerBuilder._handlerDispatcher.Services,
+                HandlerBuilder = _handlerBuilder,
+            };
 
-    public static Func<BotRequestContext, Task<IResult>> GenericDelegateWrapper<T>(
-        Func<BotRequestContext, T> delegateInvocation, Func<T, IResult> resultHandler)
-    {
-        return context =>
+            var filtered = FilteredBotRequestDelegateBuilder.Build(handlerDelegate, options);
+            var handler = new Handler(filtered, metadata);
+
+            return [handler,];
+        }
+
+        private Dictionary<Type, object[]> ConstructHandlerMetadata()
         {
-            var invocationResult = delegateInvocation(context);
-            return Task.FromResult(resultHandler(invocationResult));
-        };
-    }
+            var metadata = _handlerBuilder.Metadata
+                .GroupBy(x => x.GetType())
+                .ToDictionary(x => x.Key, x => x.ToArray());
 
-    public static Func<BotRequestContext, Task<IResult>> TaskDelegateWrapper(
-        Func<BotRequestContext, Task> delegateInvocation)
-    {
-        return async context =>
-        {
-            await delegateInvocation(context);
-            return Results.Results.Empty;
-        };
-    }
-
-    public static Func<BotRequestContext, Task<IResult>> GenericTaskDelegateWrapper<T>(
-        Func<BotRequestContext, Task<T>> delegateInvocation, Func<T, IResult> resultHandler)
-    {
-        return async context =>
-        {
-            var invocationResult = await delegateInvocation(context);
-            return resultHandler(invocationResult);
-        };
-    }
-
-    public static Func<BotRequestContext, Task<IResult>> ValueTaskDelegateWrapper(Func<BotRequestContext,
-        ValueTask> delegateInvocation)
-    {
-        return async context =>
-        {
-            await delegateInvocation(context);
-            return Results.Results.Empty;
-        };
-    }
-
-    public static Func<BotRequestContext, Task<IResult>> ResultValueTaskDelegateWrapper(Func<BotRequestContext,
-        ValueTask<IResult>> delegateInvocation)
-    {
-        return async context => await delegateInvocation(context);
-    }
-
-    public static Func<BotRequestContext, Task<IResult>> GenericValueTaskDelegateWrapper<T>(Func<BotRequestContext,
-        ValueTask<T>> delegateInvocation, Func<T, IResult> resultHandler)
-    {
-        return async context =>
-        {
-            var invocationResult = await delegateInvocation(context);
-            return resultHandler(invocationResult);
-        };
+            return metadata;
+        }
     }
 }
