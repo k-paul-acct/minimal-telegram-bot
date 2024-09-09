@@ -1,13 +1,12 @@
 using MinimalTelegramBot.Localization.Abstractions;
 using MinimalTelegramBot.StateMachine.Abstractions;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace MinimalTelegramBot;
 
 public class BotRequestContext
 {
-    public ITelegramBotClient Client { get; set; } = null!;
+    public ITelegramBotClientFacade Client { get; set; } = null!;
     public Update Update { get; set; } = null!;
     public long ChatId { get; set; }
     public string? MessageText { get; set; }

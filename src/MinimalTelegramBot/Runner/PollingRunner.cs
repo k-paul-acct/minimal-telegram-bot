@@ -17,10 +17,15 @@ internal static partial class PollingRunner
 
         return app._host;
 
-        Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
+        async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
         {
-            Task.Run(() => updateHandler.Handle(update), cancellationToken);
-            return Task.CompletedTask;
+            var invocationContext = await updateHandler.CreateInvocationContext(update, false);
+            if (invocationContext is null)
+            {
+                return;
+            }
+
+            _ = Task.Run(invocationContext.Invoke, cancellationToken);
         }
 
         Task PollingErrorHandler(ITelegramBotClient client, Exception ex, CancellationToken cancellationToken)

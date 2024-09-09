@@ -42,6 +42,8 @@ public sealed class BotApplicationBuilder : IHostApplicationBuilder
 
         Services.TryAddSingleton<ITelegramBotClient>(client);
         Services.TryAddSingleton<IBotRequestContextAccessor, BotRequestContextAccessor>();
+        Services.TryAddSingleton<ITelegramBotClientFactory, TelegramBotClientFactory>();
+        Services.TryAddSingleton<IBotRequestContextFactory, BotRequestContextFactory>();
 
         var host = _hostBuilder.Build();
 

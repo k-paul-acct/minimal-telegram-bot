@@ -1,8 +1,9 @@
+using System.Net.Mime;
 using Microsoft.AspNetCore.Http.Json;
 using MinimalTelegramBot.Settings;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using HttpResults = Microsoft.AspNetCore.Http.Results;
+using Http = Microsoft.AspNetCore.Http;
 
 namespace MinimalTelegramBot.Runner;
 
@@ -34,10 +35,40 @@ internal static class WebhookRunner
 
         webApp.MapPost("", async (Update update) =>
         {
-            await updateHandler.Handle(update);
-            return HttpResults.StatusCode(StatusCodes.Status200OK);
+            var invocationContext = await updateHandler.CreateInvocationContext(update, true);
+            if (invocationContext is null)
+            {
+                return Http.Results.StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            var httpContentTask = invocationContext.BotRequestContext.Client.WaitHttpContent();
+            _ = Task.Run(invocationContext.Invoke);
+            var httpContent = await httpContentTask;
+            return httpContent is null ? Http.Results.StatusCode(StatusCodes.Status200OK) : new JsonHttpContentResult(httpContent);
         }).AddEndpointFilter(new TelegramWebhookSecretTokenFilter(options.SecretToken));
 
         return webApp;
+    }
+
+    private sealed class JsonHttpContentResult : Http.IResult
+    {
+        private readonly HttpContent _httpContent;
+
+        public JsonHttpContentResult(HttpContent httpContent)
+        {
+            _httpContent = httpContent;
+        }
+
+        public Task ExecuteAsync(HttpContext httpContext)
+        {
+            using (_httpContent)
+            {
+                httpContext.Response.StatusCode = StatusCodes.Status200OK;
+                httpContext.Response.ContentType = MediaTypeNames.Application.Json;
+                _httpContent.CopyTo(httpContext.Response.Body, null, default);
+                httpContext.Response.ContentLength = _httpContent.Headers.ContentLength;
+                return Task.CompletedTask;
+            }
+        }
     }
 }
