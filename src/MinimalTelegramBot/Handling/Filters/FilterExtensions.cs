@@ -5,8 +5,9 @@ namespace MinimalTelegramBot.Handling.Filters;
 
 public static class FilterExtensions
 {
-    public static IHandlerConventionBuilder Filter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(this IHandlerConventionBuilder builder)
+    public static TBuilder Filter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter, TBuilder>(this TBuilder builder)
         where TFilter : IHandlerFilter
+        where TBuilder : IHandlerConventionBuilder
     {
         ArgumentNullException.ThrowIfNull(builder);
 
@@ -33,7 +34,8 @@ public static class FilterExtensions
         return builder;
     }
 
-    public static IHandlerConventionBuilder Filter(this IHandlerConventionBuilder builder, Func<BotRequestFilterContext, BotRequestFilterDelegate, ValueTask<IResult>> filter)
+    public static TBuilder Filter<TBuilder>(this TBuilder builder, Func<BotRequestFilterContext, BotRequestFilterDelegate, ValueTask<IResult>> filter)
+        where TBuilder : IHandlerConventionBuilder
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(filter);
@@ -43,33 +45,39 @@ public static class FilterExtensions
         return builder;
     }
 
-    public static IHandlerConventionBuilder Filter(this IHandlerConventionBuilder builder, Func<BotRequestFilterContext, IResult> filterDelegate)
+    public static TBuilder Filter<TBuilder>(this TBuilder builder, Func<BotRequestFilterContext, IResult> filterDelegate)
+        where TBuilder : IHandlerConventionBuilder
     {
         throw new NotImplementedException();
     }
 
-    public static IHandlerConventionBuilder Filter(this IHandlerConventionBuilder builder, Func<BotRequestFilterContext, ValueTask<IResult>> filterDelegate)
+    public static TBuilder Filter<TBuilder>(this TBuilder builder, Func<BotRequestFilterContext, ValueTask<IResult>> filterDelegate)
+        where TBuilder : IHandlerConventionBuilder
     {
         throw new NotImplementedException();
     }
 
-    public static IHandlerConventionBuilder Filter(this IHandlerConventionBuilder builder, Func<BotRequestFilterContext, bool> filterDelegate)
+    public static TBuilder Filter<TBuilder>(this TBuilder builder, Func<BotRequestFilterContext, bool> filterDelegate)
+        where TBuilder : IHandlerConventionBuilder
     {
         throw new NotImplementedException();
     }
 
-    public static IHandlerConventionBuilder Filter(this IHandlerConventionBuilder builder, Func<BotRequestFilterContext, ValueTask<bool>> filterDelegate)
+    public static TBuilder Filter<TBuilder>(this TBuilder builder, Func<BotRequestFilterContext, ValueTask<bool>> filterDelegate)
+        where TBuilder : IHandlerConventionBuilder
     {
         throw new NotImplementedException();
     }
 
-    private static IHandlerConventionBuilder AddFilterFactory(this IHandlerConventionBuilder builder, Func<BotRequestFilterFactoryContext, BotRequestFilterDelegate, BotRequestFilterDelegate> factory)
+    private static TBuilder AddFilterFactory<TBuilder>(this TBuilder builder, Func<BotRequestFilterFactoryContext, BotRequestFilterDelegate, BotRequestFilterDelegate> factory)
+        where TBuilder : IHandlerConventionBuilder
     {
         builder.Add(handlerBuilder => handlerBuilder.FilterFactories.Add(factory));
         return builder;
     }
 
-    public static IHandlerConventionBuilder FilterText(this IHandlerConventionBuilder builder, Func<string, bool> filter)
+    public static TBuilder FilterText<TBuilder>(this TBuilder builder, Func<string, bool> filter)
+        where TBuilder : IHandlerConventionBuilder
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(filter);
@@ -77,7 +85,8 @@ public static class FilterExtensions
         return builder.Filter(ctx => ctx.BotRequestContext.MessageText is not null && filter(ctx.BotRequestContext.MessageText));
     }
 
-    public static IHandlerConventionBuilder FilterCommand(this IHandlerConventionBuilder builder, string command)
+    public static TBuilder FilterCommand<TBuilder>(this TBuilder builder, string command)
+        where TBuilder : IHandlerConventionBuilder
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(command);
@@ -119,7 +128,8 @@ public static class FilterExtensions
         return builder;
     }
 
-    public static IHandlerConventionBuilder FilterCallbackData(this IHandlerConventionBuilder builder, Func<string, bool> filter)
+    public static TBuilder FilterCallbackData<TBuilder>(this TBuilder builder, Func<string, bool> filter)
+        where TBuilder : IHandlerConventionBuilder
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(filter);
@@ -127,7 +137,8 @@ public static class FilterExtensions
         return builder.Filter(ctx => ctx.BotRequestContext.CallbackData is not null && filter(ctx.BotRequestContext.CallbackData));
     }
 
-    public static IHandlerConventionBuilder FilterUpdateType(this IHandlerConventionBuilder builder, UpdateType updateType)
+    public static TBuilder FilterUpdateType<TBuilder>(this TBuilder builder, UpdateType updateType)
+        where TBuilder : IHandlerConventionBuilder
     {
         ArgumentNullException.ThrowIfNull(builder);
 
@@ -141,7 +152,8 @@ public static class FilterExtensions
         return builder;
     }
 
-    public static IHandlerConventionBuilder FilterUpdateType(this IHandlerConventionBuilder builder, Func<UpdateType, bool> filter)
+    public static TBuilder FilterUpdateType<TBuilder>(this TBuilder builder, Func<UpdateType, bool> filter)
+        where TBuilder : IHandlerConventionBuilder
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(filter);
