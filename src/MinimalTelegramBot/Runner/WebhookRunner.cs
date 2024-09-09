@@ -65,9 +65,7 @@ internal static class WebhookRunner
             {
                 httpContext.Response.StatusCode = StatusCodes.Status200OK;
                 httpContext.Response.ContentType = MediaTypeNames.Application.Json;
-                _httpContent.CopyTo(httpContext.Response.Body, null, default);
-                httpContext.Response.ContentLength = _httpContent.Headers.ContentLength;
-                return Task.CompletedTask;
+                return _httpContent.CopyToAsync(httpContext.Response.Body);
             }
         }
     }

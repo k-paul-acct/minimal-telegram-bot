@@ -2,7 +2,7 @@ namespace MinimalTelegramBot.Handling;
 
 internal static class RequestDelegateHelper
 {
-    public static HandlerDelegate VoidDelegateWrapper(Action<BotRequestContext> delegateInvocation)
+    public static Func<BotRequestContext, Task<IResult>> VoidDelegateWrapper(Action<BotRequestContext> delegateInvocation)
     {
         return context =>
         {
@@ -11,12 +11,12 @@ internal static class RequestDelegateHelper
         };
     }
 
-    public static HandlerDelegate ResultDelegateWrapper(Func<BotRequestContext, IResult> delegateInvocation)
+    public static Func<BotRequestContext, Task<IResult>> ResultDelegateWrapper(Func<BotRequestContext, IResult> delegateInvocation)
     {
         return context => Task.FromResult(delegateInvocation(context));
     }
 
-    public static HandlerDelegate GenericDelegateWrapper<T>(Func<BotRequestContext, T> delegateInvocation, Func<T, IResult> resultHandler)
+    public static Func<BotRequestContext, Task<IResult>> GenericDelegateWrapper<T>(Func<BotRequestContext, T> delegateInvocation, Func<T, IResult> resultHandler)
     {
         return context =>
         {
@@ -25,7 +25,7 @@ internal static class RequestDelegateHelper
         };
     }
 
-    public static HandlerDelegate TaskDelegateWrapper(Func<BotRequestContext, Task> delegateInvocation)
+    public static Func<BotRequestContext, Task<IResult>> TaskDelegateWrapper(Func<BotRequestContext, Task> delegateInvocation)
     {
         return async context =>
         {
@@ -34,7 +34,7 @@ internal static class RequestDelegateHelper
         };
     }
 
-    public static HandlerDelegate GenericTaskDelegateWrapper<T>(Func<BotRequestContext, Task<T>> delegateInvocation, Func<T, IResult> resultHandler)
+    public static Func<BotRequestContext, Task<IResult>> GenericTaskDelegateWrapper<T>(Func<BotRequestContext, Task<T>> delegateInvocation, Func<T, IResult> resultHandler)
     {
         return async context =>
         {
@@ -43,7 +43,7 @@ internal static class RequestDelegateHelper
         };
     }
 
-    public static HandlerDelegate ValueTaskDelegateWrapper(Func<BotRequestContext, ValueTask> delegateInvocation)
+    public static Func<BotRequestContext, Task<IResult>> ValueTaskDelegateWrapper(Func<BotRequestContext, ValueTask> delegateInvocation)
     {
         return async context =>
         {
@@ -52,12 +52,12 @@ internal static class RequestDelegateHelper
         };
     }
 
-    public static HandlerDelegate ResultValueTaskDelegateWrapper(Func<BotRequestContext, ValueTask<IResult>> delegateInvocation)
+    public static Func<BotRequestContext, Task<IResult>> ResultValueTaskDelegateWrapper(Func<BotRequestContext, ValueTask<IResult>> delegateInvocation)
     {
         return context => delegateInvocation(context).AsTask();
     }
 
-    public static HandlerDelegate GenericValueTaskDelegateWrapper<T>(Func<BotRequestContext, ValueTask<T>> delegateInvocation, Func<T, IResult> resultHandler)
+    public static Func<BotRequestContext, Task<IResult>> GenericValueTaskDelegateWrapper<T>(Func<BotRequestContext, ValueTask<T>> delegateInvocation, Func<T, IResult> resultHandler)
     {
         return async context =>
         {

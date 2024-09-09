@@ -2,7 +2,7 @@ namespace MinimalTelegramBot.Handling.Filters;
 
 internal static class FilteredBotRequestDelegateBuilder
 {
-    public static BotRequestDelegate Build(HandlerDelegate handlerDelegate, BotRequestDelegateFactoryOptions options)
+    public static BotRequestDelegate Build(Func<BotRequestContext, Task<IResult>> handlerDelegate, BotRequestDelegateFactoryOptions options)
     {
         var factoryContext = new BotRequestFilterFactoryContext
         {

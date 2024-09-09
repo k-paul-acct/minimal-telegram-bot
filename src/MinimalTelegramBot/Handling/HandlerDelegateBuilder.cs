@@ -10,7 +10,7 @@ namespace MinimalTelegramBot.Handling;
 
 internal static class HandlerDelegateBuilder
 {
-    public static HandlerDelegate Build(Delegate d)
+    public static Func<BotRequestContext, Task<IResult>> Build(Delegate d)
     {
         var returnType = d.Method.ReturnType;
         var parameters = d.Method.GetParameters();
@@ -117,14 +117,14 @@ internal static class HandlerDelegateBuilder
         var delegateInvokeExp = Expression.Invoke(delegateConstant, argumentsExp);
         var delegateLambdaExp = Expression.Lambda(delegateInvokeExp, contextParameter);
 
-        HandlerDelegate compiled;
+        Func<BotRequestContext, Task<IResult>> compiled;
 
         if (returnType == typeof(void))
         {
             var wrapper = typeof(RequestDelegateHelper).GetMethod(nameof(RequestDelegateHelper.VoidDelegateWrapper))!;
             var wrappedCallExp = Expression.Call(wrapper, delegateLambdaExp);
             var wrappedInvokeExp = Expression.Invoke(wrappedCallExp, contextParameter);
-            var finalLambdaExp = Expression.Lambda<HandlerDelegate>(wrappedInvokeExp, contextParameter);
+            var finalLambdaExp = Expression.Lambda<Func<BotRequestContext, Task<IResult>>>(wrappedInvokeExp, contextParameter);
             var final = finalLambdaExp.Compile();
             compiled = final;
         }
@@ -133,7 +133,7 @@ internal static class HandlerDelegateBuilder
             var wrapper = typeof(RequestDelegateHelper).GetMethod(nameof(RequestDelegateHelper.ResultDelegateWrapper))!;
             var wrappedCallExp = Expression.Call(wrapper, delegateLambdaExp);
             var wrappedInvokeExp = Expression.Invoke(wrappedCallExp, contextParameter);
-            var finalLambdaExp = Expression.Lambda<HandlerDelegate>(wrappedInvokeExp, contextParameter);
+            var finalLambdaExp = Expression.Lambda<Func<BotRequestContext, Task<IResult>>>(wrappedInvokeExp, contextParameter);
             var final = finalLambdaExp.Compile();
             compiled = final;
         }
@@ -146,14 +146,14 @@ internal static class HandlerDelegateBuilder
                     var wrapper = typeof(RequestDelegateHelper).GetMethod(nameof(RequestDelegateHelper.TaskDelegateWrapper))!;
                     var wrappedCallExp = Expression.Call(wrapper, delegateLambdaExp);
                     var wrappedInvokeExp = Expression.Invoke(wrappedCallExp, contextParameter);
-                    var finalLambdaExp = Expression.Lambda<HandlerDelegate>(wrappedInvokeExp, contextParameter);
+                    var finalLambdaExp = Expression.Lambda<Func<BotRequestContext, Task<IResult>>>(wrappedInvokeExp, contextParameter);
                     var final = finalLambdaExp.Compile();
                     compiled = final;
                 }
                 else if (typeof(IResult).IsAssignableFrom(genericType))
                 {
                     var final = delegateLambdaExp.Compile();
-                    compiled = (HandlerDelegate)final;
+                    compiled = (Func<BotRequestContext, Task<IResult>>)final;
                 }
                 else
                 {
@@ -163,7 +163,7 @@ internal static class HandlerDelegateBuilder
                     var resultHandlerExp = Expression.Constant(resultHandler);
                     var wrappedCallExp = Expression.Call(wrapper, delegateLambdaExp, resultHandlerExp);
                     var wrappedInvokeExp = Expression.Invoke(wrappedCallExp, contextParameter);
-                    var finalLambdaExp = Expression.Lambda<HandlerDelegate>(wrappedInvokeExp, contextParameter);
+                    var finalLambdaExp = Expression.Lambda<Func<BotRequestContext, Task<IResult>>>(wrappedInvokeExp, contextParameter);
                     var final = finalLambdaExp.Compile();
                     compiled = final;
                 }
@@ -175,7 +175,7 @@ internal static class HandlerDelegateBuilder
                     var wrapper = typeof(RequestDelegateHelper).GetMethod(nameof(RequestDelegateHelper.ValueTaskDelegateWrapper))!;
                     var wrappedCallExp = Expression.Call(wrapper, delegateLambdaExp);
                     var wrappedInvokeExp = Expression.Invoke(wrappedCallExp, contextParameter);
-                    var finalLambdaExp = Expression.Lambda<HandlerDelegate>(wrappedInvokeExp, contextParameter);
+                    var finalLambdaExp = Expression.Lambda<Func<BotRequestContext, Task<IResult>>>(wrappedInvokeExp, contextParameter);
                     var final = finalLambdaExp.Compile();
                     compiled = final;
                 }
@@ -184,7 +184,7 @@ internal static class HandlerDelegateBuilder
                     var wrapper = typeof(RequestDelegateHelper).GetMethod(nameof(RequestDelegateHelper.ResultValueTaskDelegateWrapper))!;
                     var wrappedCallExp = Expression.Call(wrapper, delegateLambdaExp);
                     var wrappedInvokeExp = Expression.Invoke(wrappedCallExp, contextParameter);
-                    var finalLambdaExp = Expression.Lambda<HandlerDelegate>(wrappedInvokeExp, contextParameter);
+                    var finalLambdaExp = Expression.Lambda<Func<BotRequestContext, Task<IResult>>>(wrappedInvokeExp, contextParameter);
                     var final = finalLambdaExp.Compile();
                     compiled = final;
                 }
@@ -196,7 +196,7 @@ internal static class HandlerDelegateBuilder
                     var resultHandlerExp = Expression.Constant(resultHandler);
                     var wrappedCallExp = Expression.Call(wrapper, delegateLambdaExp, resultHandlerExp);
                     var wrappedInvokeExp = Expression.Invoke(wrappedCallExp, contextParameter);
-                    var finalLambdaExp = Expression.Lambda<HandlerDelegate>(wrappedInvokeExp, contextParameter);
+                    var finalLambdaExp = Expression.Lambda<Func<BotRequestContext, Task<IResult>>>(wrappedInvokeExp, contextParameter);
                     var final = finalLambdaExp.Compile();
                     compiled = final;
                 }
@@ -210,7 +210,7 @@ internal static class HandlerDelegateBuilder
             var resultHandlerExp = Expression.Constant(resultHandler);
             var wrappedCallExp = Expression.Call(wrapper, delegateLambdaExp, resultHandlerExp);
             var wrappedInvokeExp = Expression.Invoke(wrappedCallExp, contextParameter);
-            var finalLambdaExp = Expression.Lambda<HandlerDelegate>(wrappedInvokeExp, contextParameter);
+            var finalLambdaExp = Expression.Lambda<Func<BotRequestContext, Task<IResult>>>(wrappedInvokeExp, contextParameter);
             var final = finalLambdaExp.Compile();
             compiled = final;
         }
