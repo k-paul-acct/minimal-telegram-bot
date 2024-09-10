@@ -1,4 +1,4 @@
-namespace MinimalTelegramBot.Results.Extensions;
+namespace MinimalTelegramBot.Results.TypedResults;
 
 internal sealed class EmptyResult : IResult
 {

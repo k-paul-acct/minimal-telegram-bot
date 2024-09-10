@@ -2,7 +2,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace MinimalTelegramBot.Results.Extensions;
+namespace MinimalTelegramBot.Results.TypedResults;
 
 internal sealed class MessageResult : IResult
 {

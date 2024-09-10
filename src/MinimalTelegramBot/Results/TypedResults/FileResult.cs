@@ -1,7 +1,7 @@
 using Telegram.Bot.Types;
 using File = System.IO.File;
 
-namespace MinimalTelegramBot.Results.Extensions;
+namespace MinimalTelegramBot.Results.TypedResults;
 
 internal abstract class FileResult : IResult
 {

@@ -1,7 +1,7 @@
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
-namespace MinimalTelegramBot.Results.Extensions;
+namespace MinimalTelegramBot.Results.TypedResults;
 
 internal sealed class CallbackAnswerResult : IResult
 {

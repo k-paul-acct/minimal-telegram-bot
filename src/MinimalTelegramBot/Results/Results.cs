@@ -1,4 +1,4 @@
-using MinimalTelegramBot.Results.Extensions;
+using MinimalTelegramBot.Results.TypedResults;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MinimalTelegramBot.Results;
