@@ -11,10 +11,14 @@ internal sealed class LocalizedTextFilter : IHandlerFilter
         _localizer = localizer;
     }
 
-    public ValueTask<bool> Filter(BotRequestFilterContext context, Func<BotRequestFilterContext, ValueTask<bool>> next)
+    public ValueTask<IResult> InvokeAsync(BotRequestFilterContext context, BotRequestFilterDelegate next)
     {
-        var key = (string)context.FilterArguments[0]!;
-        var pass = context.BotRequestContext.MessageText is not null && _localizer[key] == context.BotRequestContext.MessageText;
-        return pass ? next(context) : ValueTask.FromResult(false);
+        if (context.BotRequestContext.MessageText is null)
+        {
+            return new ValueTask<IResult>(Results.Results.Empty);
+        }
+
+        var key = (string)context.Arguments[^1]!;
+        return _localizer[key] == context.BotRequestContext.MessageText ? next(context) : new ValueTask<IResult>(Results.Results.Empty);
     }
 }

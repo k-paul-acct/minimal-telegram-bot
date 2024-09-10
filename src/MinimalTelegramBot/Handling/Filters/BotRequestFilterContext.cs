@@ -7,7 +7,7 @@ public sealed class BotRequestFilterContext
         BotRequestContext = context;
     }
 
-    public List<object?> FilterArguments { get; } = [];
+    public List<object?> Arguments { get; } = [];
     public BotRequestContext BotRequestContext { get; }
     public IServiceProvider Services => BotRequestContext.Services;
 }

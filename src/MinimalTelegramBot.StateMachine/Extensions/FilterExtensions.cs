@@ -1,23 +1,26 @@
 using MinimalTelegramBot.Handling;
+using MinimalTelegramBot.Handling.Filters;
 using MinimalTelegramBot.StateMachine.Filters;
 
 namespace MinimalTelegramBot.StateMachine.Extensions;
 
 public static class FilterExtensions
 {
-    public static Handler FilterState(this Handler handler, State state)
+    public static TBuilder FilterState<TBuilder>(this TBuilder builder, State state)
+        where TBuilder : IHandlerConventionBuilder
     {
-        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(state);
 
-        return handler.FilterState(userState => userState == state);
+        return builder.FilterState(userState => userState == state);
     }
 
-    public static Handler FilterState(this Handler handler, Func<State?, bool> filter)
+    public static TBuilder FilterState<TBuilder>(this TBuilder builder, Func<State?, bool> filter)
+        where TBuilder : IHandlerConventionBuilder
     {
-        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(filter);
 
-        return handler.Filter<StateFilter>([filter,]);
+        return builder.Filter<TBuilder, StateFilter>(context => context.Arguments.Add(filter));
     }
 }

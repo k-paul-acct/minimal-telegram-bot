@@ -1,6 +1,5 @@
-﻿using MinimalTelegramBot;
-using MinimalTelegramBot.Builder;
-using MinimalTelegramBot.Extensions;
+﻿using MinimalTelegramBot.Builder;
+using MinimalTelegramBot.Handling;
 using MinimalTelegramBot.Handling.Filters;
 using MinimalTelegramBot.Localization.Abstractions;
 using MinimalTelegramBot.Localization.Extensions;
@@ -13,9 +12,7 @@ using UsageExample.CommandModels;
 using UsageExample.Services;
 using Results = MinimalTelegramBot.Results.Results;
 
-// TODO: Group filtering.
 // TODO: More Result templates.
-// TODO: More efficient handler resolving.
 // TODO: Different state models.
 // TODO: Notifications.
 // TODO: Different persistence and builder options in builders (State Machine, Notification Service).
@@ -103,8 +100,7 @@ app.Handle(() =>
 
 app.Handle(() => Results.Photo("cat.jpeg", "Little cat")).FilterCallbackData(x => x == "Photo");
 
-app.Handle(() => Results.MessageReply("I'm replied!"))
-    .FilterText(x => x.Equals("reply", StringComparison.OrdinalIgnoreCase));
+app.Handle(() => Results.MessageReply("I'm replied!")).FilterMessageText(x => x.Equals("reply", StringComparison.OrdinalIgnoreCase));
 
 app.Handle(async (string messageText, WeatherService weatherService) =>
 {
@@ -117,7 +113,7 @@ app.Run();
 
 return;
 
-ReplyKeyboardMarkup MenuKeyboard(ILocalizer localizer)
+static ReplyKeyboardMarkup MenuKeyboard(ILocalizer localizer)
 {
     var helloButton = localizer["Button.Hello"];
     var catButton = localizer["Button.Cat"];

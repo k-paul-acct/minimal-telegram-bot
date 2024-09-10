@@ -14,6 +14,11 @@ public sealed class Handler
 
     public bool SatisfyRequirements(ICollection<UpdateHandlingRequirement> requirements)
     {
+        if (_metadata.Count == 0)
+        {
+            return true;
+        }
+
         foreach (var requirement in requirements)
         {
             var requirementType = requirement.Requirement.GetType();

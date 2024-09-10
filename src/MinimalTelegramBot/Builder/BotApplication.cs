@@ -26,6 +26,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
         _handlerDispatcher = new RootHandlerDispatcher(Services);
 
         this.UsePipe<UpdateLoggerPipe>();
+        this.UsePipe<BotRequestContextAccessorPipe>();
     }
 
     public IServiceProvider Services => _host.Services;

@@ -5,7 +5,7 @@ namespace MinimalTelegramBot.Handling.Filters;
 
 public static class FilterExtensions
 {
-    public static TBuilder Filter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter, TBuilder>(this TBuilder builder)
+    public static TBuilder Filter<TBuilder, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(this TBuilder builder)
         where TFilter : IHandlerFilter
         where TBuilder : IHandlerConventionBuilder
     {
@@ -27,6 +27,37 @@ public static class FilterExtensions
             return filterContext =>
             {
                 var filter = (IHandlerFilter)filterFactory(factoryContext.Services, [factoryContext,]);
+                return filter.InvokeAsync(filterContext, next);
+            };
+        });
+
+        return builder;
+    }
+
+    public static TBuilder Filter<TBuilder, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(this TBuilder builder, Action<BotRequestFilterContext> configure)
+        where TFilter : IHandlerFilter
+        where TBuilder : IHandlerConventionBuilder
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(configure);
+
+        ObjectFactory filterFactory;
+
+        try
+        {
+            filterFactory = ActivatorUtilities.CreateFactory(typeof(TFilter), [typeof(BotRequestFilterFactoryContext),]);
+        }
+        catch (InvalidOperationException)
+        {
+            filterFactory = ActivatorUtilities.CreateFactory(typeof(TFilter), []);
+        }
+
+        builder.AddFilterFactory((factoryContext, next) =>
+        {
+            return filterContext =>
+            {
+                var filter = (IHandlerFilter)filterFactory(factoryContext.Services, [factoryContext,]);
+                configure(filterContext);
                 return filter.InvokeAsync(filterContext, next);
             };
         });
@@ -184,6 +215,10 @@ public static class FilterExtensions
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(filter);
 
-        return builder.Filter(ctx => filter(ctx.BotRequestContext.Update.Type));
+        builder.Filter((context, next) => filter(context.BotRequestContext.Update.Type)
+            ? next(context)
+            : new ValueTask<IResult>(Results.Results.Empty));
+
+        return builder;
     }
 }

@@ -27,11 +27,6 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
         _conventions.Add(convention);
     }
 
-    public Handler Build(ICollection<Action<HandlerBuilder>> outerConventions)
-    {
-        throw new NotImplementedException();
-    }
-
     private sealed class SingleHandlerHandlerSource : HandlerSource
     {
         private readonly HandlerBuilder _handlerBuilder;
