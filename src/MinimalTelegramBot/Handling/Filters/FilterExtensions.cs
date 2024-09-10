@@ -76,13 +76,26 @@ public static class FilterExtensions
         return builder;
     }
 
-    public static TBuilder FilterText<TBuilder>(this TBuilder builder, Func<string, bool> filter)
+    public static TBuilder FilterMessageText<TBuilder>(this TBuilder builder, Func<string, bool> filter)
         where TBuilder : IHandlerConventionBuilder
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(filter);
 
-        return builder.Filter(ctx => ctx.BotRequestContext.MessageText is not null && filter(ctx.BotRequestContext.MessageText));
+        builder.Filter((context, next) =>
+        {
+            if (context.BotRequestContext.MessageText is null)
+            {
+                return new ValueTask<IResult>(Results.Results.Empty);
+            }
+
+            return filter(context.BotRequestContext.MessageText) ? next(context) : new ValueTask<IResult>(Results.Results.Empty);
+        });
+
+        var metadata = new UpdateTypeAttribute(UpdateType.Message);
+        builder.Add(handlerBuilder => handlerBuilder.Metadata.Add(metadata));
+
+        return builder;
     }
 
     public static TBuilder FilterCommand<TBuilder>(this TBuilder builder, string command)
@@ -134,7 +147,20 @@ public static class FilterExtensions
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(filter);
 
-        return builder.Filter(ctx => ctx.BotRequestContext.CallbackData is not null && filter(ctx.BotRequestContext.CallbackData));
+        builder.Filter((context, next) =>
+        {
+            if (context.BotRequestContext.CallbackData is null)
+            {
+                return new ValueTask<IResult>(Results.Results.Empty);
+            }
+
+            return filter(context.BotRequestContext.CallbackData) ? next(context) : new ValueTask<IResult>(Results.Results.Empty);
+        });
+
+        var metadata = new UpdateTypeAttribute(UpdateType.CallbackQuery);
+        builder.Add(handlerBuilder => handlerBuilder.Metadata.Add(metadata));
+
+        return builder;
     }
 
     public static TBuilder FilterUpdateType<TBuilder>(this TBuilder builder, UpdateType updateType)

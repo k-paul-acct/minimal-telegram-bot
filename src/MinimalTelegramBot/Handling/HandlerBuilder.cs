@@ -41,11 +41,11 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
             _handlerBuilder = handlerBuilder;
         }
 
-        public override IReadOnlyCollection<Handler> Handlers => GetHandlers();
-
-        private List<Handler> GetHandlers()
+        public IReadOnlyList<Handler> GetHandlers(IReadOnlyList<Action<HandlerBuilder>> conventions)
         {
-            foreach (var convention in _handlerBuilder._conventions)
+            IEnumerable<Action<HandlerBuilder>> fullConventions = [..conventions, .._handlerBuilder._conventions];
+
+            foreach (var convention in fullConventions)
             {
                 convention(_handlerBuilder);
             }

@@ -1,6 +1,6 @@
 namespace MinimalTelegramBot.Handling;
 
-public abstract class HandlerSource
+public interface HandlerSource
 {
-    public abstract IReadOnlyCollection<Handler> Handlers { get; }
+    IReadOnlyList<Handler> GetHandlers(IReadOnlyList<Action<HandlerBuilder>> conventions);
 }

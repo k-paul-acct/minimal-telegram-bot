@@ -10,7 +10,7 @@ public sealed class HandlerResolver
 
         foreach (var handlerSource in handlerSources)
         {
-            _handlers.AddRange(handlerSource.Handlers);
+            _handlers.AddRange(handlerSource.GetHandlers([]));
         }
     }
 

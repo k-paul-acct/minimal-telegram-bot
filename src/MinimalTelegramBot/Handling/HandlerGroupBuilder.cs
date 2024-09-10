@@ -30,15 +30,19 @@ public sealed class HandlerGroupBuilder : IHandlerDispatcher, IHandlerConvention
             _groupBuilder = groupBuilder;
         }
 
-        public override IReadOnlyCollection<Handler> Handlers => []; // GetHandlers();
-
-        /*private IReadOnlyList<Handler> GetHandlers()
+        public IReadOnlyList<Handler> GetHandlers(IReadOnlyList<Action<HandlerBuilder>> conventions)
         {
             var handlers = new List<Handler>();
+            IHandlerDispatcher handlerDispatcher = _groupBuilder;
+            IReadOnlyList<Action<HandlerBuilder>> sourceOuterConventions = [..conventions, .._groupBuilder._conventions];
 
-            _groupBuilder._handlerSources
+            foreach (var handlerSource in handlerDispatcher.HandlerSources)
+            {
+                var sourceHandlers = handlerSource.GetHandlers(sourceOuterConventions);
+                handlers.AddRange(sourceHandlers);
+            }
 
-            handlers.AddRange(_groupBuilder._handlerSources);
-        }*/
+            return handlers;
+        }
     }
 }
