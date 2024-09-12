@@ -29,12 +29,27 @@ public static class HandleExtensions
         return builder;
     }
 
-    public static HandlerBuilder HandleMessage(this IHandlerDispatcher handlerDispatcher)
+    public static HandlerBuilder HandleMessageText(this IHandlerDispatcher handlerDispatcher, string messageText)
     {
         throw new NotImplementedException();
     }
 
-    public static HandlerBuilder HandleCallbackDate(this IHandlerDispatcher handlerDispatcher)
+    public static HandlerBuilder HandleMessageText(this IHandlerDispatcher handlerDispatcher, Func<string, bool> predicate)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static HandlerBuilder HandleCallbackData(this IHandlerDispatcher handlerDispatcher, string callbackData)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static HandlerBuilder HandleCallbackData(this IHandlerDispatcher handlerDispatcher, Func<string, bool> predicate)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static HandlerBuilder HandleCallbackDataPrefix(this IHandlerDispatcher handlerDispatcher, string callbackDataPrefix)
     {
         throw new NotImplementedException();
     }
