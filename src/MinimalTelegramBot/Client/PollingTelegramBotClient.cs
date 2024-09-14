@@ -3,48 +3,20 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Requests.Abstractions;
 
-namespace MinimalTelegramBot;
+namespace MinimalTelegramBot.Client;
 
-internal sealed class TelegramBotClientFacade : ITelegramBotClientFacade
+internal sealed class PollingTelegramBotClient : ITelegramBotClient
 {
     private readonly ITelegramBotClient _client;
-    private readonly TaskCompletionSource<HttpContent?>? _httpResultTcs;
-    private bool _webhookResponseAvailable;
 
-    public TelegramBotClientFacade(ITelegramBotClient client, bool webhookResponseAvailable)
+    public PollingTelegramBotClient(ITelegramBotClient client)
     {
         _client = client;
-        _webhookResponseAvailable = webhookResponseAvailable;
-
-        if (_webhookResponseAvailable)
-        {
-            _httpResultTcs = new TaskCompletionSource<HttpContent?>();
-        }
-    }
-
-    public Task<HttpContent?> WaitHttpContent()
-    {
-        return _httpResultTcs!.Task;
-    }
-
-    public void FlushHttpContent()
-    {
-        _httpResultTcs?.TrySetResult(null);
     }
 
     public Task<TResponse> MakeRequestAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
-        if (!_webhookResponseAvailable)
-        {
-            return _client.MakeRequestAsync(request, cancellationToken);
-        }
-
-        _webhookResponseAvailable = false;
-        request.IsWebhookResponse = true;
-        var content = request.ToHttpContent();
-        _httpResultTcs!.TrySetResult(content);
-
-        return Task.FromResult<TResponse>(default!);
+        return _client.MakeRequestAsync(request, cancellationToken);
     }
 
     public Task<bool> TestApiAsync(CancellationToken cancellationToken = default)

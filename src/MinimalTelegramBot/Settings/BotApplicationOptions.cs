@@ -4,16 +4,16 @@ namespace MinimalTelegramBot.Settings;
 
 internal sealed class BotApplicationOptions
 {
-    public BotApplicationOptions(BotApplicationBuilderOptions builderOptions)
+    public BotApplicationOptions(BotApplicationBuilderOptions builderOptions, string botToken)
     {
-        Token = builderOptions.Token ?? throw new Exception("Bot token not specified");
+        Token = botToken;
         ReceiverOptions = builderOptions.ReceiverOptions;
         Args = builderOptions.Args;
         BuilderOptions = builderOptions;
     }
 
-    public string[]? Args { get; set; }
+    public string[] Args { get; set; }
     public string Token { get; set; }
-    public ReceiverOptions? ReceiverOptions { get; set; }
-    public BotApplicationBuilderOptions? BuilderOptions { get; set; }
+    public ReceiverOptions ReceiverOptions { get; set; }
+    public BotApplicationBuilderOptions BuilderOptions { get; set; }
 }

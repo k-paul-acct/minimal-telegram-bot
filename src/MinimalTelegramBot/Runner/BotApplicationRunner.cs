@@ -1,59 +1,42 @@
 using MinimalTelegramBot.Logging;
+using MinimalTelegramBot.Server;
 using Telegram.Bot;
 
 namespace MinimalTelegramBot.Runner;
 
-internal static partial class BotApplicationRunner
+internal static class BotApplicationRunner
 {
     public static async Task RunAsync(BotApplication app, CancellationToken cancellationToken)
     {
         var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
-        var logger = loggerFactory.CreateLogger("MinimalTelegramBot.Runner");
         var infrastructureLogger = new InfrastructureLogger(loggerFactory);
 
         IBotApplicationBuilder builder = app;
         var pipeline = builder.Build();
-        var updateHandler = new UpdateHandler(builder.Services, pipeline, infrastructureLogger);
         var isWebhook = builder.Properties.ContainsKey("__WebhookEnabled");
+        var updateServer = new UpdateServer(app.Services, pipeline, infrastructureLogger);
 
-        await app.HandleDeleteWebhookFeature(cancellationToken);
-        var host = await (isWebhook ? app.StartWebhook(updateHandler, cancellationToken) : app.StartPolling(updateHandler, cancellationToken));
+        await app.HandleFeatures();
 
-        var gettingUpdatesVia = isWebhook ? "Webhook" : "Polling";
-        var client = app.Services.GetRequiredService<ITelegramBotClient>();
-        var info = await GetBotStartupInfo(client, cancellationToken);
-        Log.GettingUpdateStarted(logger, gettingUpdatesVia, info.BotUsername, info.BotFullName, info.BotId);
+        var hostTask = isWebhook ? app.StartWebhook(updateServer) : app.StartPolling(updateServer, infrastructureLogger);
+        var host = await hostTask;
+
+        var botInfo = await app._client.GetBotStartupInfo();
+
+        infrastructureLogger.GettingUpdateStarted(isWebhook, botInfo.Username, botInfo.FullName, botInfo.Id);
 
         await host.WaitForShutdownAsync(cancellationToken);
     }
 
-    private static async Task<BotStartupInfo> GetBotStartupInfo(ITelegramBotClient client, CancellationToken cancellationToken)
+    private static async Task<BotStartupInfo> GetBotStartupInfo(this ITelegramBotClient client)
     {
-        var bot = await client.GetMeAsync(cancellationToken);
+        var bot = await client.GetMeAsync();
         return new BotStartupInfo
         {
-            BotId = bot.Id,
-            BotUsername = bot.Username ?? "N/A",
-            BotFirstName = bot.FirstName,
-            BotLastName = bot.LastName,
+            Id = bot.Id,
+            FirstName = bot.FirstName,
+            LastName = bot.LastName,
+            Username = bot.Username ?? "N/A",
         };
-    }
-
-    private static async Task HandleDeleteWebhookFeature(this BotApplication app, CancellationToken cancellationToken)
-    {
-        IBotApplicationBuilder builder = app;
-        builder.Properties.TryGetValue("__DeleteWebhook", out var deleteWebhook);
-
-        if (deleteWebhook is true)
-        {
-            var dropPendingUpdates = app._options.ReceiverOptions?.DropPendingUpdates ?? false;
-            await app._client.DeleteWebhookAsync(dropPendingUpdates, cancellationToken);
-        }
-    }
-
-    private static partial class Log
-    {
-        [LoggerMessage(0, LogLevel.Information, "Getting updates via {gettingUpdatesVia} started for bot @{botUsername} ({botFullName}) with ID = {botId}", EventName = nameof(GettingUpdateStarted))]
-        public static partial void GettingUpdateStarted(ILogger logger, string gettingUpdatesVia, string botUsername, string botFullName, long botId);
     }
 }

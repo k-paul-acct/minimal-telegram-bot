@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using MinimalTelegramBot.Handling.Requirements;
 using Telegram.Bot.Types.Enums;
 
 namespace MinimalTelegramBot.Handling.Filters;
@@ -123,7 +124,7 @@ public static class FilterExtensions
             return filter(context.BotRequestContext.MessageText) ? next(context) : new ValueTask<IResult>(Results.Results.Empty);
         });
 
-        var metadata = new UpdateTypeAttribute(UpdateType.Message);
+        var metadata = new UpdateTypeRequirement(UpdateType.Message);
         builder.Add(handlerBuilder => handlerBuilder.Metadata.Add(metadata));
 
         return builder;
@@ -166,7 +167,7 @@ public static class FilterExtensions
             return span[..commandEnd].SequenceEqual(command) ? next(context) : new ValueTask<IResult>(Results.Results.Empty);
         });
 
-        var metadata = new UpdateTypeAttribute(UpdateType.Message);
+        var metadata = new UpdateTypeRequirement(UpdateType.Message);
         builder.Add(handlerBuilder => handlerBuilder.Metadata.Add(metadata));
 
         return builder;
@@ -188,7 +189,7 @@ public static class FilterExtensions
             return filter(context.BotRequestContext.CallbackData) ? next(context) : new ValueTask<IResult>(Results.Results.Empty);
         });
 
-        var metadata = new UpdateTypeAttribute(UpdateType.CallbackQuery);
+        var metadata = new UpdateTypeRequirement(UpdateType.CallbackQuery);
         builder.Add(handlerBuilder => handlerBuilder.Metadata.Add(metadata));
 
         return builder;
@@ -203,7 +204,7 @@ public static class FilterExtensions
             ? next(context)
             : new ValueTask<IResult>(Results.Results.Empty));
 
-        var metadata = new UpdateTypeAttribute(updateType);
+        var metadata = new UpdateTypeRequirement(updateType);
         builder.Add(handlerBuilder => handlerBuilder.Metadata.Add(metadata));
 
         return builder;

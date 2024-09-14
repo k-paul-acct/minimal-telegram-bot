@@ -1,36 +1,38 @@
+using MinimalTelegramBot.Handling.Requirements;
+
 namespace MinimalTelegramBot.Handling;
 
 public sealed class Handler
 {
-    private readonly Dictionary<Type, object[]> _metadata;
-
-    public Handler(BotRequestDelegate requestDelegate, Dictionary<Type, object[]> metadata)
+    public Handler(BotRequestDelegate filteredBotRequestDelegate, Dictionary<Type, object[]> metadata)
     {
-        RequestDelegate = requestDelegate;
-        _metadata = metadata;
+        FilteredBotRequestDelegate = filteredBotRequestDelegate;
+        Metadata = metadata;
     }
 
-    public BotRequestDelegate RequestDelegate { get; }
+    public Dictionary<Type, object[]> Metadata { get; }
+    public BotRequestDelegate FilteredBotRequestDelegate { get; }
 
-    public bool SatisfyRequirements(ICollection<UpdateHandlingRequirement> requirements)
+    public bool SatisfyRequirements(IReadOnlyCollection<UpdateHandlingRequirement> requirements)
     {
-        if (_metadata.Count == 0)
+        if (Metadata.Count == 0)
         {
             return true;
         }
 
         foreach (var requirement in requirements)
         {
+            // TODO:
             var requirementType = requirement.Requirement.GetType();
 
-            if (!_metadata.TryGetValue(requirementType, out var objects))
+            if (!Metadata.TryGetValue(requirementType, out var objects))
             {
                 return false;
             }
 
-            if (requirementType == typeof(UpdateTypeAttribute))
+            if (requirementType == typeof(UpdateTypeRequirement))
             {
-                var updateTypeAttribute = (UpdateTypeAttribute)requirement.Requirement;
+                var updateTypeAttribute = (UpdateTypeRequirement)requirement.Requirement;
                 var pass = CheckUpdateTypeRequirement(objects, updateTypeAttribute);
                 if (!pass)
                 {
@@ -42,11 +44,11 @@ public sealed class Handler
         return true;
     }
 
-    private static bool CheckUpdateTypeRequirement(object[] metadata, UpdateTypeAttribute requirement)
+    private static bool CheckUpdateTypeRequirement(object[] metadata, UpdateTypeRequirement requirement)
     {
         foreach (var obj in metadata)
         {
-            var updateTypeMetadata = (UpdateTypeAttribute)obj;
+            var updateTypeMetadata = (UpdateTypeRequirement)obj;
             if (updateTypeMetadata.UpdateType == requirement.UpdateType)
             {
                 return true;

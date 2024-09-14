@@ -8,7 +8,7 @@ public static class UseExtensions
     {
         ArgumentNullException.ThrowIfNull(app);
 
-        app.Properties["__CallbackAutoAnsweringAdded"] = true;
+        app.Properties["__CallbackAutoAnsweringPipeAdded"] = true;
         return app;
     }
 
@@ -48,7 +48,7 @@ public static class UseExtensions
     {
         return app.Use(next => context =>
         {
-            var instance = (IPipe)ActivatorUtilities.CreateInstance(app.Services, pipeType);
+            var instance = (IPipe)ActivatorUtilities.CreateInstance(context.Services, pipeType);
             return instance.InvokeAsync(context, next);
         });
     }

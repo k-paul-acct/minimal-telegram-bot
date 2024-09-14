@@ -1,43 +1,31 @@
+using MinimalTelegramBot.Logging;
+using MinimalTelegramBot.Server;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace MinimalTelegramBot.Runner;
 
-internal static partial class PollingRunner
+internal static class PollingRunner
 {
-    public static async Task<IHost> StartPolling(this BotApplication app, UpdateHandler updateHandler, CancellationToken ct)
+    public static async Task<IHost> StartPolling(this BotApplication app, UpdateServer updateServer, InfrastructureLogger logger)
     {
-        var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
-        var botClient = app.Services.GetRequiredService<ITelegramBotClient>();
-        var logger = loggerFactory.CreateLogger(nameof(Runner));
+        await app._host.StartAsync();
 
-        await app._host.StartAsync(ct);
-
-        botClient.StartReceiving(UpdateHandler, PollingErrorHandler, app._options.ReceiverOptions, ct);
+        app._client.StartReceiving(UpdateHandler, PollingErrorHandler, app._options.ReceiverOptions);
 
         return app._host;
 
-        async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
+        Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
         {
-            var invocationContext = await updateHandler.CreateInvocationContext(update, false);
-            if (invocationContext is null)
-            {
-                return;
-            }
-
-            _ = Task.Run(invocationContext.Invoke, cancellationToken);
+            var invocationContext = updateServer.CreatePollingInvocationContext(update);
+            _ = Task.Run(() => updateServer.Serve(invocationContext), cancellationToken);
+            return Task.CompletedTask;
         }
 
         Task PollingErrorHandler(ITelegramBotClient client, Exception ex, CancellationToken cancellationToken)
         {
-            Log.PollingError(logger, ex.Message);
+            logger.PollingError(ex);
             return Task.CompletedTask;
         }
-    }
-
-    private static partial class Log
-    {
-        [LoggerMessage(500, LogLevel.Error, "Polling error: {message}", EventName = nameof(PollingError))]
-        public static partial void PollingError(ILogger logger, string message);
     }
 }

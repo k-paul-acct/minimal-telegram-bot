@@ -2,7 +2,6 @@ using MinimalTelegramBot.Pipeline.TypedPipes;
 using MinimalTelegramBot.Runner;
 using MinimalTelegramBot.Settings;
 using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
 
 namespace MinimalTelegramBot.Builder;
 
@@ -13,10 +12,10 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
     private readonly IHandlerDispatcher _handlerDispatcher;
 
     internal readonly IHost _host;
-    internal readonly TelegramBotClient _client;
+    internal readonly ITelegramBotClient _client;
     internal readonly BotApplicationOptions _options;
 
-    internal BotApplication(IHost host, TelegramBotClient client, BotApplicationOptions options)
+    internal BotApplication(IHost host, ITelegramBotClient client, BotApplicationOptions options)
     {
         _host = host;
         _client = client;
@@ -25,8 +24,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
         _pipelineBuilder = new PipelineBuilder(Services, _properties);
         _handlerDispatcher = new RootHandlerDispatcher(Services);
 
-        this.UsePipe<UpdateLoggerPipe>();
-        this.UsePipe<BotRequestContextAccessorPipe>();
+        UsePipesBeforeHandlerResolver();
     }
 
     public IServiceProvider Services => _host.Services;
@@ -52,20 +50,8 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
         });
     }
 
-    public static BotApplicationBuilder CreateBuilder(HostApplicationBuilderSettings settings)
-    {
-        ArgumentNullException.ThrowIfNull(settings);
-
-        return CreateBuilder(new BotApplicationBuilderOptions
-        {
-            Args = settings.Args,
-            HostApplicationBuilderSettings = settings,
-        });
-    }
-
     private static BotApplicationBuilder CreateBuilder(BotApplicationBuilderOptions options)
     {
-        options.ReceiverOptions.AllowedUpdates ??= [UpdateType.Message, UpdateType.CallbackQuery,];
         return new BotApplicationBuilder(options);
     }
 
@@ -79,10 +65,9 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
 
     BotRequestDelegate IBotApplicationBuilder.Build()
     {
-        var handlerResolver = new HandlerResolver(_handlerDispatcher.HandlerSources);
-        var fullPipeline = handlerResolver.BuildFullPipeline();
+        var handlerResolverPipe = HandlerResolverPipeBuilder.Build(_handlerDispatcher.HandlerSources);
 
-        this.Use(next => context => fullPipeline(context, next));
+        this.Use(handlerResolverPipe);
 
         var pipeline = _pipelineBuilder.Build();
 
@@ -111,11 +96,21 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
 
     public Task RunAsync(CancellationToken cancellationToken = default)
     {
-        if (_pipelineBuilder.Properties.ContainsKey("__CallbackAutoAnsweringAdded"))
+        UsePipesBeforeRun();
+        return BotApplicationRunner.RunAsync(this, cancellationToken);
+    }
+
+    private void UsePipesBeforeHandlerResolver()
+    {
+        this.UsePipe<UpdateLoggingPipe>();
+        this.UsePipe<BotRequestContextAccessorPipe>();
+    }
+
+    private void UsePipesBeforeRun()
+    {
+        if (_pipelineBuilder.Properties.ContainsKey("__CallbackAutoAnsweringPipeAdded"))
         {
             this.UsePipe(new CallbackAutoAnsweringPipe());
         }
-
-        return BotApplicationRunner.RunAsync(this, cancellationToken);
     }
 }

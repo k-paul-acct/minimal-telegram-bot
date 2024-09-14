@@ -33,20 +33,26 @@ public sealed class BotApplicationBuilder : IHostApplicationBuilder
 
     public BotApplication Build()
     {
-        _options.Validate();
+        if (_options.Token is null)
+        {
+            throw new InvalidOperationException($"Cannot build a {nameof(BotApplication)} without a bot token configured");
+        }
 
-        var telegramBotClientOptions = new TelegramBotClientOptions(_options.Token!);
+        var telegramBotClientOptions = new TelegramBotClientOptions(_options.Token);
         _options.TelegramBotClientOptionsConfigure?.Invoke(telegramBotClientOptions);
 
         var client = new TelegramBotClient(telegramBotClientOptions);
 
-        Services.TryAddSingleton<ITelegramBotClient>(client);
-        Services.TryAddSingleton<IBotRequestContextAccessor, BotRequestContextAccessor>();
-        Services.TryAddSingleton<ITelegramBotClientFactory, TelegramBotClientFactory>();
-        Services.TryAddSingleton<IBotRequestContextFactory, BotRequestContextFactory>();
+        AddDefaultServices(client);
 
         var host = _hostBuilder.Build();
 
-        return new BotApplication(host, client, new BotApplicationOptions(_options));
+        return new BotApplication(host, client, new BotApplicationOptions(_options, _options.Token));
+    }
+
+    private void AddDefaultServices(ITelegramBotClient client)
+    {
+        Services.TryAddSingleton(client);
+        Services.TryAddSingleton<IBotRequestContextAccessor, BotRequestContextAccessor>();
     }
 }

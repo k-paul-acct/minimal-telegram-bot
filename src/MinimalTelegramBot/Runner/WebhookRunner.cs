@@ -1,5 +1,6 @@
 using System.Net.Mime;
 using Microsoft.AspNetCore.Http.Json;
+using MinimalTelegramBot.Server;
 using MinimalTelegramBot.Settings;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -9,43 +10,50 @@ namespace MinimalTelegramBot.Runner;
 
 internal static class WebhookRunner
 {
-    public static async Task<IHost> StartWebhook(this BotApplication app, UpdateHandler updateHandler, CancellationToken ct)
+    public static async Task<IHost> StartWebhook(this BotApplication app, UpdateServer updateServer)
     {
-        IBotApplicationBuilder builder = app;
-        var options = (WebhookOptions)builder.Properties["__WebhookEnabled"]!;
+        var options = (WebhookOptions)((IBotApplicationBuilder)app).Properties["__WebhookEnabled"]!;
+        var webApp = CreateWebApp(app._options.Args, options, updateServer);
 
-        await app._client.SetWebhookAsync(
-            options.Url, options.Certificate, options.IpAddress, options.MaxConnections, app._options.ReceiverOptions?.AllowedUpdates,
-            app._options.ReceiverOptions?.DropPendingUpdates ?? false, options.SecretToken, ct);
+        await webApp.StartAsync();
 
-        var webApp = CreateWebApp(app, options, updateHandler);
-
-        await webApp.StartAsync(ct);
+        await app._client.SetWebhookAsync(options.Url, options.Certificate, options.IpAddress, options.MaxConnections,
+            app._options.ReceiverOptions.AllowedUpdates, app._options.ReceiverOptions.DropPendingUpdates, options.SecretToken);
 
         return webApp;
     }
 
-    private static WebApplication CreateWebApp(BotApplication app, WebhookOptions options, UpdateHandler updateHandler)
+    private static WebApplication CreateWebApp(string[] args, WebhookOptions options, UpdateServer updateServer)
     {
-        var webAppBuilder = WebApplication.CreateSlimBuilder(app._options.Args ?? []);
+        var webAppBuilder = WebApplication.CreateSlimBuilder(args);
 
         webAppBuilder.Services.Configure<JsonOptions>(o => JsonBotAPI.Configure(o.SerializerOptions));
 
         var webApp = webAppBuilder.Build();
 
-        webApp.MapPost("", async (Update update) =>
+        if (!webApp.Environment.IsDevelopment())
         {
-            var invocationContext = await updateHandler.CreateInvocationContext(update, true);
-            if (invocationContext is null)
+            webApp.UseExceptionHandler(builder => builder.Run(async context =>
             {
-                return Http.Results.StatusCode(StatusCodes.Status500InternalServerError);
-            }
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                context.Response.ContentType = MediaTypeNames.Text.Plain;
+                await context.Response.WriteAsync("Internal Server Error");
+            }));
+        }
 
-            var httpContentTask = invocationContext.BotRequestContext.Client.WaitHttpContent();
-            _ = Task.Run(invocationContext.Invoke);
+        var routeHandlerBuilder = webApp.MapPost(options.ListenPath, async (Update update) =>
+        {
+            var invocationContext = updateServer.CreateWebhookInvocationContext(update);
+            var httpContentTask = invocationContext.WebhookTelegramBotClient.WaitHttpContent();
+            _ = Task.Run(() => updateServer.Serve(invocationContext));
             var httpContent = await httpContentTask;
             return httpContent is null ? Http.Results.StatusCode(StatusCodes.Status200OK) : new JsonHttpContentResult(httpContent);
-        }).AddEndpointFilter(new TelegramWebhookSecretTokenFilter(options.SecretToken));
+        });
+
+        if (options.SecretToken is not null)
+        {
+            routeHandlerBuilder.AddEndpointFilter(new TelegramWebhookSecretTokenFilter(options.SecretToken));
+        }
 
         return webApp;
     }
@@ -61,12 +69,36 @@ internal static class WebhookRunner
 
         public Task ExecuteAsync(HttpContext httpContext)
         {
-            using (_httpContent)
+            httpContext.Response.StatusCode = StatusCodes.Status200OK;
+            httpContext.Response.ContentType = MediaTypeNames.Application.Json;
+            httpContext.Response.RegisterForDispose(_httpContent);
+            return _httpContent.CopyToAsync(httpContext.Response.Body);
+        }
+    }
+
+    private sealed class TelegramWebhookSecretTokenFilter : IEndpointFilter
+    {
+        private const string SecretTokenHeaderName = "X-Telegram-Bot-Api-Secret-Token";
+
+        private readonly string _secretToken;
+
+        public TelegramWebhookSecretTokenFilter(string secretToken)
+        {
+            _secretToken = secretToken;
+        }
+
+        public ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+        {
+            var header = context.HttpContext.Request.Headers[SecretTokenHeaderName];
+
+            if (header.Count != 1)
             {
-                httpContext.Response.StatusCode = StatusCodes.Status200OK;
-                httpContext.Response.ContentType = MediaTypeNames.Application.Json;
-                return _httpContent.CopyToAsync(httpContext.Response.Body);
+                return new ValueTask<object?>(Http.Results.StatusCode(StatusCodes.Status401Unauthorized));
             }
+
+            return header.Equals(_secretToken)
+                ? next(context)
+                : new ValueTask<object?>(Http.Results.StatusCode(StatusCodes.Status403Forbidden));
         }
     }
 }

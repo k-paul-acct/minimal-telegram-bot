@@ -12,7 +12,7 @@ internal static class FilteredBotRequestDelegateBuilder
 
         BotRequestFilterDelegate filteredInvocation = async context =>
         {
-            context.BotRequestContext.UpdateHandlingStarted = true;
+            context.BotRequestContext.Data["__UpdateHandlingStarted"] = new object();
             var result = await handlerDelegate(context.BotRequestContext);
             return result;
         };
@@ -29,7 +29,7 @@ internal static class FilteredBotRequestDelegateBuilder
         {
             return async context =>
             {
-                context.UpdateHandlingStarted = true;
+                context.Data["__UpdateHandlingStarted"] = new object();
                 var result = await handlerDelegate(context);
                 await result.ExecuteAsync(context);
             };
