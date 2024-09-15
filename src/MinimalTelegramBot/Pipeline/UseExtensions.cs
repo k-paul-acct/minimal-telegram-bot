@@ -1,17 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MinimalTelegramBot.Pipeline;
 
 public static class UseExtensions
 {
-    public static IBotApplicationBuilder UseCallbackAutoAnswering(this IBotApplicationBuilder app)
-    {
-        ArgumentNullException.ThrowIfNull(app);
-
-        app.Properties["__CallbackAutoAnsweringAdded"] = true;
-        return app;
-    }
-
     public static IBotApplicationBuilder Use(this IBotApplicationBuilder app, Func<BotRequestContext, Func<Task>, Task> pipe)
     {
         ArgumentNullException.ThrowIfNull(app);
@@ -20,7 +13,7 @@ public static class UseExtensions
         return app.Use(next => context => pipe(context, () => next(context)));
     }
 
-    public static IBotApplicationBuilder Use(this IBotApplicationBuilder app, Func<BotRequestContext, Func<BotRequestContext, Task>, Task> pipe)
+    public static IBotApplicationBuilder Use(this IBotApplicationBuilder app, Func<BotRequestContext, BotRequestDelegate, Task> pipe)
     {
         ArgumentNullException.ThrowIfNull(app);
         ArgumentNullException.ThrowIfNull(pipe);
@@ -28,10 +21,18 @@ public static class UseExtensions
         return app.Use(next => context => pipe(context, next));
     }
 
-    public static IBotApplicationBuilder UsePipe<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TPipe>(this IBotApplicationBuilder app) where TPipe : IPipe
+    public static IBotApplicationBuilder UsePipe(this IBotApplicationBuilder app, IPipe pipe)
     {
         ArgumentNullException.ThrowIfNull(app);
+        ArgumentNullException.ThrowIfNull(pipe);
 
+        return app.Use(next => context => pipe.InvokeAsync(context, next));
+    }
+
+    public static IBotApplicationBuilder UsePipe<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TPipe>(this IBotApplicationBuilder app)
+        where TPipe : IPipe
+    {
+        ArgumentNullException.ThrowIfNull(app);
         return app.UsePipe(typeof(TPipe));
     }
 
@@ -39,7 +40,7 @@ public static class UseExtensions
     {
         return app.Use(next => context =>
         {
-            var instance = (IPipe)ActivatorUtilities.CreateInstance(app.Services, pipeType);
+            var instance = (IPipe)ActivatorUtilities.CreateInstance(context.Services, pipeType);
             return instance.InvokeAsync(context, next);
         });
     }

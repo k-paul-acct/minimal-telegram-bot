@@ -5,17 +5,74 @@ using Telegram.Bot.Types;
 
 namespace MinimalTelegramBot;
 
-public class BotRequestContext
+public sealed class BotRequestContext
 {
-    public ITelegramBotClient Client { get; set; } = null!;
-    public Update Update { get; set; } = null!;
-    public long ChatId { get; set; }
-    public string? MessageText { get; set; }
-    public string? CallbackData { get; set; }
-    public IServiceProvider Services { get; set; } = null!;
-    public IDictionary<string, object?> Data { get; } = new Dictionary<string, object?>();
-    public Locale UserLocale { get; internal set; } = Locale.Default;
-    public State? UserState { get; internal set; }
+    private readonly List<IDisposable> _disposables;
+    internal readonly IDictionary<string, object?> _properties;
 
-    internal bool UpdateHandlingStarted { get; set; }
+    internal BotRequestContext(IServiceProvider services, Update update, ITelegramBotClient client, IDictionary<string, object?> properties)
+    {
+        Services = services;
+        Update = update;
+        Client = client;
+        _properties = properties;
+        _disposables = [];
+        UserLocale = Locale.Default;
+        Data = new Dictionary<string, object?>();
+
+        var messageText = update.Message?.Text;
+        var callbackData = update.CallbackQuery?.Data;
+        var chatId = update.Message?.Chat.Id ??
+                     update.CallbackQuery?.Message?.Chat.Id ??
+                     update.EditedMessage?.Chat.Id ??
+                     update.ChannelPost?.Chat.Id ??
+                     update.EditedChannelPost?.Chat.Id ??
+                     update.MessageReaction?.Chat.Id ??
+                     update.MessageReactionCount?.Chat.Id ??
+                     update.ChatBoost?.Chat.Id ??
+                     update.RemovedChatBoost?.Chat.Id ??
+                     0;
+
+        MessageText = messageText;
+        CallbackData = callbackData;
+        ChatId = chatId;
+    }
+
+    public ITelegramBotClient Client { get; }
+    public Update Update { get; }
+    public long ChatId { get; }
+    public string? MessageText { get; }
+    public string? CallbackData { get; }
+    public IServiceProvider Services { get; }
+    public IDictionary<string, object?> Data { get; }
+    public Locale UserLocale { get; set; }
+    public State? UserState { get; set; }
+
+    public void RegisterForDispose(IDisposable disposable)
+    {
+        _disposables.Add(disposable);
+    }
+
+    internal void DisposeItems()
+    {
+        foreach (var disposable in _disposables)
+        {
+            disposable.Dispose();
+        }
+    }
+
+    internal async ValueTask DisposeItemsAsync()
+    {
+        foreach (var disposable in _disposables)
+        {
+            if (disposable is IAsyncDisposable asyncDisposable)
+            {
+                await asyncDisposable.DisposeAsync();
+            }
+            else
+            {
+                disposable.Dispose();
+            }
+        }
+    }
 }

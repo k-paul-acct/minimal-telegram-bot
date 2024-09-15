@@ -2,5 +2,5 @@ namespace MinimalTelegramBot.Handling.Filters;
 
 public interface IHandlerFilter
 {
-    ValueTask<bool> Filter(BotRequestFilterContext context);
+    ValueTask<IResult> InvokeAsync(BotRequestFilterContext context, BotRequestFilterDelegate next);
 }

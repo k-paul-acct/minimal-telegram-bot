@@ -1,11 +1,15 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.Metrics;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using MinimalTelegramBot.Settings;
 using Telegram.Bot;
 
 namespace MinimalTelegramBot.Builder;
 
-public class BotApplicationBuilder : IHostApplicationBuilder
+public sealed class BotApplicationBuilder : IHostApplicationBuilder
 {
     private readonly HostApplicationBuilder _hostBuilder;
 
@@ -15,6 +19,8 @@ public class BotApplicationBuilder : IHostApplicationBuilder
     {
         _hostBuilder = Host.CreateApplicationBuilder(options.HostApplicationBuilderSettings);
         _options = options;
+
+        _options.Token = Configuration["TelegramBotToken"] ?? Configuration["BotToken"] ?? Configuration["Token"];
     }
 
     public IConfigurationManager Configuration => _hostBuilder.Configuration;
@@ -33,20 +39,26 @@ public class BotApplicationBuilder : IHostApplicationBuilder
 
     public BotApplication Build()
     {
-        _options.Validate();
+        if (_options.Token is null)
+        {
+            throw new InvalidOperationException($"Cannot build a {nameof(BotApplication)} without a bot token configured");
+        }
 
-        var telegramBotClientOptions = new TelegramBotClientOptions(_options.Token!);
+        var telegramBotClientOptions = new TelegramBotClientOptions(_options.Token);
         _options.TelegramBotClientOptionsConfigure?.Invoke(telegramBotClientOptions);
 
         var client = new TelegramBotClient(telegramBotClientOptions);
-        var handlerBuilder = new HandlerBuilder();
 
-        Services.TryAddSingleton<ITelegramBotClient>(client);
-        Services.TryAddSingleton<IHandlerBuilder>(handlerBuilder);
-        Services.TryAddSingleton<IBotRequestContextAccessor, BotRequestContextAccessor>();
+        AddDefaultServices(client);
 
         var host = _hostBuilder.Build();
 
-        return new BotApplication(host, client, new BotApplicationOptions(_options), handlerBuilder);
+        return new BotApplication(host, client, new BotApplicationOptions(_options, _options.Token));
+    }
+
+    private void AddDefaultServices(ITelegramBotClient client)
+    {
+        Services.TryAddSingleton(client);
+        Services.TryAddSingleton<IBotRequestContextAccessor, BotRequestContextAccessor>();
     }
 }

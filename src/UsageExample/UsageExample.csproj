@@ -17,13 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="cat.jpeg"/>
-    <Content Include="cat.jpeg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Localization\ru.yaml"/>
     <Resource Include="Localization\ru.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

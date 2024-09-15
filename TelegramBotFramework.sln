@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalTelegramBot.StateMac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsageExample.Nuget", "src\UsageExample.Nuget\UsageExample.Nuget.csproj", "{0BA91910-7B4D-4180-B944-7F742A785C54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsageExample.MinimalSetup", "src\UsageExample.MinimalSetup\UsageExample.MinimalSetup.csproj", "{7BCD2E05-2965-4AA9-92F8-A6C35D261DA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,7 @@ Global
 		{8C617CE8-265A-4FC1-BA45-7A5BD49550C3} = {9EE18A62-A9F0-49C8-A7C6-80E01961A02B}
 		{DBFE92C2-2BDA-4A3B-9E00-0449BCAFE0BC} = {9EE18A62-A9F0-49C8-A7C6-80E01961A02B}
 		{0BA91910-7B4D-4180-B944-7F742A785C54} = {9EE18A62-A9F0-49C8-A7C6-80E01961A02B}
+		{7BCD2E05-2965-4AA9-92F8-A6C35D261DA7} = {9EE18A62-A9F0-49C8-A7C6-80E01961A02B}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{371C5D0C-D217-4079-891F-BA0AFEDC513A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -59,5 +62,9 @@ Global
 		{0BA91910-7B4D-4180-B944-7F742A785C54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BA91910-7B4D-4180-B944-7F742A785C54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BA91910-7B4D-4180-B944-7F742A785C54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BCD2E05-2965-4AA9-92F8-A6C35D261DA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BCD2E05-2965-4AA9-92F8-A6C35D261DA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BCD2E05-2965-4AA9-92F8-A6C35D261DA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BCD2E05-2965-4AA9-92F8-A6C35D261DA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
