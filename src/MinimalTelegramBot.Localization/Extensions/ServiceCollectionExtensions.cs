@@ -29,6 +29,8 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(locale);
         ArgumentNullException.ThrowIfNull(build);
 
+        Locale.Default = locale;
+
         var builder = new LocaleStringSetBuilder(locale);
         build(builder);
         var set = builder.Build();

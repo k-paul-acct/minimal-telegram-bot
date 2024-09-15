@@ -15,6 +15,6 @@ internal sealed class BotApplicationBuilderOptions
     public ReceiverOptions ReceiverOptions { get; set; } = new()
     {
         AllowedUpdates = [UpdateType.Message, UpdateType.CallbackQuery,],
-        DropPendingUpdates = false,
+        DropPendingUpdates = true,
     };
 }

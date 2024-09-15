@@ -19,20 +19,6 @@ using Results = MinimalTelegramBot.Results.Results;
 
 var builder = BotApplication.CreateBuilder(args);
 
-builder.SetBotToken(builder.Configuration["BotToken"]!);
-
-builder.ConfigureReceiverOptions(options =>
-{
-    options.AllowedUpdates = [UpdateType.Message, UpdateType.CallbackQuery,];
-    options.DropPendingUpdates = true;
-});
-
-builder.ConfigureTelegramBotClientOptions(options =>
-{
-    options.RetryThreshold = 60;
-    options.RetryCount = 3;
-});
-
 builder.Services.AddStateMachine();
 builder.Services.AddSingleLocale(new Locale("ru"), locale => locale.EnrichFromFile("Localization/ru.yaml"));
 
@@ -46,6 +32,9 @@ app.UsePolling();
 //app.UseWebhook(new WebhookOptions { Url = "", });
 
 app.UseCallbackAutoAnswering();
+
+app.UseStateMachine();
+app.UseLocalization();
 
 app.Handle((ILocalizer localizer) =>
 {

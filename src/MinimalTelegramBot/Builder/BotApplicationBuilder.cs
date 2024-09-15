@@ -19,6 +19,8 @@ public sealed class BotApplicationBuilder : IHostApplicationBuilder
     {
         _hostBuilder = Host.CreateApplicationBuilder(options.HostApplicationBuilderSettings);
         _options = options;
+
+        _options.Token = Configuration["TelegramBotToken"] ?? Configuration["BotToken"] ?? Configuration["Token"];
     }
 
     public IConfigurationManager Configuration => _hostBuilder.Configuration;

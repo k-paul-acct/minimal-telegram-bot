@@ -19,7 +19,7 @@ internal static class BotApplicationRunner
         var isWebhook = builder.Properties.ContainsKey("__WebhookEnabled");
         var updateServer = new UpdateServer(app.Services, pipeline, builder.Properties, infrastructureLogger);
 
-        await app.HandleFeatures();
+        await app.HandleStartupFeatures();
 
         var hostTask = isWebhook ? app.StartWebhook(updateServer) : app.StartPolling(updateServer, infrastructureLogger);
         var host = await hostTask;
@@ -29,6 +29,8 @@ internal static class BotApplicationRunner
         infrastructureLogger.GettingUpdateStarted(isWebhook, botInfo.Username, botInfo.FullName, botInfo.Id);
 
         await host.WaitForShutdownAsync(cancellationToken);
+
+        await app.HandleShutdownFeatures();
     }
 
     private static async Task<BotStartupInfo> GetBotStartupInfo(this ITelegramBotClient client)
