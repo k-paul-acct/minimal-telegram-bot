@@ -9,6 +9,7 @@ internal sealed class WebhookBuilder : IWebhookBuilder
     private string _listenPath;
     private WebApplication? _webApplication;
     private bool _webhookResponseEnabled;
+    private bool _deleteWebhookOnShutdown;
 
     public WebhookBuilder(WebhookOptions options)
     {
@@ -29,6 +30,12 @@ internal sealed class WebhookBuilder : IWebhookBuilder
         return this;
     }
 
+    public IWebhookBuilder DeleteWebhookOnShutdown()
+    {
+        _deleteWebhookOnShutdown = true;
+        return this;
+    }
+
     public IWebhookBuilder UseWebApplication(WebApplication app)
     {
         ArgumentNullException.ThrowIfNull(app);
@@ -44,6 +51,7 @@ internal sealed class WebhookBuilder : IWebhookBuilder
             ListenPath = _listenPath,
             WebApplication = _webApplication,
             WebhookResponseEnabled = _webhookResponseEnabled,
+            DeleteWebhookOnShutdown = _deleteWebhookOnShutdown,
         };
     }
 }

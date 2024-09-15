@@ -46,11 +46,4 @@ public static class BotApplicationExtensions
         app.Properties["__CallbackAutoAnsweringPipeAdded"] = true;
         return app;
     }
-
-    public static IBotApplicationBuilder DeleteWebhookOnShutdown(this IBotApplicationBuilder app)
-    {
-        ArgumentNullException.ThrowIfNull(app);
-        app.Properties["__DeleteWebhookOnShutdown"] = new object();
-        return app;
-    }
 }

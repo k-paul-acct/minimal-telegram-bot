@@ -20,6 +20,11 @@ internal static class WebhookRunner
 
         updateServer._properties["__WebhookUrl"] = new Uri(webhookConfiguration.Options.Url);
 
+        if (webhookConfiguration.DeleteWebhookOnShutdown)
+        {
+            updateServer._properties["__DeleteWebhookOnShutdown"] = new object();
+        }
+
         var webApp = CreateWebApp(app._options.Args, webhookConfiguration, updateServer);
 
         await webApp.StartAsync();

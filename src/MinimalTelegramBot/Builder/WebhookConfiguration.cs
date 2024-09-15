@@ -7,6 +7,7 @@ internal sealed class WebhookConfiguration
 {
     public required WebhookOptions Options { get; set; }
     public WebApplication? WebApplication { get; set; }
+    public bool DeleteWebhookOnShutdown { get; set; }
     public bool WebhookResponseEnabled { get; set; }
     public required string ListenPath { get; set; }
 }
