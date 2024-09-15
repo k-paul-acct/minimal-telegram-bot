@@ -2,29 +2,26 @@ namespace MinimalTelegramBot.Pipeline;
 
 internal sealed class PipelineBuilder : IBotApplicationBuilder
 {
-    public const string RequestUnhandledKey = "__RequestUnhandled";
+    private readonly List<Func<BotRequestDelegate, BotRequestDelegate>> _pipes = [];
 
-    private readonly List<Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>>> _pipes = [];
+    public PipelineBuilder(IServiceProvider services, IDictionary<string, object?> properties)
+    {
+        Services = services;
+        Properties = properties;
+    }
 
-    public IDictionary<string, object?> Properties { get; } = new Dictionary<string, object?>();
+    public IServiceProvider Services { get; }
+    public IDictionary<string, object?> Properties { get; }
 
-    public IBotApplicationBuilder Use(Func<Func<BotRequestContext, Task>, Func<BotRequestContext, Task>> pipe)
+    public IBotApplicationBuilder Use(Func<BotRequestDelegate, BotRequestDelegate> pipe)
     {
         _pipes.Add(pipe);
         return this;
     }
 
-    public Func<BotRequestContext, Task> Build()
+    public BotRequestDelegate Build()
     {
-        Func<BotRequestContext, Task> pipeline = context =>
-        {
-            if (!context.UpdateHandlingStarted)
-            {
-                context.Data[RequestUnhandledKey] = true;
-            }
-
-            return Task.CompletedTask;
-        };
+        BotRequestDelegate pipeline = _ => Task.CompletedTask;
 
         for (var i = _pipes.Count - 1; i >= 0; --i)
         {

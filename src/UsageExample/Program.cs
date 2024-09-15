@@ -1,6 +1,5 @@
-﻿using MinimalTelegramBot;
-using MinimalTelegramBot.Builder;
-using MinimalTelegramBot.Extensions;
+﻿using MinimalTelegramBot.Builder;
+using MinimalTelegramBot.Handling;
 using MinimalTelegramBot.Handling.Filters;
 using MinimalTelegramBot.Localization.Abstractions;
 using MinimalTelegramBot.Localization.Extensions;
@@ -13,28 +12,12 @@ using UsageExample.CommandModels;
 using UsageExample.Services;
 using Results = MinimalTelegramBot.Results.Results;
 
-// TODO: Group filtering.
 // TODO: More Result templates.
-// TODO: More efficient handler resolving.
 // TODO: Different state models.
 // TODO: Notifications.
 // TODO: Different persistence and builder options in builders (State Machine, Notification Service).
 
 var builder = BotApplication.CreateBuilder(args);
-
-builder.SetBotToken(builder.Configuration["BotToken"]!);
-
-builder.ConfigureReceiverOptions(options =>
-{
-    options.AllowedUpdates = [UpdateType.Message, UpdateType.CallbackQuery,];
-    options.DropPendingUpdates = true;
-});
-
-builder.ConfigureTelegramBotClientOptions(options =>
-{
-    options.RetryThreshold = 60;
-    options.RetryCount = 3;
-});
 
 builder.Services.AddStateMachine();
 builder.Services.AddSingleLocale(new Locale("ru"), locale => locale.EnrichFromFile("Localization/ru.yaml"));
@@ -49,6 +32,9 @@ app.UsePolling();
 //app.UseWebhook(new WebhookOptions { Url = "", });
 
 app.UseCallbackAutoAnswering();
+
+app.UseStateMachine();
+app.UseLocalization();
 
 app.Handle((ILocalizer localizer) =>
 {
@@ -65,6 +51,16 @@ app.Handle(([UseFormatProvider] AddCommandModel model, ILocalizer localizer) => 
 app.Handle(([FromKeyedServices("FirstName")] NameService nameService) => nameService.Name).FilterCommand("/firstname");
 
 app.Handle(([FromKeyedServices("LastName")] NameService nameService) => nameService.Name).FilterCommand("/lastname");
+
+app.HandleCommand("/throw", () =>
+{
+    if (Random.Shared.Next(0, 2) == 0)
+    {
+        throw new Exception("Error");
+    }
+
+    return Results.Message("Ok");
+});
 
 app.Handle((ILocalizer localizer) =>
 {
@@ -101,10 +97,9 @@ app.Handle(() =>
     return Results.MessageEdit("Button pressed", keyboard);
 }).FilterCallbackData(x => x == "Hello");
 
-app.Handle(() => Results.Photo("cat.jpeg", "Little cat")).FilterCallbackData(x => x == "Photo");
+app.Handle(() => Results.Photo(new Uri("cat.jpeg", UriKind.Relative), "Little cat")).FilterCallbackData(x => x == "Photo");
 
-app.Handle(() => Results.MessageReply("I'm replied!"))
-    .FilterText(x => x.Equals("reply", StringComparison.OrdinalIgnoreCase));
+app.Handle(() => Results.MessageReply("I'm replied!")).FilterMessageText(x => x.Equals("reply", StringComparison.OrdinalIgnoreCase));
 
 app.Handle(async (string messageText, WeatherService weatherService) =>
 {
@@ -117,7 +112,7 @@ app.Run();
 
 return;
 
-ReplyKeyboardMarkup MenuKeyboard(ILocalizer localizer)
+static ReplyKeyboardMarkup MenuKeyboard(ILocalizer localizer)
 {
     var helloButton = localizer["Button.Hello"];
     var catButton = localizer["Button.Cat"];

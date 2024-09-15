@@ -1,80 +1,60 @@
-using System.Diagnostics.CodeAnalysis;
+using MinimalTelegramBot.Handling.Requirements;
 
 namespace MinimalTelegramBot.Handling;
 
-public class Handler
+public sealed class Handler
 {
-    private readonly List<(Func<BotRequestFilterContext, ValueTask<bool>> Delegate, IList<object?>? Arguments)> _filterDelegates = [];
-    private readonly Func<BotRequestContext, Task<IResult>> _handlerDelegate;
-
-    public Handler(Delegate handlerDelegate)
+    public Handler(BotRequestDelegate filteredBotRequestDelegate, Dictionary<Type, object[]> metadata)
     {
-        ArgumentNullException.ThrowIfNull(handlerDelegate);
-
-        _handlerDelegate = HandlerDelegateBuilder.Build(handlerDelegate);
+        FilteredBotRequestDelegate = filteredBotRequestDelegate;
+        Metadata = metadata;
     }
 
-    public Handler Filter(Func<BotRequestFilterContext, bool> filterDelegate)
+    public Dictionary<Type, object[]> Metadata { get; }
+    public BotRequestDelegate FilteredBotRequestDelegate { get; }
+
+    public bool SatisfyRequirements(IReadOnlyCollection<UpdateHandlingRequirement> requirements)
     {
-        ArgumentNullException.ThrowIfNull(filterDelegate);
-
-        _filterDelegates.Add((context => ValueTask.FromResult(filterDelegate(context)), null));
-        return this;
-    }
-
-    public Handler Filter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>() where TFilter : class, IHandlerFilter
-    {
-        return FilterWithFactory<TFilter>(null);
-    }
-
-    public Handler Filter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(object?[] arguments) where TFilter : class, IHandlerFilter
-    {
-        return FilterWithFactory<TFilter>(arguments);
-    }
-
-    private Handler FilterWithFactory<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(object?[]? arguments) where TFilter : class, IHandlerFilter
-    {
-        ObjectFactory filterFactory;
-
-        try
+        if (Metadata.Count == 0)
         {
-            filterFactory = ActivatorUtilities.CreateFactory(typeof(TFilter), [typeof(BotRequestFilterContext),]);
-        }
-        catch (InvalidOperationException)
-        {
-            filterFactory = ActivatorUtilities.CreateFactory(typeof(TFilter), []);
+            return true;
         }
 
-        _filterDelegates.Add((filterContext =>
+        foreach (var requirement in requirements)
         {
-            var filter = (IHandlerFilter)filterFactory(filterContext.Services, [filterContext,]);
-            return filter.Filter(filterContext);
-        }, arguments));
+            // TODO:
+            var requirementType = requirement.Requirement.GetType();
 
-        return this;
-    }
-
-    internal async ValueTask<bool> CanHandle(BotRequestFilterContext context)
-    {
-        foreach (var (filterDelegate, arguments) in _filterDelegates)
-        {
-            if (arguments is not null)
-            {
-                context.FilterArguments = arguments;
-            }
-
-            if (!await filterDelegate(context))
+            if (!Metadata.TryGetValue(requirementType, out var objects))
             {
                 return false;
+            }
+
+            if (requirementType == typeof(UpdateTypeRequirement))
+            {
+                var updateTypeAttribute = (UpdateTypeRequirement)requirement.Requirement;
+                var pass = CheckUpdateTypeRequirement(objects, updateTypeAttribute);
+                if (!pass)
+                {
+                    return false;
+                }
             }
         }
 
         return true;
     }
 
-    internal async Task Handle(BotRequestContext context)
+    private static bool CheckUpdateTypeRequirement(object[] metadata, UpdateTypeRequirement requirement)
     {
-        var result = await _handlerDelegate(context);
-        await result.ExecuteAsync(context);
+        foreach (var obj in metadata)
+        {
+            var updateTypeMetadata = (UpdateTypeRequirement)obj;
+            if (updateTypeMetadata.UpdateType == requirement.UpdateType)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

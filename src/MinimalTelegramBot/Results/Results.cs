@@ -1,11 +1,11 @@
-using MinimalTelegramBot.Results.Extensions;
+using MinimalTelegramBot.Results.TypedResults;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MinimalTelegramBot.Results;
 
 public static class Results
 {
-    internal static IResult Empty => new MessageResult(string.Empty);
+    public static IResult Empty { get; } = new EmptyResult();
 
     public static IResult Message(string message, IReplyMarkup? keyboard = null)
     {
@@ -31,6 +31,13 @@ public static class Results
     public static IResult CallbackAnswer()
     {
         return new CallbackAnswerResult();
+    }
+
+    public static IResult Photo(Uri uri, string? caption = null)
+    {
+        ArgumentNullException.ThrowIfNull(uri);
+
+        return new PhotoResult(uri, caption);
     }
 
     public static IResult Photo(string photoName, string? caption = null)
