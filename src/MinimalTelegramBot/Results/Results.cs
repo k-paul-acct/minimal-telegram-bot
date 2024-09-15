@@ -33,6 +33,13 @@ public static class Results
         return new CallbackAnswerResult();
     }
 
+    public static IResult Photo(Uri uri, string? caption = null)
+    {
+        ArgumentNullException.ThrowIfNull(uri);
+
+        return new PhotoResult(uri, caption);
+    }
+
     public static IResult Photo(string photoName, string? caption = null)
     {
         ArgumentNullException.ThrowIfNull(photoName);

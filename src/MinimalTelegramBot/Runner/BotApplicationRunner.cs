@@ -14,7 +14,7 @@ internal static class BotApplicationRunner
         IBotApplicationBuilder builder = app;
         var pipeline = builder.Build();
         var isWebhook = builder.Properties.ContainsKey("__WebhookEnabled");
-        var updateServer = new UpdateServer(app.Services, pipeline, infrastructureLogger);
+        var updateServer = new UpdateServer(app.Services, pipeline, builder.Properties, infrastructureLogger);
 
         await app.HandleFeatures();
 

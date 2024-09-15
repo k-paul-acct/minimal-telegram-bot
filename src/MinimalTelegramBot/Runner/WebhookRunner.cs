@@ -15,6 +15,8 @@ internal static class WebhookRunner
         var options = (WebhookOptions)((IBotApplicationBuilder)app).Properties["__WebhookEnabled"]!;
         var webApp = CreateWebApp(app._options.Args, options, updateServer);
 
+        updateServer._properties["__WebhookUrl"] = new Uri(options.Url);
+
         await webApp.StartAsync();
 
         await app._client.SetWebhookAsync(options.Url, options.Certificate, options.IpAddress, options.MaxConnections,
@@ -30,6 +32,8 @@ internal static class WebhookRunner
         webAppBuilder.Services.Configure<JsonOptions>(o => JsonBotAPI.Configure(o.SerializerOptions));
 
         var webApp = webAppBuilder.Build();
+
+        webApp.UseStaticFiles();
 
         if (!webApp.Environment.IsDevelopment())
         {

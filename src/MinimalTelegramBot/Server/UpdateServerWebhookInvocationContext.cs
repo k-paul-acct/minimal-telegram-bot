@@ -1,14 +1,13 @@
 using MinimalTelegramBot.Client;
-using Telegram.Bot;
 
 namespace MinimalTelegramBot.Server;
 
 internal sealed class UpdateServerWebhookInvocationContext : UpdateServerInvocationContext
 {
-    public UpdateServerWebhookInvocationContext(AsyncServiceScope serviceScope, BotRequestContext botRequestContext, ITelegramBotClient telegramBotClient)
+    public UpdateServerWebhookInvocationContext(AsyncServiceScope serviceScope, BotRequestContext botRequestContext, WebhookTelegramBotClient client)
         : base(serviceScope, botRequestContext)
     {
-        WebhookTelegramBotClient = new WebhookTelegramBotClient(telegramBotClient);
+        WebhookTelegramBotClient = client;
     }
 
     public WebhookTelegramBotClient WebhookTelegramBotClient { get; }

@@ -63,6 +63,16 @@ app.Handle(([FromKeyedServices("FirstName")] NameService nameService) => nameSer
 
 app.Handle(([FromKeyedServices("LastName")] NameService nameService) => nameService.Name).FilterCommand("/lastname");
 
+app.HandleCommand("/throw", () =>
+{
+    if (Random.Shared.Next(0, 2) == 0)
+    {
+        throw new Exception("Error");
+    }
+
+    return Results.Message("Ok");
+});
+
 app.Handle((ILocalizer localizer) =>
 {
     var menuText = localizer["Menu"];
@@ -98,7 +108,7 @@ app.Handle(() =>
     return Results.MessageEdit("Button pressed", keyboard);
 }).FilterCallbackData(x => x == "Hello");
 
-app.Handle(() => Results.Photo("cat.jpeg", "Little cat")).FilterCallbackData(x => x == "Photo");
+app.Handle(() => Results.Photo(new Uri("cat.jpeg", UriKind.Relative), "Little cat")).FilterCallbackData(x => x == "Photo");
 
 app.Handle(() => Results.MessageReply("I'm replied!")).FilterMessageText(x => x.Equals("reply", StringComparison.OrdinalIgnoreCase));
 

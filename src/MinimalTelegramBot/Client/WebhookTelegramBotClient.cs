@@ -19,7 +19,7 @@ internal sealed class WebhookTelegramBotClient : ITelegramBotClient
 
     public Task<TResponse> MakeRequestAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
-        if (_webhookResponseUsed)
+        if (_webhookResponseUsed || !request.IsWebhookResponseAvailable())
         {
             return _client.MakeRequestAsync(request, cancellationToken);
         }

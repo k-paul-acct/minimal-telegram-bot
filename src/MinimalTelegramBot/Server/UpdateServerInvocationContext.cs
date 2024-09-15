@@ -11,13 +11,15 @@ internal abstract class UpdateServerInvocationContext : IDisposable, IAsyncDispo
     private AsyncServiceScope ServiceScope { get; }
     public BotRequestContext BotRequestContext { get; }
 
-    public virtual ValueTask DisposeAsync()
+    public virtual async ValueTask DisposeAsync()
     {
-        return ServiceScope.DisposeAsync();
+        await BotRequestContext.DisposeItemsAsync();
+        await ServiceScope.DisposeAsync();
     }
 
     public virtual void Dispose()
     {
+        BotRequestContext.DisposeItems();
         ServiceScope.Dispose();
     }
 }
