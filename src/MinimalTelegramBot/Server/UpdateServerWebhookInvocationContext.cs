@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using MinimalTelegramBot.Client;
 
 namespace MinimalTelegramBot.Server;

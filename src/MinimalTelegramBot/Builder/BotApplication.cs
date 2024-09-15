@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Hosting;
 using MinimalTelegramBot.Pipeline.TypedPipes;
 using MinimalTelegramBot.Runner;
 using MinimalTelegramBot.Settings;

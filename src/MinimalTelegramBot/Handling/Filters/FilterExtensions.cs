@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 using MinimalTelegramBot.Handling.Requirements;
 using Telegram.Bot.Types.Enums;
 

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Hosting;
 using MinimalTelegramBot.Logging;
 using MinimalTelegramBot.Server;
 using Telegram.Bot;

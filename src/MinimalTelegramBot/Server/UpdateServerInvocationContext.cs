@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+
 namespace MinimalTelegramBot.Server;
 
 internal abstract class UpdateServerInvocationContext : IDisposable, IAsyncDisposable

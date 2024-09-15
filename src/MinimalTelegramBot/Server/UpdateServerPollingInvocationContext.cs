@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+
 namespace MinimalTelegramBot.Server;
 
 internal sealed class UpdateServerPollingInvocationContext : UpdateServerInvocationContext

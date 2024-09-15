@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 namespace MinimalTelegramBot.Logging;
 
 internal sealed partial class InfrastructureLogger : ILogger

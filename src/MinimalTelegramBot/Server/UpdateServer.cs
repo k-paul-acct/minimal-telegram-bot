@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using MinimalTelegramBot.Client;
 using MinimalTelegramBot.Logging;
 using Telegram.Bot;
