@@ -23,7 +23,7 @@ public static class BotApplicationExtensions
         return app;
     }
 
-    public static IBotApplicationBuilder UseWebhook(this IBotApplicationBuilder app, WebhookOptions options)
+    public static IWebhookBuilder UseWebhook(this IBotApplicationBuilder app, WebhookOptions options)
     {
         ArgumentNullException.ThrowIfNull(app);
         ArgumentNullException.ThrowIfNull(options);
@@ -33,9 +33,11 @@ public static class BotApplicationExtensions
             throw new InvalidOperationException("Cannot use webhook because polling already used");
         }
 
-        app.Properties.TryAdd("__WebhookEnabled", options);
+        var webhookBuilder = new WebhookBuilder(options);
 
-        return app;
+        app.Properties.TryAdd("__WebhookEnabled", webhookBuilder);
+
+        return webhookBuilder;
     }
 
     public static IBotApplicationBuilder UseCallbackAutoAnswering(this IBotApplicationBuilder app)
