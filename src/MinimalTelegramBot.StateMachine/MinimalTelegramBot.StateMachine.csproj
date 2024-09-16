@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <PackageId>MinimalTelegramBot.StateMachine</PackageId>
-    <Version>0.0.8</Version>
+    <Version>0.0.9</Version>
     <Authors>Pavel Kulakov</Authors>
     <RepositoryUrl>https://github.com/k-paul-acct/minimal-telegram-bot</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
