@@ -1,3 +1,5 @@
+<img alt="" src="./logo/package-icon.png" width="96"/>
+
 # Welcome to the Minimal Telegram Bot project
 
 [![latest version](https://img.shields.io/nuget/v/MinimalTelegramBot)](https://www.nuget.org/packages/MinimalTelegramBot)
