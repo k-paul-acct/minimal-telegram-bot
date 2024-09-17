@@ -11,10 +11,10 @@ internal sealed class LocalizationPipe : IPipe
         _localeProvider = localeProvider;
     }
 
-    public async Task InvokeAsync(BotRequestContext ctx, BotRequestDelegate next)
+    public async Task InvokeAsync(BotRequestContext context, BotRequestDelegate next)
     {
-        var locale = await _localeProvider.GetUserLocaleAsync(ctx.ChatId);
-        ctx.UserLocale = locale;
-        await next(ctx);
+        var locale = await _localeProvider.GetUserLocaleAsync(context.ChatId);
+        context.UserLocale = locale;
+        await next(context);
     }
 }

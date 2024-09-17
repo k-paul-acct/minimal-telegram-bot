@@ -28,7 +28,7 @@ public static class FilterExtensions
         {
             return filterContext =>
             {
-                var filter = (IHandlerFilter)filterFactory(factoryContext.Services, [factoryContext,]);
+                var filter = (IHandlerFilter)filterFactory(filterContext.Services, [factoryContext,]);
                 return filter.InvokeAsync(filterContext, next);
             };
         });
@@ -58,7 +58,7 @@ public static class FilterExtensions
         {
             return filterContext =>
             {
-                var filter = (IHandlerFilter)filterFactory(factoryContext.Services, [factoryContext,]);
+                var filter = (IHandlerFilter)filterFactory(filterContext.Services, [factoryContext,]);
                 configure(filterContext);
                 return filter.InvokeAsync(filterContext, next);
             };

@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <PackageId>MinimalTelegramBot.Localization.Abstractions</PackageId>
-    <Version>0.0.9</Version>
+    <Version>0.0.10</Version>
     <Authors>Pavel Kulakov</Authors>
     <RepositoryUrl>https://github.com/k-paul-acct/minimal-telegram-bot</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -17,7 +17,15 @@
     <Description>
       Provides localization abstractions for the Minimal Telegram Bot Framework Localization.
     </Description>
+    <PackageIcon>package-icon.png</PackageIcon>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\logo\package-icon.png">
+      <Pack>true</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
