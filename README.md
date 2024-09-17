@@ -1,4 +1,8 @@
 # Welcome to the Minimal Telegram Bot project
+
+[![latest version](https://img.shields.io/nuget/v/MinimalTelegramBot)](https://www.nuget.org/packages/MinimalTelegramBot)
+[![Telegram Bot API](https://img.shields.io/badge/Telegram_Bot_API-7.10-blue)](https://core.telegram.org/bots/api)
+
 Minimal Telegram Bot is a modern .NET framework for building Telegram Bots using simple and concise syntax inspired by
 ASP.NET Core Minimal APIs.
 
@@ -113,7 +117,7 @@ In other environments you can use `.env` files or just set bot token in `appsett
   "BotToken": "your bot token"
 }
 ```
-Ensure that your bot token is not included in version control to prevent unauthorized access to your bot.
+> Ensure that your bot token is not included in version control to prevent unauthorized access to your bot.
 
 If you have any trouble with telegram bot token or [BotFather](https://t.me/botfather), read the
 [official tutorial](https://core.telegram.org/bots/tutorial#obtain-your-bot-token).
