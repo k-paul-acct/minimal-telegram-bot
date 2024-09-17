@@ -9,9 +9,9 @@ internal sealed class BotRequestContextAccessorPipe : IPipe
         _contextAccessor = contextAccessor;
     }
 
-    public Task InvokeAsync(BotRequestContext ctx, BotRequestDelegate next)
+    public Task InvokeAsync(BotRequestContext context, BotRequestDelegate next)
     {
-        _contextAccessor.BotRequestContext = ctx;
-        return next(ctx);
+        _contextAccessor.BotRequestContext = context;
+        return next(context);
     }
 }

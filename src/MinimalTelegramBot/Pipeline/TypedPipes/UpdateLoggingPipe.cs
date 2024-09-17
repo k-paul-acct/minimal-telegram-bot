@@ -12,23 +12,23 @@ internal sealed class UpdateLoggingPipe : IPipe
         _logger = logger;
     }
 
-    public async Task InvokeAsync(BotRequestContext ctx, BotRequestDelegate next)
+    public async Task InvokeAsync(BotRequestContext context, BotRequestDelegate next)
     {
-        _logger.LogInformation(0, "Received update with ID = {UpdateId}", ctx.Update.Id);
+        _logger.LogInformation(0, "Received update with ID = {UpdateId}", context.Update.Id);
 
         var stopWatch = Stopwatch.StartNew();
 
-        await next(ctx);
+        await next(context);
 
         stopWatch.Stop();
 
-        if (ctx.Data.ContainsKey("__UpdateHandlingStarted"))
+        if (context.Data.ContainsKey("__UpdateHandlingStarted"))
         {
-            _logger.LogInformation(200, "Update with ID = {UpdateId} is handled. Duration: {Milliseconds} ms", ctx.Update.Id, stopWatch.ElapsedMilliseconds);
+            _logger.LogInformation(200, "Update with ID = {UpdateId} is handled. Duration: {Milliseconds} ms", context.Update.Id, stopWatch.ElapsedMilliseconds);
         }
         else
         {
-            _logger.LogInformation(404, "Update with ID = {UpdateId} is not handled", ctx.Update.Id);
+            _logger.LogInformation(404, "Update with ID = {UpdateId} is not handled", context.Update.Id);
         }
     }
 }

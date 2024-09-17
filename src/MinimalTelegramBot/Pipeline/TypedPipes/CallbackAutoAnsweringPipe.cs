@@ -5,13 +5,13 @@ namespace MinimalTelegramBot.Pipeline.TypedPipes;
 
 internal sealed class CallbackAutoAnsweringPipe : IPipe
 {
-    public async Task InvokeAsync(BotRequestContext ctx, BotRequestDelegate next)
+    public async Task InvokeAsync(BotRequestContext context, BotRequestDelegate next)
     {
-        await next(ctx);
-        if (ctx.Update.Type == UpdateType.CallbackQuery && !ctx.Data.ContainsKey("__CallbackAnswered"))
+        await next(context);
+        if (context.Update.Type == UpdateType.CallbackQuery && !context.Data.ContainsKey("__CallbackAnswered"))
         {
-            ctx.Data["__CallbackAnswered"] = true;
-            await ctx.Client.AnswerCallbackQueryAsync(ctx.Update.CallbackQuery!.Id);
+            context.Data["__CallbackAnswered"] = true;
+            await context.Client.AnswerCallbackQueryAsync(context.Update.CallbackQuery!.Id);
         }
     }
 }
