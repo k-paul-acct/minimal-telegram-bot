@@ -1,7 +1,7 @@
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
-namespace MinimalTelegramBot.Pipeline.TypedPipes;
+namespace MinimalTelegramBot.Pipeline;
 
 internal sealed class CallbackAutoAnsweringPipe : IPipe
 {

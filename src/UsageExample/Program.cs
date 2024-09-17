@@ -3,7 +3,6 @@ using MinimalTelegramBot.Handling;
 using MinimalTelegramBot.Handling.Filters;
 using MinimalTelegramBot.Localization.Abstractions;
 using MinimalTelegramBot.Localization.Extensions;
-using MinimalTelegramBot.Pipeline;
 using MinimalTelegramBot.StateMachine.Extensions;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
