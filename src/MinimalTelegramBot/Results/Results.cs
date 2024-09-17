@@ -4,17 +4,17 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace MinimalTelegramBot.Results;
 
 /// <summary>
-/// Represents a collection of static methods for generating different types of <see cref="IResult"/>.
+///     Represents a collection of static methods for generating different types of <see cref="IResult"/>.
 /// </summary>
 public static class Results
 {
     /// <summary>
-    /// Represents an empty <see cref="IResult"/> with no action.
+    ///     Represents an empty <see cref="IResult"/> with no action.
     /// </summary>
     public static IResult Empty { get; } = new EmptyResult();
 
     /// <summary>
-    /// Creates a new <see cref="IResult"/> that sends a message to the chat.
+    ///     Creates a new <see cref="IResult"/> that sends a message to the chat.
     /// </summary>
     /// <param name="message">Message text.</param>
     /// <param name="keyboard">Message keyboard.</param>
@@ -27,7 +27,7 @@ public static class Results
     }
 
     /// <summary>
-    /// Creates a new <see cref="IResult"/> that sends a message to the chat as a reply.
+    ///     Creates a new <see cref="IResult"/> that sends a message to the chat as a reply.
     /// </summary>
     /// <param name="message">Message text.</param>
     /// <returns>Created <see cref="IResult"/>.</returns>
@@ -39,7 +39,7 @@ public static class Results
     }
 
     /// <summary>
-    /// Creates a new <see cref="IResult"/> that edits the bot message contained in the update.
+    ///     Creates a new <see cref="IResult"/> that edits the bot message contained in the update.
     /// </summary>
     /// <param name="message">New message text.</param>
     /// <param name="keyboard">New message keyboard.</param>
@@ -52,7 +52,7 @@ public static class Results
     }
 
     /// <summary>
-    /// Creates a new <see cref="IResult"/> that answers the callback query.
+    ///     Creates a new <see cref="IResult"/> that answers the callback query.
     /// </summary>
     /// <returns>Created <see cref="IResult"/>.</returns>
     public static IResult CallbackAnswer()
@@ -61,7 +61,7 @@ public static class Results
     }
 
     /// <summary>
-    /// Creates a new <see cref="IResult"/> that sends a photo to the chat.
+    ///     Creates a new <see cref="IResult"/> that sends a photo to the chat.
     /// </summary>
     /// <param name="uri">URI of the photo relative to the wwwroot directory.</param>
     /// <param name="caption">Photo caption.</param>
@@ -74,7 +74,7 @@ public static class Results
     }
 
     /// <summary>
-    /// Creates a new <see cref="IResult"/> that sends a photo to the chat.
+    ///     Creates a new <see cref="IResult"/> that sends a photo to the chat.
     /// </summary>
     /// <param name="photoPath">Path of the photo file.</param>
     /// <param name="caption">Photo caption.</param>
@@ -87,7 +87,7 @@ public static class Results
     }
 
     /// <summary>
-    /// Creates a new <see cref="IResult"/> that sends a photo to the chat.
+    ///     Creates a new <see cref="IResult"/> that sends a photo to the chat.
     /// </summary>
     /// <param name="photoStream">Stream representing the photo.</param>
     /// <param name="caption">Photo caption.</param>
@@ -100,7 +100,7 @@ public static class Results
     }
 
     /// <summary>
-    /// Creates a new <see cref="IResult"/> that sends a document to the chat.
+    ///     Creates a new <see cref="IResult"/> that sends a document to the chat.
     /// </summary>
     /// <param name="documentPath">Path of the document file.</param>
     /// <param name="caption">Document caption.</param>
@@ -113,7 +113,7 @@ public static class Results
     }
 
     /// <summary>
-    /// Creates a new <see cref="IResult"/> that sends a document to the chat.
+    ///     Creates a new <see cref="IResult"/> that sends a document to the chat.
     /// </summary>
     /// <param name="documentStream">Stream representing the document.</param>
     /// <param name="caption">Document caption.</param>
