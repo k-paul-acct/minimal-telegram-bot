@@ -76,15 +76,14 @@ public static class Results
     /// <summary>
     /// Creates a new <see cref="IResult"/> that sends a photo to the chat.
     /// </summary>
-    /// <param name="photoName">Path of the photo file.</param>
+    /// <param name="photoPath">Path of the photo file.</param>
     /// <param name="caption">Photo caption.</param>
     /// <returns>Created <see cref="IResult"/>.</returns>
-    // TODO: Rename photoName to photoPath.
-    public static IResult Photo(string photoName, string? caption = null)
+    public static IResult Photo(string photoPath, string? caption = null)
     {
-        ArgumentNullException.ThrowIfNull(photoName);
+        ArgumentNullException.ThrowIfNull(photoPath);
 
-        return new PhotoResult(photoName, caption);
+        return new PhotoResult(photoPath, caption);
     }
 
     /// <summary>
@@ -103,15 +102,14 @@ public static class Results
     /// <summary>
     /// Creates a new <see cref="IResult"/> that sends a document to the chat.
     /// </summary>
-    /// <param name="documentName">Path of the document file.</param>
+    /// <param name="documentPath">Path of the document file.</param>
     /// <param name="caption">Document caption.</param>
     /// <returns>Created <see cref="IResult"/>.</returns>
-    // TODO: Rename documentName to documentPath.
-    public static IResult Document(string documentName, string? caption = null)
+    public static IResult Document(string documentPath, string? caption = null)
     {
-        ArgumentNullException.ThrowIfNull(documentName);
+        ArgumentNullException.ThrowIfNull(documentPath);
 
-        return new DocumentResult(documentName, caption);
+        return new DocumentResult(documentPath, caption);
     }
 
     /// <summary>

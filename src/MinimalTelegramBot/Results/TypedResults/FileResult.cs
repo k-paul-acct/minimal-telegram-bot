@@ -5,7 +5,7 @@ namespace MinimalTelegramBot.Results.TypedResults;
 
 internal abstract class FileResult : IResult
 {
-    private readonly string? _fileName;
+    private readonly string? _filePath;
     private readonly Uri? _uri;
     private readonly Stream? _fileStream;
 
@@ -17,9 +17,9 @@ internal abstract class FileResult : IResult
         Caption = caption;
     }
 
-    protected FileResult(string fileName, string? caption = null)
+    protected FileResult(string filePath, string? caption = null)
     {
-        _fileName = fileName;
+        _filePath = filePath;
         Caption = caption;
     }
 
@@ -41,7 +41,7 @@ internal abstract class FileResult : IResult
 
     private Task<Message> SendFromName(BotRequestContext context)
     {
-        var stream = File.OpenRead(_fileName!);
+        var stream = File.OpenRead(_filePath!);
         return SendFromStream(context, stream);
     }
 
