@@ -4,7 +4,7 @@ namespace MinimalTelegramBot.Builder;
 
 public static class BotApplicationExtensions
 {
-    public static IBotApplicationBuilder UsePolling(this IBotApplicationBuilder app, bool deleteWebhook = false)
+    public static IPollingBuilder UsePolling(this IBotApplicationBuilder app, bool deleteWebhook = false)
     {
         ArgumentNullException.ThrowIfNull(app);
 
@@ -13,14 +13,16 @@ public static class BotApplicationExtensions
             throw new InvalidOperationException("Cannot use polling because webhook already used");
         }
 
-        app.Properties.TryAdd("__PollingEnabled", true);
-
         if (deleteWebhook)
         {
             app.Properties.TryAdd("__DeleteWebhookOnStartup", new object());
         }
 
-        return app;
+        var pollingBuilder = new PollingBuilder();
+
+        app.Properties.TryAdd("__PollingEnabled", pollingBuilder);
+
+        return pollingBuilder;
     }
 
     public static IWebhookBuilder UseWebhook(this IBotApplicationBuilder app, WebhookOptions options)

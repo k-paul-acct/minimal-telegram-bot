@@ -47,7 +47,7 @@ internal abstract class FileResult : IResult
 
     private Task<Message> SendFromUri(BotRequestContext context)
     {
-        var baseUri = (Uri)context._properties["__WebhookUrl"]!;
+        var baseUri = (Uri)context._properties["__WebServerUrl"]!;
         var fullUri = new Uri(baseUri, _uri!);
         var file = new InputFileUrl(fullUri);
         return Send(context, file);
