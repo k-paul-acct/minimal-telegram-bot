@@ -1,3 +1,5 @@
+using Telegram.Bot.Types.Enums;
+
 namespace MinimalTelegramBot.Handling;
 
 public static class HandleExtensions
@@ -29,28 +31,57 @@ public static class HandleExtensions
         return builder;
     }
 
-    public static HandlerBuilder HandleMessageText(this IHandlerDispatcher handlerDispatcher, string messageText)
+    public static HandlerBuilder HandleMessageText(this IHandlerDispatcher handlerDispatcher, string messageText, Delegate handler)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(handlerDispatcher);
+        ArgumentNullException.ThrowIfNull(messageText);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var builder = handlerDispatcher.Handle(handler);
+        builder.FilterMessageText(messageText);
+        return builder;
     }
 
-    public static HandlerBuilder HandleMessageText(this IHandlerDispatcher handlerDispatcher, Func<string, bool> predicate)
+    public static HandlerBuilder HandleCallbackData(this IHandlerDispatcher handlerDispatcher, string callbackData, Delegate handler)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(handlerDispatcher);
+        ArgumentNullException.ThrowIfNull(callbackData);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var builder = handlerDispatcher.Handle(handler);
+        builder.FilterCallbackData(callbackData);
+        return builder;
     }
 
-    public static HandlerBuilder HandleCallbackData(this IHandlerDispatcher handlerDispatcher, string callbackData)
+    public static HandlerBuilder HandleCallbackDataPrefix(this IHandlerDispatcher handlerDispatcher, string callbackDataPrefix, Delegate handler)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(handlerDispatcher);
+        ArgumentNullException.ThrowIfNull(callbackDataPrefix);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var builder = handlerDispatcher.Handle(handler);
+        builder.FilterCallbackData(x => x.StartsWith(callbackDataPrefix, StringComparison.Ordinal));
+        return builder;
     }
 
-    public static HandlerBuilder HandleCallbackData(this IHandlerDispatcher handlerDispatcher, Func<string, bool> predicate)
+    public static HandlerBuilder HandleUpdateType(this IHandlerDispatcher handlerDispatcher, UpdateType updateType, Delegate handler)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(handlerDispatcher);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var builder = handlerDispatcher.Handle(handler);
+        builder.FilterUpdateType(updateType);
+        return builder;
     }
 
-    public static HandlerBuilder HandleCallbackDataPrefix(this IHandlerDispatcher handlerDispatcher, string callbackDataPrefix)
+    public static HandlerBuilder HandleInlineQuery(this IHandlerDispatcher handlerDispatcher, string query, Delegate handler)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(handlerDispatcher);
+        ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var builder = handlerDispatcher.Handle(handler);
+        builder.FilterInlineQuery(query);
+        return builder;
     }
 }
