@@ -9,6 +9,7 @@ internal sealed class StateMachine : IStateMachine
     {
         _repository = repository;
         _context = contextAccessor.BotRequestContext ??
+                   // TODO: Not use base Exception.
                    throw new Exception($"No current context in {nameof(IBotRequestContextAccessor)}");
     }
 

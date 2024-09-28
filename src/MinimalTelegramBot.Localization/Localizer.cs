@@ -15,7 +15,7 @@ internal sealed class Localizer : ILocalizer
     {
         if (_contextAccessor.BotRequestContext is null)
         {
-            throw new Exception($"{nameof(BotRequestContext)} is null");
+            throw new InvalidOperationException($"{nameof(BotRequestContext)} is null");
         }
 
         var locale = _contextAccessor.BotRequestContext.UserLocale;
