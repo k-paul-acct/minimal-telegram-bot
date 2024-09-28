@@ -1,12 +1,20 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using MinimalTelegramBot.Handling.Requirements;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace MinimalTelegramBot.Handling.Filters;
 
 public static class FilterExtensions
 {
+    /// <summary>
+    ///     Adds a filter of type <typeparamref name="TFilter"/> to the handler or handler group.
+    /// </summary>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <typeparam name="TFilter">The type of the <see cref="IHandlerFilter"/> to add.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder Filter<TBuilder, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(this TBuilder builder)
         where TFilter : IHandlerFilter
         where TBuilder : IHandlerConventionBuilder
@@ -36,6 +44,14 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter of type <typeparamref name="TFilter"/> to the handler or handler group.
+    /// </summary>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="configure">The action to configure the <see cref="BotRequestFilterContext"/> before filter invocation.</param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <typeparam name="TFilter">The type of the <see cref="IHandlerFilter"/> to add.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder Filter<TBuilder, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(this TBuilder builder, Action<BotRequestFilterContext> configure)
         where TFilter : IHandlerFilter
         where TBuilder : IHandlerConventionBuilder
@@ -67,6 +83,13 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter to the handler or handler group using a custom filter delegate.
+    /// </summary>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="filter">The delegate that defines the filter logic.</param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder Filter<TBuilder>(this TBuilder builder, Func<BotRequestFilterContext, BotRequestFilterDelegate, ValueTask<IResult>> filter)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -84,32 +107,15 @@ public static class FilterExtensions
         builder.Add(handlerBuilder => handlerBuilder.FilterFactories.Add(factory));
     }
 
-    public static TBuilder Filter<TBuilder>(this TBuilder builder, Func<BotRequestFilterContext, IResult> filterDelegate)
-        where TBuilder : IHandlerConventionBuilder
-    {
-        ArgumentNullException.ThrowIfNull(builder);
-        ArgumentNullException.ThrowIfNull(filterDelegate);
-
-        builder.Filter((context, _) =>
-        {
-            var result = filterDelegate(context);
-            return new ValueTask<IResult>(result);
-        });
-
-        return builder;
-    }
-
-    public static TBuilder Filter<TBuilder>(this TBuilder builder, Func<BotRequestFilterContext, ValueTask<IResult>> filterDelegate)
-        where TBuilder : IHandlerConventionBuilder
-    {
-        ArgumentNullException.ThrowIfNull(builder);
-        ArgumentNullException.ThrowIfNull(filterDelegate);
-
-        builder.Filter((context, _) => filterDelegate(context));
-
-        return builder;
-    }
-
+    /// <summary>
+    ///     Adds a filter to the handler or handler group using a custom filter delegate.
+    ///     The next filter after the current one will be invoked if the current one returns true,
+    ///     otherwise the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    /// </summary>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="filterDelegate">The delegate that defines the filter logic.</param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder Filter<TBuilder>(this TBuilder builder, Func<BotRequestFilterContext, bool> filterDelegate)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -123,6 +129,15 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter to the handler or handler group using a custom async filter delegate.
+    ///     The next filter after the current one will be invoked if the current one returns true,
+    ///     otherwise the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    /// </summary>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="filterDelegate">The async delegate that defines the filter logic.</param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder Filter<TBuilder>(this TBuilder builder, Func<BotRequestFilterContext, ValueTask<bool>> filterDelegate)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -136,6 +151,21 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
+    ///     the filter pipeline if the <see cref="Message.Text"/> of an incoming <see cref="Message"/> update matches the specified one.
+    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    /// </summary>
+    /// <remarks>
+    ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
+    ///     should be a <see cref="UpdateType.Message"/>.
+    /// </remarks>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="messageText">
+    ///     Required value of the <see cref="Message.Text"/> of an incoming <see cref="Message"/> update.
+    /// </param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder FilterMessageText<TBuilder>(this TBuilder builder, string messageText)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -152,6 +182,22 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
+    ///     the filter pipeline if the <see cref="Message.Text"/> of an incoming <see cref="Message"/> update satisfies
+    ///     the specified filter.
+    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    /// </summary>
+    /// <remarks>
+    ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
+    ///     should be a <see cref="UpdateType.Message"/>.
+    /// </remarks>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="filter">
+    ///     The predicate to check the <see cref="Message.Text"/> of an incoming <see cref="Message"/> update.
+    /// </param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder FilterMessageText<TBuilder>(this TBuilder builder, Func<string, bool> filter)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -174,6 +220,25 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
+    ///     the filter pipeline if the <see cref="Message.Text"/> of an incoming <see cref="Message"/> update is a command
+    ///     and that command matches the specified one, for example <c>/start</c>.
+    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Additional command arguments, such as <c>123</c> in <c>/start 123</c> command, are not counted.
+    ///     </para>
+    ///     <para>
+    ///         This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
+    ///         should be a <see cref="UpdateType.Message"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="command">The command.</param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder FilterCommand<TBuilder>(this TBuilder builder, string command)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -217,6 +282,22 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
+    ///     the filter pipeline if the <see cref="CallbackQuery.Data"/> of an incoming <see cref="CallbackQuery"/> update matches
+    ///     the specified one.
+    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    /// </summary>
+    /// <remarks>
+    ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
+    ///     should be a <see cref="UpdateType.CallbackQuery"/>.
+    /// </remarks>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="callbackData">
+    ///     Required value of the <see cref="CallbackQuery.Data"/> of an incoming <see cref="CallbackQuery"/> update.
+    /// </param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder FilterCallbackData<TBuilder>(this TBuilder builder, string callbackData)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -233,6 +314,23 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
+    ///     the filter pipeline if the <see cref="CallbackQuery.Data"/> of an incoming <see cref="CallbackQuery"/> update satisfies
+    ///     the specified filter.
+    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    /// </summary>
+    /// <remarks>
+    ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
+    ///     should be a <see cref="UpdateType.CallbackQuery"/>.
+    /// </remarks>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="filter">
+    ///     The predicate to check the <see cref="CallbackQuery.Data"/> of
+    ///     an incoming <see cref="CallbackQuery"/> update.
+    /// </param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder FilterCallbackData<TBuilder>(this TBuilder builder, Func<string, bool> filter)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -255,6 +353,17 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
+    ///     the filter pipeline if its <see cref="Update.Type"/> matches the specified one.
+    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    /// </summary>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="updateType">
+    ///     Required value of the <see cref="Update.Type"/> of an incoming <see cref="Update"/>.
+    /// </param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder FilterUpdateType<TBuilder>(this TBuilder builder, UpdateType updateType)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -270,6 +379,17 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
+    ///     the filter pipeline if its <see cref="Update.Type"/> satisfies the specified filter.
+    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    /// </summary>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="filter">
+    ///     The predicate to check the <see cref="Update.Type"/> of an incoming <see cref="Update"/>.
+    /// </param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder FilterUpdateType<TBuilder>(this TBuilder builder, Func<UpdateType, bool> filter)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -283,6 +403,22 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
+    ///     the filter pipeline if the <see cref="InlineQuery.Query"/> of an incoming <see cref="InlineQuery"/> update matches
+    ///     the specified one.
+    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    /// </summary>
+    /// <remarks>
+    ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
+    ///     should be an <see cref="UpdateType.InlineQuery"/>.
+    /// </remarks>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="query">
+    ///     Required value of the <see cref="InlineQuery.Query"/> of an incoming <see cref="InlineQuery"/>.
+    /// </param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder FilterInlineQuery<TBuilder>(this TBuilder builder, string query)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -299,6 +435,22 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
+    ///     the filter pipeline if the <see cref="InlineQuery.Query"/> of an incoming <see cref="InlineQuery"/> update satisfies
+    ///     the specified filter.
+    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    /// </summary>
+    /// <remarks>
+    ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
+    ///     should be an <see cref="UpdateType.InlineQuery"/>.
+    /// </remarks>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="filter">
+    ///     The predicate to check the <see cref="InlineQuery.Query"/> of an incoming <see cref="InlineQuery"/> update.
+    /// </param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder FilterInlineQuery<TBuilder>(this TBuilder builder, Func<string, bool> filter)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -323,6 +475,22 @@ public static class FilterExtensions
         return builder;
     }
 
+    /// <summary>
+    ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
+    ///     the filter pipeline if the <see cref="InlineQuery.Query"/> of an incoming <see cref="InlineQuery"/> update satisfies
+    ///     the specified async filter.
+    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    /// </summary>
+    /// <remarks>
+    ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
+    ///     should be an <see cref="UpdateType.InlineQuery"/>.
+    /// </remarks>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="filter">
+    ///     The async predicate to check the <see cref="InlineQuery.Query"/> of an incoming <see cref="InlineQuery"/> update.
+    /// </param>
+    /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
+    /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
     public static TBuilder FilterInlineQuery<TBuilder>(this TBuilder builder, Func<string, ValueTask<bool>> filter)
         where TBuilder : IHandlerConventionBuilder
     {
@@ -340,45 +508,6 @@ public static class FilterExtensions
                 ? await next(context)
                 : Results.Results.Empty;
         });
-
-        var metadata = new UpdateTypeRequirement(UpdateType.InlineQuery);
-        builder.Add(handlerBuilder => handlerBuilder.Metadata.Add(metadata));
-
-        return builder;
-    }
-
-    public static TBuilder FilterInlineQuery<TBuilder>(this TBuilder builder, Func<string, IResult> filter)
-        where TBuilder : IHandlerConventionBuilder
-    {
-        ArgumentNullException.ThrowIfNull(builder);
-        ArgumentNullException.ThrowIfNull(filter);
-
-        builder.Filter((context, _) =>
-        {
-            if (context.BotRequestContext.Update.InlineQuery?.Query is null)
-            {
-                return new ValueTask<IResult>(Results.Results.Empty);
-            }
-
-            var result = filter(context.BotRequestContext.Update.InlineQuery.Query);
-            return new ValueTask<IResult>(result);
-        });
-
-        var metadata = new UpdateTypeRequirement(UpdateType.InlineQuery);
-        builder.Add(handlerBuilder => handlerBuilder.Metadata.Add(metadata));
-
-        return builder;
-    }
-
-    public static TBuilder FilterInlineQuery<TBuilder>(this TBuilder builder, Func<string, ValueTask<IResult>> filter)
-        where TBuilder : IHandlerConventionBuilder
-    {
-        ArgumentNullException.ThrowIfNull(builder);
-        ArgumentNullException.ThrowIfNull(filter);
-
-        builder.Filter((context, _) => context.BotRequestContext.Update.InlineQuery?.Query is null
-            ? new ValueTask<IResult>(Results.Results.Empty)
-            : filter(context.BotRequestContext.Update.InlineQuery.Query));
 
         var metadata = new UpdateTypeRequirement(UpdateType.InlineQuery);
         builder.Add(handlerBuilder => handlerBuilder.Metadata.Add(metadata));
