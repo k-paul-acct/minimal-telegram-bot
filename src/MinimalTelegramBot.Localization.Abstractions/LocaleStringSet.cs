@@ -1,7 +1,7 @@
 namespace MinimalTelegramBot.Localization.Abstractions;
 
 /// <summary>
-///     Represents a set of localized strings for a specific locale.
+///     Represents a set of localized strings for a specific <see cref="MinimalTelegramBot.Localization.Abstractions.Locale"/>.
 /// </summary>
 public class LocaleStringSet
 {

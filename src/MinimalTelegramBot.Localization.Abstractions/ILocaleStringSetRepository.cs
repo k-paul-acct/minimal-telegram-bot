@@ -1,7 +1,7 @@
 namespace MinimalTelegramBot.Localization.Abstractions;
 
 /// <summary>
-///     Interface for managing locale-specific string sets.
+///     Interface for managing multiple <see cref="LocaleStringSet"/>.
 /// </summary>
 public interface ILocaleStringSetRepository
 {

@@ -6,6 +6,12 @@ namespace MinimalTelegramBot.Localization.Extensions;
 
 public static class LocaleStringSetBuilderExtensions
 {
+    /// <summary>
+    ///     Enriches the <see cref="ILocaleStringSetBuilder"/> with locale strings from a JSON string.
+    /// </summary>
+    /// <param name="builder">The <see cref="ILocaleStringSetBuilder"/> to be enriched.</param>
+    /// <param name="json">The JSON string containing locale strings.</param>
+    /// <returns>The current instance of <see cref="ILocaleStringSetBuilder"/>.</returns>
     public static ILocaleStringSetBuilder EnrichFromJson(this ILocaleStringSetBuilder builder, string json)
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -15,6 +21,12 @@ public static class LocaleStringSetBuilderExtensions
         return builder.Enrich(flattened.ToDictionary());
     }
 
+    /// <summary>
+    ///     Enriches the <see cref="ILocaleStringSetBuilder"/> with locale strings from a YAML string.
+    /// </summary>
+    /// <param name="builder">The <see cref="ILocaleStringSetBuilder"/> to be enriched.</param>
+    /// <param name="yaml">The YAML string containing locale strings.</param>
+    /// <returns>The current instance of <see cref="ILocaleStringSetBuilder"/>.</returns>
     public static ILocaleStringSetBuilder EnrichFromYaml(this ILocaleStringSetBuilder builder, string yaml)
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -47,13 +59,24 @@ public static class LocaleStringSetBuilderExtensions
         }
     }
 
+    /// <summary>
+    ///     Enriches the <see cref="ILocaleStringSetBuilder"/> with locale strings from a file.
+    /// </summary>
+    /// <param name="builder">The <see cref="ILocaleStringSetBuilder"/> to be enriched.</param>
+    /// <param name="fileName">The name of the file containing locale strings.</param>
+    /// <returns>The current instance of <see cref="ILocaleStringSetBuilder"/>.</returns>
+    /// <exception cref="ArgumentException">The given file name has no extension.</exception>
+    /// <exception cref="NotSupportedException">
+    ///     The extension of the given file name not supported.
+    ///     Extensions for JSON and YAML files are currently supported.
+    /// </exception>
     public static ILocaleStringSetBuilder EnrichFromFile(this ILocaleStringSetBuilder builder, string fileName)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(fileName);
 
         var content = File.ReadAllText(fileName);
-        var extension = Path.GetExtension(fileName).ToLower() ?? throw new Exception("File must have an extension");
+        var extension = Path.GetExtension(fileName).ToLower() ?? throw new ArgumentException("File must have an extension", nameof(fileName));
 
         switch (extension)
         {

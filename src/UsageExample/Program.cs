@@ -77,7 +77,7 @@ app.Handle((ILocalizer localizer) =>
     var keyboard = model.GetPageKeyboard(backText, "Menu");
 
     return Results.Message("Page 1", keyboard);
-}).FilterTextWithLocalizer("Button.Page");
+}).FilterMessageTextWithLocalizer("Button.Page");
 
 app.Handle((PaginationModel model, ILocalizer localizer) =>
 {
