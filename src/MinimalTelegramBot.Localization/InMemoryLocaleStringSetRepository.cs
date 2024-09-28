@@ -10,7 +10,7 @@ internal sealed class InMemoryLocaleStringSetRepository : ILocaleStringSetReposi
     {
         if (!_translates.TryGetValue(locale.ToString(), out var stringSet) || !stringSet.TryGetValue(key, out var result))
         {
-            throw new Exception($"No string with key {key} found for locale {locale}");
+            throw new KeyNotFoundException($"No string with key {key} found for locale {locale}");
         }
 
         return result;
