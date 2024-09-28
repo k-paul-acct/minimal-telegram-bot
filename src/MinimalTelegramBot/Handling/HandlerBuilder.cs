@@ -1,5 +1,8 @@
 namespace MinimalTelegramBot.Handling;
 
+/// <summary>
+///     A builder for a single <see cref="Handler"/> that processes bot request.
+/// </summary>
 public sealed class HandlerBuilder : IHandlerConventionBuilder
 {
     private readonly List<Action<HandlerBuilder>> _conventions;
@@ -27,7 +30,7 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
         _conventions.Add(convention);
     }
 
-    private sealed class SingleHandlerHandlerSource : HandlerSource
+    private sealed class SingleHandlerHandlerSource : IHandlerSource
     {
         private readonly HandlerBuilder _handlerBuilder;
 

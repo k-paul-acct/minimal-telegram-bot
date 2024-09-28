@@ -5,7 +5,7 @@ namespace MinimalTelegramBot.Pipeline;
 
 internal static class HandlerResolverPipeBuilder
 {
-    public static Func<BotRequestDelegate, BotRequestDelegate> Build(ICollection<HandlerSource> handlerSources)
+    public static Func<BotRequestDelegate, BotRequestDelegate> Build(ICollection<IHandlerSource> handlerSources)
     {
         List<Handler> handlers = [];
 

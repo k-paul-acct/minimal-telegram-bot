@@ -28,7 +28,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
     }
 
     public IServiceProvider Services => _host.Services;
-    ICollection<HandlerSource> IHandlerDispatcher.HandlerSources => _handlerDispatcher.HandlerSources;
+    ICollection<IHandlerSource> IHandlerDispatcher.HandlerSources => _handlerDispatcher.HandlerSources;
     IDictionary<string, object?> IBotApplicationBuilder.Properties => _properties;
 
     public static BotApplicationBuilder CreateBuilder()
