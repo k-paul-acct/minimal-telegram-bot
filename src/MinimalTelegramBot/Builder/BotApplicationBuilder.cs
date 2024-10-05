@@ -22,8 +22,7 @@ public sealed class BotApplicationBuilder : IHostApplicationBuilder
     {
         _hostBuilder = Host.CreateApplicationBuilder(options.HostApplicationBuilderSettings);
         _options = options;
-
-        _options.Token = Configuration["TelegramBotToken"] ?? Configuration["BotToken"] ?? Configuration["Token"];
+        TrySetBotToken();
     }
 
     public IConfigurationManager Configuration => _hostBuilder.Configuration;
@@ -47,6 +46,8 @@ public sealed class BotApplicationBuilder : IHostApplicationBuilder
     /// <exception cref="InvalidOperationException">Thrown if the bot token is not configured.</exception>
     public BotApplication Build()
     {
+        TrySetBotToken();
+
         if (_options.Token is null)
         {
             throw new InvalidOperationException($"Cannot build a {nameof(BotApplication)} without a bot token configured");
@@ -68,5 +69,10 @@ public sealed class BotApplicationBuilder : IHostApplicationBuilder
     {
         Services.TryAddSingleton(client);
         Services.TryAddSingleton<IBotRequestContextAccessor, BotRequestContextAccessor>();
+    }
+
+    private void TrySetBotToken()
+    {
+        _options.Token = Configuration["TelegramBotToken"] ?? Configuration["BotToken"] ?? Configuration["Token"];
     }
 }
