@@ -64,4 +64,13 @@ public interface IStateMachine
     ///     state to null.
     /// </summary>
     void DropState();
+
+    Task SetStateAsync(long userId, State state, CancellationToken cancellationToken = default);
+    Task SetStateAsync(State state, CancellationToken cancellationToken = default);
+    Task<State?> GetStateAsync(long userId, CancellationToken cancellationToken = default);
+    Task<State?> GetStateAsync(CancellationToken cancellationToken = default);
+    Task<bool> CheckIfInStateAsync(long userId, State state, CancellationToken cancellationToken = default);
+    Task<bool> CheckIfInStateAsync(State state, CancellationToken cancellationToken = default);
+    Task DropStateAsync(long userId, CancellationToken cancellationToken = default);
+    Task DropStateAsync(CancellationToken cancellationToken = default);
 }
