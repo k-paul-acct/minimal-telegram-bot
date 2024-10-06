@@ -3,6 +3,9 @@ using Telegram.Bot.Polling;
 
 namespace MinimalTelegramBot.Builder;
 
+/// <summary>
+///     BotApplicationBuilderExtensions.
+/// </summary>
 public static class BotApplicationBuilderExtensions
 {
     /// <summary>

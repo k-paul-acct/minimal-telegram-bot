@@ -3,6 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MinimalTelegramBot.Pipeline;
 
+/// <summary>
+///     UseExtensions.
+/// </summary>
 public static class UseExtensions
 {
     /// <summary>

@@ -103,6 +103,7 @@ public abstract class State : IEquatable<State>
         return !(a == b);
     }
 
+    /// <inheritdoc/>
     public override int GetHashCode()
     {
         return HashCode.Combine(_stateId, _stateKey);

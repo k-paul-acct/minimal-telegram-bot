@@ -4,6 +4,9 @@ using MinimalTelegramBot.Pipeline;
 
 namespace MinimalTelegramBot.Localization.Extensions;
 
+/// <summary>
+///     BotApplicationBuilderExtensions.
+/// </summary>
 public static class BotApplicationBuilderExtensions
 {
     /// <summary>

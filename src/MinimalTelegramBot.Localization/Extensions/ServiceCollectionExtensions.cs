@@ -4,6 +4,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace MinimalTelegramBot.Localization.Extensions;
 
+/// <summary>
+///     ServiceCollectionExtensions.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>

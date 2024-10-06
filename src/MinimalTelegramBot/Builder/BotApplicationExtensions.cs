@@ -2,6 +2,9 @@ using MinimalTelegramBot.Settings;
 
 namespace MinimalTelegramBot.Builder;
 
+/// <summary>
+///     BotApplicationExtensions.
+/// </summary>
 public static class BotApplicationExtensions
 {
     /// <summary>

@@ -25,14 +25,24 @@ public sealed class BotApplicationBuilder : IHostApplicationBuilder
         TrySetBotToken();
     }
 
+    /// <inheritdoc cref="Microsoft.Extensions.Hosting.HostApplicationBuilder.Configuration"/>
     public IConfigurationManager Configuration => _hostBuilder.Configuration;
+
+    /// <inheritdoc cref="Microsoft.Extensions.Hosting.HostApplicationBuilder.Services"/>
     public IServiceCollection Services => _hostBuilder.Services;
+
+    /// <inheritdoc cref="Microsoft.Extensions.Hosting.HostApplicationBuilder.Logging"/>
     public ILoggingBuilder Logging => _hostBuilder.Logging;
+
+    /// <inheritdoc cref="Microsoft.Extensions.Hosting.HostApplicationBuilder.Environment"/>
     public IHostEnvironment Environment => _hostBuilder.Environment;
+
+    /// <inheritdoc cref="Microsoft.Extensions.Hosting.HostApplicationBuilder.Metrics"/>
     public IMetricsBuilder Metrics => _hostBuilder.Metrics;
 
     IDictionary<object, object> IHostApplicationBuilder.Properties => ((IHostApplicationBuilder)_hostBuilder).Properties;
 
+    /// <inheritdoc cref="Microsoft.Extensions.Hosting.HostApplicationBuilder.ConfigureContainer{TContainerBuilder}"/>
     public void ConfigureContainer<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory, Action<TContainerBuilder>? configure = null)
         where TContainerBuilder : notnull
     {

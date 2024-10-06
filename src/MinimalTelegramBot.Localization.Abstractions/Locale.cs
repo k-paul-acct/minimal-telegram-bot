@@ -94,11 +94,13 @@ public sealed class Locale : IEquatable<Locale>
         return string.Equals(FullCode, other.FullCode, StringComparison.Ordinal);
     }
 
+    /// <inheritdoc/>
     public override string ToString()
     {
         return FullCode;
     }
 
+    /// <inheritdoc/>
     public override int GetHashCode()
     {
         return StringComparer.Ordinal.GetHashCode(FullCode);
