@@ -9,7 +9,7 @@ internal sealed class PhotoResult : FileResult
     {
     }
 
-    public PhotoResult(string photoName, string? caption = null) : base(photoName, caption)
+    public PhotoResult(string photoPath, string? caption = null) : base(photoPath, caption)
     {
     }
 

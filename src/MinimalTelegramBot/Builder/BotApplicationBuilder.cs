@@ -9,6 +9,9 @@ using Telegram.Bot;
 
 namespace MinimalTelegramBot.Builder;
 
+/// <summary>
+///     Provides a builder for configuring and creating a BotApplication instance.
+/// </summary>
 public sealed class BotApplicationBuilder : IHostApplicationBuilder
 {
     private readonly HostApplicationBuilder _hostBuilder;
@@ -36,6 +39,11 @@ public sealed class BotApplicationBuilder : IHostApplicationBuilder
         _hostBuilder.ConfigureContainer(factory, configure);
     }
 
+    /// <summary>
+    ///     Builds a new instance of <see cref="BotApplication"/>.
+    /// </summary>
+    /// <returns>A new instance of <see cref="BotApplication"/>.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the bot token is not configured.</exception>
     public BotApplication Build()
     {
         TrySetBotToken();

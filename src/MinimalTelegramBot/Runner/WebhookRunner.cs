@@ -18,7 +18,7 @@ internal static class WebhookRunner
         var webhookBuilder = (WebhookBuilder)((IBotApplicationBuilder)app).Properties["__WebhookEnabled"]!;
         var webhookConfiguration = webhookBuilder.Build();
 
-        updateServer._properties["__WebhookUrl"] = new Uri(webhookConfiguration.Options.Url);
+        updateServer._properties["__WebServerUrl"] = new Uri(webhookConfiguration.Options.Url);
 
         if (webhookConfiguration.DeleteWebhookOnShutdown)
         {

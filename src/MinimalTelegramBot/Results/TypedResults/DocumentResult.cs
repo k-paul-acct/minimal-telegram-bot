@@ -9,7 +9,7 @@ internal sealed class DocumentResult : FileResult
     {
     }
 
-    public DocumentResult(string documentName, string? caption = null) : base(documentName, caption)
+    public DocumentResult(string documentPath, string? caption = null) : base(documentPath, caption)
     {
     }
 

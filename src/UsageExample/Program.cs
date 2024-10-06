@@ -3,7 +3,6 @@ using MinimalTelegramBot.Handling;
 using MinimalTelegramBot.Handling.Filters;
 using MinimalTelegramBot.Localization.Abstractions;
 using MinimalTelegramBot.Localization.Extensions;
-using MinimalTelegramBot.Pipeline;
 using MinimalTelegramBot.StateMachine.Extensions;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -78,7 +77,7 @@ app.Handle((ILocalizer localizer) =>
     var keyboard = model.GetPageKeyboard(backText, "Menu");
 
     return Results.Message("Page 1", keyboard);
-}).FilterTextWithLocalizer("Button.Page");
+}).FilterMessageTextWithLocalizer("Button.Page");
 
 app.Handle((PaginationModel model, ILocalizer localizer) =>
 {

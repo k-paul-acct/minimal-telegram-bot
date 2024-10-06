@@ -1,5 +1,8 @@
 namespace MinimalTelegramBot.Handling;
 
+/// <summary>
+///     A builder for a group of handlers.
+/// </summary>
 public sealed class HandlerGroupBuilder : IHandlerDispatcher, IHandlerConventionBuilder
 {
     private readonly IHandlerDispatcher _outerDispatcher;
@@ -19,9 +22,9 @@ public sealed class HandlerGroupBuilder : IHandlerDispatcher, IHandlerConvention
     }
 
     IServiceProvider IHandlerDispatcher.Services => _outerDispatcher.Services;
-    ICollection<HandlerSource> IHandlerDispatcher.HandlerSources { get; } = new List<HandlerSource>();
+    ICollection<IHandlerSource> IHandlerDispatcher.HandlerSources { get; } = new List<IHandlerSource>();
 
-    private sealed class HandlerGroupHandlerSource : HandlerSource
+    private sealed class HandlerGroupHandlerSource : IHandlerSource
     {
         private readonly HandlerGroupBuilder _groupBuilder;
 

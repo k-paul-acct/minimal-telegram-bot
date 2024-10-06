@@ -2,7 +2,6 @@ using System.Collections.Frozen;
 
 namespace MinimalTelegramBot.Localization;
 
-/// <inheritdoc />
 internal sealed class LocaleStringSetBuilder : ILocaleStringSetBuilder
 {
     private readonly List<IReadOnlyDictionary<string, string>> _values = [];
@@ -12,10 +11,8 @@ internal sealed class LocaleStringSetBuilder : ILocaleStringSetBuilder
         Locale = locale;
     }
 
-    /// <inheritdoc />
     public Locale Locale { get; }
 
-    /// <inheritdoc />
     public LocaleStringSet Build()
     {
         var combined = _values.SelectMany(x => x).ToFrozenDictionary();
@@ -26,7 +23,6 @@ internal sealed class LocaleStringSetBuilder : ILocaleStringSetBuilder
         };
     }
 
-    /// <inheritdoc />
     public ILocaleStringSetBuilder Enrich(IReadOnlyDictionary<string, string> stringSet)
     {
         _values.Add(stringSet);
