@@ -59,7 +59,7 @@ public sealed class BotRequestContext
 
     /// <summary>
     ///     Gets text of an incoming <see cref="Message"/> update.
-    ///     Note, that it is not possible to get message text for each update, so in such cases the message test is null.
+    ///     Note, that it is not possible to get message text for each update, so in such cases the message text is null.
     /// </summary>
     public string? MessageText { get; }
 

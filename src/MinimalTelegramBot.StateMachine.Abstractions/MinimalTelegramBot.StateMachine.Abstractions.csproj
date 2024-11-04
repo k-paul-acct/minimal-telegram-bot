@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <PackageId>MinimalTelegramBot.StateMachine.Abstractions</PackageId>
-    <Version>0.0.31</Version>
+    <Version>0.0.32</Version>
     <Authors>Pavel Kulakov</Authors>
     <RepositoryUrl>https://github.com/k-paul-acct/minimal-telegram-bot</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

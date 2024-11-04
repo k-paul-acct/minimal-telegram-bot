@@ -32,6 +32,6 @@ internal static class FeatureHandler
 
     private static Task DeleteWebhook(ITelegramBotClient client, bool dropPendingUpdates)
     {
-        return client.DeleteWebhookAsync(dropPendingUpdates);
+        return client.DeleteWebhook(dropPendingUpdates);
     }
 }

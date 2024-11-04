@@ -17,11 +17,11 @@ internal sealed class WebhookTelegramBotClient : ITelegramBotClient
         _httpContentTcs = new TaskCompletionSource<HttpContent?>(TaskCreationOptions.RunContinuationsAsynchronously);
     }
 
-    public Task<TResponse> MakeRequestAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
+    public Task<TResponse> SendRequest<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
         if (_webhookResponseUsed || !request.IsWebhookResponseAvailable())
         {
-            return _client.MakeRequestAsync(request, cancellationToken);
+            return _client.SendRequest(request, cancellationToken);
         }
 
         _webhookResponseUsed = true;
@@ -32,14 +32,24 @@ internal sealed class WebhookTelegramBotClient : ITelegramBotClient
         return Task.FromResult<TResponse>(default!);
     }
 
-    public Task<bool> TestApiAsync(CancellationToken cancellationToken = default)
+    public Task<TResponse> MakeRequest<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
-        return _client.TestApiAsync(cancellationToken);
+        return SendRequest(request, cancellationToken);
     }
 
-    public Task DownloadFileAsync(string filePath, Stream destination, CancellationToken cancellationToken = default)
+    public Task<TResponse> MakeRequestAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
-        return _client.DownloadFileAsync(filePath, destination, cancellationToken);
+        return SendRequest(request, cancellationToken);
+    }
+
+    public Task<bool> TestApi(CancellationToken cancellationToken = default)
+    {
+        return _client.TestApi(cancellationToken);
+    }
+
+    public Task DownloadFile(string filePath, Stream destination, CancellationToken cancellationToken = default)
+    {
+        return _client.DownloadFile(filePath, destination, cancellationToken);
     }
 
     public bool LocalBotServer => _client.LocalBotServer;
