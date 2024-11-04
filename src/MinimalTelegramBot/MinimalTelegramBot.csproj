@@ -32,7 +32,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MinimalTelegramBot.Localization.Abstractions\MinimalTelegramBot.Localization.Abstractions.csproj"/>
-    <ProjectReference Include="..\MinimalTelegramBot.StateMachine.Abstractions\MinimalTelegramBot.StateMachine.Abstractions.csproj"/>
+    <ProjectReference Include="..\StateMachine\Abstractions\MinimalTelegramBot.StateMachine.Abstractions.csproj"/>
   </ItemGroup>
 
   <ItemGroup>

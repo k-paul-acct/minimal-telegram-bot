@@ -22,8 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MinimalTelegramBot.StateMachine.Abstractions\MinimalTelegramBot.StateMachine.Abstractions.csproj"/>
-    <ProjectReference Include="..\MinimalTelegramBot\MinimalTelegramBot.csproj"/>
+    <ProjectReference Include="..\..\MinimalTelegramBot\MinimalTelegramBot.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -31,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\logo\package-icon.png">
+    <None Include="..\..\..\logo\package-icon.png">
       <Pack>true</Pack>
       <PackagePath>\</PackagePath>
     </None>
