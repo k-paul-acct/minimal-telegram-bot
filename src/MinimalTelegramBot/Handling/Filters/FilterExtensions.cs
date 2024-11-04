@@ -6,6 +6,9 @@ using Telegram.Bot.Types.Enums;
 
 namespace MinimalTelegramBot.Handling.Filters;
 
+/// <summary>
+///     FilterExtensions.
+/// </summary>
 public static class FilterExtensions
 {
     /// <summary>
@@ -110,7 +113,7 @@ public static class FilterExtensions
     /// <summary>
     ///     Adds a filter to the handler or handler group using a custom filter delegate.
     ///     The next filter after the current one will be invoked if the current one returns true,
-    ///     otherwise the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    ///     otherwise the <see cref="MinimalTelegramBot.Results.Results.Empty"/> result will be used as the result of the bot request.
     /// </summary>
     /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
     /// <param name="filterDelegate">The delegate that defines the filter logic.</param>
@@ -132,7 +135,7 @@ public static class FilterExtensions
     /// <summary>
     ///     Adds a filter to the handler or handler group using a custom async filter delegate.
     ///     The next filter after the current one will be invoked if the current one returns true,
-    ///     otherwise the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    ///     otherwise the <see cref="MinimalTelegramBot.Results.Results.Empty"/> result will be used as the result of the bot request.
     /// </summary>
     /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
     /// <param name="filterDelegate">The async delegate that defines the filter logic.</param>
@@ -154,7 +157,7 @@ public static class FilterExtensions
     /// <summary>
     ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
     ///     the filter pipeline if the <see cref="Message.Text"/> of an incoming <see cref="Message"/> update matches the specified one.
-    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    ///     If not, the <see cref="MinimalTelegramBot.Results.Results.Empty"/> result will be used as the result of the bot request.
     /// </summary>
     /// <remarks>
     ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
@@ -186,7 +189,7 @@ public static class FilterExtensions
     ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
     ///     the filter pipeline if the <see cref="Message.Text"/> of an incoming <see cref="Message"/> update satisfies
     ///     the specified filter.
-    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    ///     If not, the <see cref="MinimalTelegramBot.Results.Results.Empty"/> result will be used as the result of the bot request.
     /// </summary>
     /// <remarks>
     ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
@@ -224,7 +227,7 @@ public static class FilterExtensions
     ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
     ///     the filter pipeline if the <see cref="Message.Text"/> of an incoming <see cref="Message"/> update is a command
     ///     and that command matches the specified one, for example <c>/start</c>.
-    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    ///     If not, the <see cref="MinimalTelegramBot.Results.Results.Empty"/> result will be used as the result of the bot request.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -286,7 +289,7 @@ public static class FilterExtensions
     ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
     ///     the filter pipeline if the <see cref="CallbackQuery.Data"/> of an incoming <see cref="CallbackQuery"/> update matches
     ///     the specified one.
-    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    ///     If not, the <see cref="MinimalTelegramBot.Results.Results.Empty"/> result will be used as the result of the bot request.
     /// </summary>
     /// <remarks>
     ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
@@ -318,7 +321,7 @@ public static class FilterExtensions
     ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
     ///     the filter pipeline if the <see cref="CallbackQuery.Data"/> of an incoming <see cref="CallbackQuery"/> update satisfies
     ///     the specified filter.
-    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    ///     If not, the <see cref="MinimalTelegramBot.Results.Results.Empty"/> result will be used as the result of the bot request.
     /// </summary>
     /// <remarks>
     ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
@@ -356,7 +359,7 @@ public static class FilterExtensions
     /// <summary>
     ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
     ///     the filter pipeline if its <see cref="Update.Type"/> matches the specified one.
-    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    ///     If not, the <see cref="MinimalTelegramBot.Results.Results.Empty"/> result will be used as the result of the bot request.
     /// </summary>
     /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
     /// <param name="updateType">
@@ -382,7 +385,7 @@ public static class FilterExtensions
     /// <summary>
     ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
     ///     the filter pipeline if its <see cref="Update.Type"/> satisfies the specified filter.
-    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    ///     If not, the <see cref="MinimalTelegramBot.Results.Results.Empty"/> result will be used as the result of the bot request.
     /// </summary>
     /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
     /// <param name="filter">
@@ -407,7 +410,7 @@ public static class FilterExtensions
     ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
     ///     the filter pipeline if the <see cref="InlineQuery.Query"/> of an incoming <see cref="InlineQuery"/> update matches
     ///     the specified one.
-    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    ///     If not, the <see cref="MinimalTelegramBot.Results.Results.Empty"/> result will be used as the result of the bot request.
     /// </summary>
     /// <remarks>
     ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
@@ -439,7 +442,7 @@ public static class FilterExtensions
     ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
     ///     the filter pipeline if the <see cref="InlineQuery.Query"/> of an incoming <see cref="InlineQuery"/> update satisfies
     ///     the specified filter.
-    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    ///     If not, the <see cref="MinimalTelegramBot.Results.Results.Empty"/> result will be used as the result of the bot request.
     /// </summary>
     /// <remarks>
     ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>
@@ -479,7 +482,7 @@ public static class FilterExtensions
     ///     Adds a filter to the handler or handler group that allows an incoming <see cref="Update"/> to pass further down
     ///     the filter pipeline if the <see cref="InlineQuery.Query"/> of an incoming <see cref="InlineQuery"/> update satisfies
     ///     the specified async filter.
-    ///     If not, the <see cref="Results.Empty"/> result will be used as the result of the bot request.
+    ///     If not, the <see cref="MinimalTelegramBot.Results.Results.Empty"/> result will be used as the result of the bot request.
     /// </summary>
     /// <remarks>
     ///     This filter implicitly implies that the <see cref="Update.Type"/> of an incoming <see cref="Update"/>

@@ -31,7 +31,9 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
         UsePipesBeforeHandlerResolver();
     }
 
+    /// <inheritdoc cref="Microsoft.Extensions.Hosting.IHost.Services"/>
     public IServiceProvider Services => _host.Services;
+
     ICollection<IHandlerSource> IHandlerDispatcher.HandlerSources => _handlerDispatcher.HandlerSources;
     IDictionary<string, object?> IBotApplicationBuilder.Properties => _properties;
 
@@ -68,6 +70,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
         return new BotApplicationBuilder(options);
     }
 
+    /// <inheritdoc cref="MinimalTelegramBot.Pipeline.PipelineBuilder.Use"/>
     public IBotApplicationBuilder Use(Func<BotRequestDelegate, BotRequestDelegate> pipe)
     {
         ArgumentNullException.ThrowIfNull(pipe);
@@ -87,16 +90,19 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
         return pipeline;
     }
 
+    /// <inheritdoc cref="Microsoft.Extensions.Hosting.IHost.StartAsync"/>
     public Task StartAsync(CancellationToken cancellationToken = default)
     {
         return _host.StartAsync(cancellationToken);
     }
 
+    /// <inheritdoc cref="Microsoft.Extensions.Hosting.IHost.StopAsync"/>
     public Task StopAsync(CancellationToken cancellationToken = default)
     {
         return _host.StopAsync(cancellationToken);
     }
 
+    /// <inheritdoc/>
     public void Dispose()
     {
         _host.Dispose();

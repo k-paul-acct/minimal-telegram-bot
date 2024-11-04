@@ -15,6 +15,6 @@ internal sealed class DocumentResult : FileResult
 
     protected override Task<Message> Send(BotRequestContext context, InputFile inputFile)
     {
-        return context.Client.SendDocumentAsync(context.ChatId, inputFile, caption: Caption);
+        return context.Client.SendDocument(context.ChatId, inputFile, Caption);
     }
 }

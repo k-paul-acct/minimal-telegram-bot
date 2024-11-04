@@ -29,7 +29,7 @@ internal static class WebhookRunner
 
         await webApp.StartAsync();
 
-        await app._client.SetWebhookAsync(
+        await app._client.SetWebhook(
             webhookConfiguration.Options.Url,
             webhookConfiguration.Options.Certificate,
             webhookConfiguration.Options.IpAddress,

@@ -4,6 +4,9 @@ using YamlDotNet.Serialization;
 
 namespace MinimalTelegramBot.Localization.Extensions;
 
+/// <summary>
+///     LocaleStringSetBuilderExtensions.
+/// </summary>
 public static class LocaleStringSetBuilderExtensions
 {
     /// <summary>

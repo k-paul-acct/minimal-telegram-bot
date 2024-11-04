@@ -2,6 +2,9 @@ using Telegram.Bot.Types.Enums;
 
 namespace MinimalTelegramBot.Handling;
 
+/// <summary>
+///     HandleExtensions.
+/// </summary>
 public static class HandleExtensions
 {
     /// <summary>

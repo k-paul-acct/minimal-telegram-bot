@@ -9,6 +9,11 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
     private readonly IHandlerDispatcher _handlerDispatcher;
     private readonly Delegate _handler;
 
+    /// <summary>
+    /// </summary>
+    /// <param name="handlerDispatcher"></param>
+    /// <param name="handler"></param>
+    /// <param name="botRequestDelegate"></param>
     public HandlerBuilder(IHandlerDispatcher handlerDispatcher, Delegate handler, BotRequestDelegate? botRequestDelegate)
     {
         _handlerDispatcher = handlerDispatcher;
@@ -21,8 +26,16 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
         _handlerDispatcher.HandlerSources.Add(new SingleHandlerHandlerSource(this));
     }
 
+    /// <summary>
+    /// </summary>
     public List<object> Metadata { get; }
+
+    /// <summary>
+    /// </summary>
     public BotRequestDelegate? BotRequestDelegate { get; set; }
+
+    /// <summary>
+    /// </summary>
     public List<Func<BotRequestFilterFactoryContext, BotRequestFilterDelegate, BotRequestFilterDelegate>> FilterFactories { get; }
 
     void IHandlerConventionBuilder.Add(Action<HandlerBuilder> convention)

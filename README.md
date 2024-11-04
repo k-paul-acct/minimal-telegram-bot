@@ -3,7 +3,7 @@
 # Welcome to the Minimal Telegram Bot project
 
 [![latest version](https://img.shields.io/nuget/v/MinimalTelegramBot)](https://www.nuget.org/packages/MinimalTelegramBot)
-[![Telegram Bot API](https://img.shields.io/badge/Telegram_Bot_API-7.10-blue)](https://core.telegram.org/bots/api)
+[![Telegram Bot API](https://img.shields.io/badge/Telegram_Bot_API-7.11-blue)](https://core.telegram.org/bots/api-changelog#october-31-2024)
 
 Minimal Telegram Bot is a modern .NET framework for building Telegram Bots using simple and concise syntax inspired by
 ASP.NET Core Minimal APIs.
