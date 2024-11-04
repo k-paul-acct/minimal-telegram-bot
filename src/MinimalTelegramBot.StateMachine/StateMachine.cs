@@ -2,59 +2,26 @@ namespace MinimalTelegramBot.StateMachine;
 
 internal sealed class StateMachine : IStateMachine
 {
-    private readonly IUserStateRepository _repository;
-    private readonly BotRequestContext _context;
+    private readonly IUserStateRepository _userStateRepository;
 
-    public StateMachine(IUserStateRepository repository, IBotRequestContextAccessor contextAccessor)
+    public StateMachine(IUserStateRepository userStateRepository)
     {
-        _repository = repository;
-        _context = contextAccessor.BotRequestContext ??
-                   // TODO: Not use base Exception.
-                   throw new Exception($"No current context in {nameof(IBotRequestContextAccessor)}");
+        _userStateRepository = userStateRepository;
     }
 
-    public void SetState(long userId, State state)
+    public ValueTask<State?> GetState(long userId, CancellationToken cancellationToken = default)
     {
-        _repository.SetState(userId, state);
+        return _userStateRepository.GetState(userId, cancellationToken);
     }
 
-    public void SetState(State state)
+    public ValueTask SetState(long userId, State state, CancellationToken cancellationToken = default)
     {
-        var userId = _context.ChatId;
-        SetState(userId, state);
+        ArgumentNullException.ThrowIfNull(state);
+        return _userStateRepository.SetState(userId, state, cancellationToken);
     }
 
-    public State? GetState(long userId)
+    public ValueTask DropState(long userId, CancellationToken cancellationToken = default)
     {
-        return _repository.GetState(userId);
-    }
-
-    public State? GetState()
-    {
-        var userId = _context.ChatId;
-        return GetState(userId);
-    }
-
-    public bool CheckIfInState(long userId, State state)
-    {
-        var currentState = GetState(userId);
-        return currentState == state;
-    }
-
-    public bool CheckIfInState(State state)
-    {
-        var userId = _context.ChatId;
-        return CheckIfInState(userId, state);
-    }
-
-    public void DropState(long userId)
-    {
-        _repository.DeleteState(userId);
-    }
-
-    public void DropState()
-    {
-        var userId = _context.ChatId;
-        DropState(userId);
+        return _userStateRepository.DeleteState(userId, cancellationToken);
     }
 }

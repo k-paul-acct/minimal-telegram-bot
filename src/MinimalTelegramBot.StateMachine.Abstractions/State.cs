@@ -41,7 +41,7 @@ public abstract class State : IEquatable<State>
     /// </summary>
     /// <param name="other">The state to compare with the current state.</param>
     /// <returns>true if the specified state is equal to the current state; otherwise, false.</returns>
-    public bool Equals(State? other)
+    public virtual bool Equals(State? other)
     {
         if (other is null)
         {

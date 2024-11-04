@@ -6,63 +6,30 @@ namespace MinimalTelegramBot.StateMachine.Abstractions;
 public interface IStateMachine
 {
     /// <summary>
-    ///     Set or update state for user with given ID.
+    ///     Gets the state of the user with the specified ID.
     /// </summary>
-    /// <param name="userId">User ID.</param>
-    /// <param name="state">State to set.</param>
-    void SetState(long userId, State state);
+    /// <param name="userId">The ID of the user.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+    /// <returns>
+    ///     The <see cref="ValueTask"/> that represents the asynchronous operation,
+    ///     containing the state of the user or null if the user has no state.
+    /// </returns>
+    ValueTask<State?> GetState(long userId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Set or update state for current user in bot request pipeline.
+    ///     Sets or updates the state of the user with the specified ID.
     /// </summary>
-    /// <param name="state">State to set.</param>
-    void SetState(State state);
+    /// <param name="userId">The ID of the user.</param>
+    /// <param name="state">The state to be set.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
+    ValueTask SetState(long userId, State state, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Get state of user with given ID.
+    ///     Deletes the state of the user with the specified ID.
     /// </summary>
-    /// <param name="userId">User ID.</param>
-    /// <returns>State if was set before or null if user has no state.</returns>
-    State? GetState(long userId);
-
-    /// <summary>
-    ///     Get state of current user in bot request pipeline.
-    /// </summary>
-    /// <returns>State if was set before or null if user has no state.</returns>
-    State? GetState();
-
-    /// <summary>
-    ///     Checks if user with given ID is in the given state.
-    /// </summary>
-    /// <param name="userId">User ID.</param>
-    /// <param name="state">State to check against of.</param>
-    /// <returns>True if user has state and that state matches the given state, false otherwise.</returns>
-    bool CheckIfInState(long userId, State state);
-
-    /// <summary>
-    ///     Checks if current user in bot request pipeline is in the given state.
-    /// </summary>
-    /// <param name="state">State to check against of.</param>
-    /// <returns>True if user has state and that state matches the given state, false otherwise.</returns>
-    bool CheckIfInState(State state);
-
-    /// <summary>
-    ///     Deletes state of user with the given ID or, equally, sets the state to null.
-    /// </summary>
-    /// <param name="userId">User ID.</param>
-    void DropState(long userId);
-
-    /// <summary>
-    ///     Deletes state of current user in bot request pipeline or, equally, sets the state to null.
-    /// </summary>
-    void DropState();
-
-    Task SetStateAsync(long userId, State state, CancellationToken cancellationToken = default);
-    Task SetStateAsync(State state, CancellationToken cancellationToken = default);
-    Task<State?> GetStateAsync(long userId, CancellationToken cancellationToken = default);
-    Task<State?> GetStateAsync(CancellationToken cancellationToken = default);
-    Task<bool> CheckIfInStateAsync(long userId, State state, CancellationToken cancellationToken = default);
-    Task<bool> CheckIfInStateAsync(State state, CancellationToken cancellationToken = default);
-    Task DropStateAsync(long userId, CancellationToken cancellationToken = default);
-    Task DropStateAsync(CancellationToken cancellationToken = default);
+    /// <param name="userId">The ID of the user.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
+    ValueTask DropState(long userId, CancellationToken cancellationToken = default);
 }

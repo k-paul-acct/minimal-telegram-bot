@@ -11,10 +11,10 @@ internal sealed class StateMachinePipe : IPipe
         _stateMachine = stateMachine;
     }
 
-    public Task InvokeAsync(BotRequestContext context, BotRequestDelegate next)
+    public async Task InvokeAsync(BotRequestContext context, BotRequestDelegate next)
     {
-        var state = _stateMachine.GetState(context.ChatId);
+        var state = await _stateMachine.GetState(context.ChatId);
         context.UserState = state;
-        return next(context);
+        await next(context);
     }
 }

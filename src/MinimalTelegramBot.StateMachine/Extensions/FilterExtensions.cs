@@ -11,8 +11,7 @@ public static class FilterExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(state);
-
-        return builder.FilterState(userState => userState == state);
+        return builder.FilterState(userState => state == userState);
     }
 
     public static TBuilder FilterState<TBuilder>(this TBuilder builder, Func<State?, bool> filter)
@@ -20,7 +19,6 @@ public static class FilterExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(filter);
-
         return builder.Filter<TBuilder, StateFilter>(context => context.Arguments.Add(filter));
     }
 }
