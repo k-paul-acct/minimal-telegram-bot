@@ -13,7 +13,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
 {
     private readonly PipelineBuilder _pipelineBuilder;
     private readonly Dictionary<string, object?> _properties;
-    private readonly IHandlerDispatcher _handlerDispatcher;
+    private readonly RootHandlerDispatcher _handlerDispatcher;
 
     internal readonly IHost _host;
     internal readonly ITelegramBotClient _client;
