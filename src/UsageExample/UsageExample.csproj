@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MinimalTelegramBot.Localization\MinimalTelegramBot.Localization.csproj"/>
-    <ProjectReference Include="..\MinimalTelegramBot.StateMachine\MinimalTelegramBot.StateMachine.csproj"/>
     <ProjectReference Include="..\MinimalTelegramBot\MinimalTelegramBot.csproj"/>
   </ItemGroup>
 

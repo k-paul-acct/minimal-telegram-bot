@@ -3,7 +3,6 @@ using MinimalTelegramBot.Handling;
 using MinimalTelegramBot.Handling.Filters;
 using MinimalTelegramBot.Localization.Abstractions;
 using MinimalTelegramBot.Localization.Extensions;
-using MinimalTelegramBot.StateMachine.Extensions;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using UsageExample.CallbackModels;
@@ -18,7 +17,6 @@ using Results = MinimalTelegramBot.Results.Results;
 
 var builder = BotApplication.CreateBuilder(args);
 
-builder.Services.AddStateMachine();
 builder.Services.AddSingleLocale(new Locale("ru"), locale => locale.EnrichFromFile("Localization/ru.yaml"));
 
 builder.Services.AddScoped<WeatherService>();
@@ -32,7 +30,6 @@ app.UsePolling();
 
 app.UseCallbackAutoAnswering();
 
-app.UseStateMachine();
 app.UseLocalization();
 
 app.Handle((ILocalizer localizer) =>

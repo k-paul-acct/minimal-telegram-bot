@@ -20,6 +20,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalTelegramBot.StateMac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalTelegramBot.StateMachine", "src\StateMachine\StateMachine\MinimalTelegramBot.StateMachine.csproj", "{FB46BFA9-FC5E-4430-8EBA-92C35C72ECD0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Persistence", "Persistence", "{6CDA80E0-F419-47AA-8D6D-70F19A80B750}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalTelegramBot.StateMachine.Persistence.Sqlite", "src\StateMachine\Persistence\MinimalTelegramBot.StateMachine.Persistence.Sqlite\MinimalTelegramBot.StateMachine.Persistence.Sqlite.csproj", "{B42CD4EC-7D18-4944-9C18-BE84975AE4AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalTelegramBot.StateMachine.Persistence.PostgreSQL", "src\StateMachine\Persistence\MinimalTelegramBot.StateMachine.Persistence.PostgreSQL\MinimalTelegramBot.StateMachine.Persistence.PostgreSQL.csproj", "{D378CAEC-0C47-4106-B08B-E6E049F00A1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +41,9 @@ Global
 		{36CA274B-5A7C-4D97-978E-C527B6A4B406} = {9EE18A62-A9F0-49C8-A7C6-80E01961A02B}
 		{349BB337-1344-42E9-A166-493BB4C53977} = {36CA274B-5A7C-4D97-978E-C527B6A4B406}
 		{FB46BFA9-FC5E-4430-8EBA-92C35C72ECD0} = {36CA274B-5A7C-4D97-978E-C527B6A4B406}
+		{6CDA80E0-F419-47AA-8D6D-70F19A80B750} = {36CA274B-5A7C-4D97-978E-C527B6A4B406}
+		{B42CD4EC-7D18-4944-9C18-BE84975AE4AB} = {6CDA80E0-F419-47AA-8D6D-70F19A80B750}
+		{D378CAEC-0C47-4106-B08B-E6E049F00A1D} = {6CDA80E0-F419-47AA-8D6D-70F19A80B750}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{371C5D0C-D217-4079-891F-BA0AFEDC513A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -69,5 +78,13 @@ Global
 		{FB46BFA9-FC5E-4430-8EBA-92C35C72ECD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB46BFA9-FC5E-4430-8EBA-92C35C72ECD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB46BFA9-FC5E-4430-8EBA-92C35C72ECD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B42CD4EC-7D18-4944-9C18-BE84975AE4AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B42CD4EC-7D18-4944-9C18-BE84975AE4AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B42CD4EC-7D18-4944-9C18-BE84975AE4AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B42CD4EC-7D18-4944-9C18-BE84975AE4AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D378CAEC-0C47-4106-B08B-E6E049F00A1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D378CAEC-0C47-4106-B08B-E6E049F00A1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D378CAEC-0C47-4106-B08B-E6E049F00A1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D378CAEC-0C47-4106-B08B-E6E049F00A1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
