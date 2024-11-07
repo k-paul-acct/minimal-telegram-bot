@@ -10,15 +10,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MinimalTelegramBot.Localization\MinimalTelegramBot.Localization.csproj"/>
-    <ProjectReference Include="..\MinimalTelegramBot\MinimalTelegramBot.csproj"/>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Localization\ru.yaml"/>
     <Resource Include="Localization\ru.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MinimalTelegramBot.Localization\MinimalTelegramBot.Localization.csproj"/>
+    <ProjectReference Include="..\..\MinimalTelegramBot\MinimalTelegramBot.csproj"/>
   </ItemGroup>
 
 </Project>
