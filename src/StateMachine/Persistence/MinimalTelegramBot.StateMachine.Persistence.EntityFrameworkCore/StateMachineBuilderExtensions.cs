@@ -23,7 +23,7 @@ public static class StateMachineBuilderExtensions
 
     public static IStateMachineBuilder PersistStatesToDbContext<TContext, TEntity>(this IStateMachineBuilder builder)
         where TContext : DbContext, IStateMachineDbContext<TEntity>
-        where TEntity : class, IMinimalTelegramBotState
+        where TEntity : class, IMinimalTelegramBotState, new()
     {
         builder.Services.AddSingleton<IConfigureOptions<StateManagementOptions>>(services =>
         {

@@ -1,15 +1,25 @@
+using Microsoft.EntityFrameworkCore;
 using MinimalTelegramBot;
 using MinimalTelegramBot.Builder;
 using MinimalTelegramBot.Handling;
 using MinimalTelegramBot.StateMachine.Extensions;
+using MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore;
 using Telegram.Bot.Types.Enums;
-using UsageExample.StateMachine;
+using UsageExample.StateMachine.EntityFrameworkCore;
 
 var builder = BotApplication.CreateBuilder(args);
 
-builder.Services.AddStateMachine();
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=db.db"));
+
+builder.Services.AddStateMachine().PersistStatesToDbContext<AppDbContext>();
 
 var bot = builder.Build();
+
+using (var scope = bot.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.EnsureCreated();
+}
 
 bot.UseStateMachine();
 

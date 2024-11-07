@@ -11,19 +11,19 @@ public static class ServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        var serializerContext = new ReflectionStateSerializerContext();
+        var serializerContext = new ReflectionStateSerializerContext(JsonSerializerOptions.Default);
         var interceptor = new StateParameterHandlerDelegateBuilderInterceptor(serializerContext);
 
         services.Configure<HandlerDelegateBuilderOptions>(options => options.Interceptors.Add(interceptor));
 
-        services.Configure<StateManagementOptions>(_ =>
+        services.Configure<StateManagementOptions>(options =>
         {
+            options.StateSerializerContext = serializerContext;
         });
 
         services.PostConfigure((StateManagementOptions options) =>
         {
             options.Repository ??= new InMemoryUserStateRepository();
-            options.JsonSerializerOptions = JsonSerializerOptions.Default;
         });
 
         services.TryAddSingleton<IStateMachine, StateMachine>();

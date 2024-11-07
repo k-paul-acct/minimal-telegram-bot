@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 
 namespace MinimalTelegramBot.StateMachine.Abstractions;
 
@@ -6,6 +7,10 @@ namespace MinimalTelegramBot.StateMachine.Abstractions;
 /// </summary>
 public interface IStateSerializerContext
 {
+    /// <summary>
+    /// </summary>
+    public JsonSerializerOptions? JsonSerializerOptions { get; }
+
     /// <summary>
     /// </summary>
     /// <param name="type"></param>

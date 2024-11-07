@@ -22,7 +22,7 @@ public static class StateSerializer
             throw new StateSerializationException(stateType);
         }
 
-        var json = JsonSerializer.Serialize(state);
+        var json = JsonSerializer.Serialize(state, serializerContext.JsonSerializerOptions);
 
         return new SerializedState(stateEntry, json);
     }
@@ -39,7 +39,7 @@ public static class StateSerializer
             throw new StateSerializationException(serializedState.StateEntry);
         }
 
-        return JsonSerializer.Deserialize<TState>(serializedState.SerializedInfo);
+        return (TState?)JsonSerializer.Deserialize(serializedState.SerializedInfo, stateType, serializerContext.JsonSerializerOptions);
     }
 
     /// <summary>
@@ -54,6 +54,6 @@ public static class StateSerializer
             throw new StateSerializationException(serializedState.StateEntry);
         }
 
-        return JsonSerializer.Deserialize(serializedState.SerializedInfo, stateType);
+        return JsonSerializer.Deserialize(serializedState.SerializedInfo, stateType, serializerContext.JsonSerializerOptions);
     }
 }

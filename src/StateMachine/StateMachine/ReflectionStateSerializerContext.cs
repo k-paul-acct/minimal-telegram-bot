@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Text.Json;
 
 namespace MinimalTelegramBot.StateMachine;
 
@@ -8,8 +9,10 @@ internal sealed class ReflectionStateSerializerContext : IStateSerializerContext
     private readonly Dictionary<Type, StateEntry> _stateInfo = [];
     private readonly Dictionary<StateEntry, Type> _stateInfoReverse = [];
 
-    public ReflectionStateSerializerContext()
+    public ReflectionStateSerializerContext(JsonSerializerOptions? jsonSerializerOptions)
     {
+        JsonSerializerOptions = jsonSerializerOptions;
+
         var assemblies = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => a.FullName is not null && !a.FullName.StartsWith("System.") && !a.FullName.StartsWith("Microsoft."));
 
@@ -41,6 +44,8 @@ internal sealed class ReflectionStateSerializerContext : IStateSerializerContext
             }
         }
     }
+
+    public JsonSerializerOptions? JsonSerializerOptions { get; }
 
     public bool GetInfo(Type type, out StateEntry stateEntry)
     {

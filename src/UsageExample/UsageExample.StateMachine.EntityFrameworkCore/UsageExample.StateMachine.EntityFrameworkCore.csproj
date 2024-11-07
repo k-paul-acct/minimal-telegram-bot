@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>35a247bc-efd4-4c6c-8a01-06e467c20bb6</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MinimalTelegramBot\MinimalTelegramBot.csproj"/>
+    <ProjectReference Include="..\..\StateMachine\StateMachine\MinimalTelegramBot.StateMachine.csproj"/>
+    <ProjectReference Include="..\..\StateMachine\Persistence\MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore\MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore.csproj"/>
+  </ItemGroup>
+
+</Project>

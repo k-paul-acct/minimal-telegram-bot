@@ -1,6 +1,6 @@
 using MinimalTelegramBot.StateMachine.Abstractions;
 
-namespace UsageExample.StateMachine.States;
+namespace UsageExample.StateMachine.EntityFrameworkCore;
 
 [StateGroup("FullNameFsm")]
 public static class FullNameFsm

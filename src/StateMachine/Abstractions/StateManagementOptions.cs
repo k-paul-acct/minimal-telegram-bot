@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace MinimalTelegramBot.StateMachine.Abstractions;
 
 /// <summary>
@@ -12,5 +10,5 @@ public sealed class StateManagementOptions
 
     /// <summary>
     /// </summary>
-    public JsonSerializerOptions? JsonSerializerOptions { get; set; }
+    public IStateSerializerContext? StateSerializerContext { get; set; }
 }
