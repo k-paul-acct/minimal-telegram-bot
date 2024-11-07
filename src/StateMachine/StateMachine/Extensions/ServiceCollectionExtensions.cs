@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MinimalTelegramBot.Handling;
@@ -15,8 +16,17 @@ public static class ServiceCollectionExtensions
 
         services.Configure<HandlerDelegateBuilderOptions>(options => options.Interceptors.Add(interceptor));
 
-        services.TryAddSingleton<IUserStateRepository, InMemoryUserStateRepository>();
-        services.TryAddScoped<IStateMachine, StateMachine>();
+        services.Configure<StateManagementOptions>(_ =>
+        {
+        });
+
+        services.PostConfigure((StateManagementOptions options) =>
+        {
+            options.Repository ??= new InMemoryUserStateRepository();
+            options.JsonSerializerOptions = JsonSerializerOptions.Default;
+        });
+
+        services.TryAddSingleton<IStateMachine, StateMachine>();
 
         return new StateMachineBuilder(services);
     }

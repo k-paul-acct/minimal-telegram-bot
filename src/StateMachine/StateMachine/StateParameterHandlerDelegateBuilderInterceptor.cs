@@ -21,9 +21,9 @@ internal sealed class StateParameterHandlerDelegateBuilderInterceptor : IHandler
 
         var data = Expression.Property(context, nameof(BotRequestContext.Data));
         var methodInfo = typeof(IDictionary<string, object?>).GetMethod(nameof(IDictionary<string, object?>.TryGetValue))!;
-        var outVariable = Expression.Variable(typeof(object), "name");
+        var outVariable = Expression.Variable(typeof(object), "state");
         var call = Expression.Call(data, methodInfo, Expression.Constant("__State"), outVariable);
-        var convert = Expression.Convert(call, type);
-        return convert;
+        var convert = Expression.Convert(outVariable, type);
+        return Expression.Block(type, [outVariable,], call, convert);
     }
 }

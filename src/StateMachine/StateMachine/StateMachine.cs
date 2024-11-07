@@ -1,12 +1,14 @@
+using Microsoft.Extensions.Options;
+
 namespace MinimalTelegramBot.StateMachine;
 
 internal sealed class StateMachine : IStateMachine
 {
     private readonly IUserStateRepository _userStateRepository;
 
-    public StateMachine(IUserStateRepository userStateRepository)
+    public StateMachine(IOptions<StateManagementOptions> stateManagementOptions)
     {
-        _userStateRepository = userStateRepository;
+        _userStateRepository = stateManagementOptions.Value.Repository!;
     }
 
     /*public ValueTask<State?> GetState(long userId, CancellationToken cancellationToken = default)
