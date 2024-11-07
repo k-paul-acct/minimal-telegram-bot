@@ -3,7 +3,6 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using MinimalTelegramBot.Localization.Abstractions;
 using MinimalTelegramBot.Results;
-using MinimalTelegramBot.StateMachine.Abstractions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -11,7 +10,7 @@ namespace MinimalTelegramBot.Handling;
 
 internal static class HandlerDelegateBuilder
 {
-    public static Func<BotRequestContext, Task<IResult>> Build(Delegate d)
+    public static Func<BotRequestContext, Task<IResult>> Build(Delegate d, ICollection<IHandlerDelegateBuilderInterceptor> interceptors)
     {
         var returnType = d.Method.ReturnType;
         var parameters = d.Method.GetParameters();
@@ -48,7 +47,6 @@ internal static class HandlerDelegateBuilder
             }
 
             var genericCallbackModel = typeof(ICallbackDataParser<>).MakeGenericType(x.ParameterType);
-
             if (x.ParameterType.IsAssignableTo(genericCallbackModel))
             {
                 var callbackExp = Expression.Property(contextParameter, nameof(BotRequestContext.CallbackData));
@@ -56,7 +54,6 @@ internal static class HandlerDelegateBuilder
             }
 
             var genericCommandModel = typeof(ICommandParser<>).MakeGenericType(x.ParameterType);
-
             if (x.ParameterType.IsAssignableTo(genericCommandModel))
             {
                 var useFormatProvider = x.GetCustomAttributes().Any(y => y is UseFormatProviderAttribute);
@@ -99,9 +96,13 @@ internal static class HandlerDelegateBuilder
                 return Expression.Property(contextParameter, nameof(BotRequestContext.UserLocale));
             }
 
-            if (typeof(State).IsAssignableFrom(x.ParameterType))
+            foreach (var interceptor in interceptors)
             {
-                return Expression.Property(contextParameter, nameof(BotRequestContext.UserState));
+                var interceptorExpression = interceptor.CheckType(x.ParameterType, contextParameter);
+                if (interceptorExpression is not null)
+                {
+                    return interceptorExpression;
+                }
             }
 
             var servicesProperty = Expression.Property(contextParameter, nameof(BotRequestContext.Services));

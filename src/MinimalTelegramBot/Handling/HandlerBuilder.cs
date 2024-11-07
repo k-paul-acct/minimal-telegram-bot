@@ -1,3 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 namespace MinimalTelegramBot.Handling;
 
 /// <summary>
@@ -6,21 +9,19 @@ namespace MinimalTelegramBot.Handling;
 public sealed class HandlerBuilder : IHandlerConventionBuilder
 {
     private readonly List<Action<HandlerBuilder>> _conventions;
-    private readonly IHandlerDispatcher _handlerDispatcher;
     private readonly Delegate _handler;
+    private readonly IHandlerDispatcher _handlerDispatcher;
 
     /// <summary>
     /// </summary>
     /// <param name="handlerDispatcher"></param>
     /// <param name="handler"></param>
-    /// <param name="botRequestDelegate"></param>
-    public HandlerBuilder(IHandlerDispatcher handlerDispatcher, Delegate handler, BotRequestDelegate? botRequestDelegate)
+    public HandlerBuilder(IHandlerDispatcher handlerDispatcher, Delegate handler)
     {
         _handlerDispatcher = handlerDispatcher;
         _handler = handler;
         _conventions = [];
         Metadata = [];
-        BotRequestDelegate = botRequestDelegate;
         FilterFactories = [];
 
         _handlerDispatcher.HandlerSources.Add(new SingleHandlerHandlerSource(this));
@@ -29,10 +30,6 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
     /// <summary>
     /// </summary>
     public List<object> Metadata { get; }
-
-    /// <summary>
-    /// </summary>
-    public BotRequestDelegate? BotRequestDelegate { get; set; }
 
     /// <summary>
     /// </summary>
@@ -54,7 +51,7 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
 
         public IReadOnlyList<Handler> GetHandlers(IReadOnlyList<Action<HandlerBuilder>> conventions)
         {
-            IEnumerable<Action<HandlerBuilder>> fullConventions = [..conventions, .._handlerBuilder._conventions];
+            IEnumerable<Action<HandlerBuilder>> fullConventions = [..conventions, .._handlerBuilder._conventions,];
 
             foreach (var convention in fullConventions)
             {
@@ -62,7 +59,8 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
             }
 
             var metadata = ConstructHandlerMetadata();
-            var handlerDelegate = HandlerDelegateBuilder.Build(_handlerBuilder._handler);
+            var builderOptions = _handlerBuilder._handlerDispatcher.Services.GetRequiredService<IOptions<HandlerDelegateBuilderOptions>>();
+            var handlerDelegate = HandlerDelegateBuilder.Build(_handlerBuilder._handler, builderOptions.Value.Interceptors);
             var options = new BotRequestDelegateFactoryOptions
             {
                 Services = _handlerBuilder._handlerDispatcher.Services,

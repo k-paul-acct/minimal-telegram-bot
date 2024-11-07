@@ -11,10 +11,11 @@ internal sealed class StateFilter : IHandlerFilter
         _stateMachine = stateMachine;
     }
 
-    public async ValueTask<IResult> InvokeAsync(BotRequestFilterContext context, BotRequestFilterDelegate next)
+    public ValueTask<IResult> InvokeAsync(BotRequestFilterContext context, BotRequestFilterDelegate next)
     {
-        var predicate = (Func<State?, bool>)context.Arguments[^1]!;
+        return default!;
+        /*var predicate = (Func<State?, bool>)context.Arguments[^1]!;
         var state = await _stateMachine.GetState(context.BotRequestContext.ChatId);
-        return predicate(state) ? await next(context) : Results.Results.Empty;
+        return predicate(state) ? await next(context) : Results.Results.Empty;*/
     }
 }

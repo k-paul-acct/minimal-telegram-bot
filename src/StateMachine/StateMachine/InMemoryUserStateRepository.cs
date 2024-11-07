@@ -4,15 +4,15 @@ namespace MinimalTelegramBot.StateMachine;
 
 internal sealed class InMemoryUserStateRepository : IUserStateRepository
 {
-    private readonly ConcurrentDictionary<long, State> _states = new();
+    private readonly ConcurrentDictionary<long, object> _states = new();
 
-    public ValueTask<State?> GetState(long userId, CancellationToken cancellationToken = default)
+    public ValueTask<TState?> GetState<TState>(long userId, CancellationToken cancellationToken = default)
     {
         _states.TryGetValue(userId, out var state);
-        return new ValueTask<State?>(state);
+        return new ValueTask<TState?>((TState?)state);
     }
 
-    public ValueTask SetState(long userId, State state, CancellationToken cancellationToken = default)
+    public ValueTask SetState<TState>(long userId, TState state, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(state);
         _states.AddOrUpdate(userId, state, (_, _) => state);

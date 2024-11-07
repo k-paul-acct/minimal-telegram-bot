@@ -6,19 +6,29 @@ namespace MinimalTelegramBot.StateMachine.Extensions;
 
 public static class FilterExtensions
 {
-    public static TBuilder FilterState<TBuilder>(this TBuilder builder, State state)
-        where TBuilder : IHandlerConventionBuilder
+    public static HandlerGroupBuilder FilterState<TState>(this HandlerGroupBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentNullException.ThrowIfNull(state);
-        return builder.FilterState(userState => state == userState);
+        return builder.Filter<HandlerGroupBuilder, StateFilter>(context => context.Arguments.Add(typeof(TState)));
     }
 
-    public static TBuilder FilterState<TBuilder>(this TBuilder builder, Func<State?, bool> filter)
-        where TBuilder : IHandlerConventionBuilder
+    public static HandlerBuilder FilterState<TState>(this HandlerBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        return builder.Filter<HandlerBuilder, StateFilter>(context => context.Arguments.Add(typeof(TState)));
+    }
+
+    public static HandlerGroupBuilder FilterState<TState>(this HandlerGroupBuilder builder, Func<TState?, bool> filter)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(filter);
-        return builder.Filter<TBuilder, StateFilter>(context => context.Arguments.Add(filter));
+        return builder.Filter<HandlerGroupBuilder, StateFilter>(context => context.Arguments.Add(filter));
+    }
+
+    public static HandlerBuilder FilterState<TState>(this HandlerBuilder builder, Func<TState?, bool> filter)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(filter);
+        return builder.Filter<HandlerBuilder, StateFilter>(context => context.Arguments.Add(filter));
     }
 }

@@ -1,6 +1,6 @@
+using MinimalTelegramBot;
 using MinimalTelegramBot.Builder;
 using MinimalTelegramBot.Handling;
-using MinimalTelegramBot.StateMachine.Abstractions;
 using MinimalTelegramBot.StateMachine.Extensions;
 using Telegram.Bot.Types.Enums;
 using UsageExample.StateMachine.States;
@@ -15,36 +15,30 @@ bot.UseStateMachine();
 
 bot.HandleCommand("/start", () => "Send command /name to set your full name");
 
-bot.HandleCommand("/name", (IStateMachine stateMachine) =>
+bot.HandleCommand("/name", async (BotRequestContext context) =>
 {
-    stateMachine.SetState(FullNameStateMachine.EnteringFirstName);
+    var state = new FullNameFsm.EnteringFirstNameState();
+    await context.SetState(state);
     return "Enter your first name";
 });
 
-bot.HandleUpdateType(UpdateType.Message, (string messageText, IStateMachine stateMachine) =>
+bot.HandleUpdateType(UpdateType.Message, async (string messageText, BotRequestContext context) =>
 {
-    var enteringLastNameState = FullNameStateMachine.EnteringLastName;
+    var enteringLastNameState = new FullNameFsm.EnteringLastNameState
+    {
+        FirstName = messageText,
+    };
 
-    enteringLastNameState.Data["FirstName"] = messageText;
-
-    stateMachine.SetState(enteringLastNameState);
+    await context.SetState(enteringLastNameState);
 
     return "Enter your last name";
-}).FilterState(FullNameStateMachine.EnteringFirstName);
+}).FilterState<FullNameFsm.EnteringFirstNameState>();
 
-bot.HandleUpdateType(UpdateType.Message, (string messageText, IStateMachine stateMachine) =>
+bot.HandleUpdateType(UpdateType.Message, async (string messageText, BotRequestContext context,
+    FullNameFsm.EnteringLastNameState state) =>
 {
-    var state = stateMachine.GetState();
-    if (state is null)
-    {
-        return "Error";
-    }
-
-    var firstName = state.Data["FirstName"] as string;
-
-    stateMachine.DropState();
-
-    return $"Your full name: {firstName} {messageText}";
-}).FilterState(FullNameStateMachine.EnteringLastName);
+    await context.DropState();
+    return $"Your full name: {state.FirstName} {messageText}";
+}).FilterState<FullNameFsm.EnteringLastNameState>();
 
 bot.Run();

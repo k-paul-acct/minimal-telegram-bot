@@ -31,7 +31,7 @@ public static class HandleExtensions
         ArgumentNullException.ThrowIfNull(handlerDispatcher);
         ArgumentNullException.ThrowIfNull(handler);
 
-        var builder = new HandlerBuilder(handlerDispatcher, handler, null);
+        var builder = new HandlerBuilder(handlerDispatcher, handler);
         return builder;
     }
 

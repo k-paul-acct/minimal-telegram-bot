@@ -1,5 +1,4 @@
 using MinimalTelegramBot.Localization.Abstractions;
-using MinimalTelegramBot.StateMachine.Abstractions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -83,11 +82,6 @@ public sealed class BotRequestContext
     ///     Gets the locale of the user associated with current bot request. Defaults to <see cref="Locale.Default"/> locale.
     /// </summary>
     public Locale UserLocale { get; set; }
-
-    /// <summary>
-    ///     Gets the state of the user associated with current bot request. Defaults to null.
-    /// </summary>
-    public State? UserState { get; set; }
 
     /// <summary>
     ///     Registers a disposable object to be disposed of after the current bot request is processed.
