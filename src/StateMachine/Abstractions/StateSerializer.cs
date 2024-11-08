@@ -7,22 +7,23 @@ namespace MinimalTelegramBot.StateMachine.Abstractions;
 /// </summary>
 public static class StateSerializer
 {
+    private static readonly JsonSerializerOptions _defaultJsonSerializerOptions = JsonSerializerOptions.Default;
+
     /// <summary>
     /// </summary>
     /// <param name="state"></param>
-    /// <param name="serializerContext"></param>
+    /// <param name="typeInfoResolver"></param>
+    /// <param name="options"></param>
     /// <typeparam name="TState"></typeparam>
     /// <returns></returns>
-    public static SerializedState Serialize<TState>(TState state, IStateSerializerContext serializerContext)
+    public static SerializedState Serialize<TState>(TState state, IStateTypeInfoResolver typeInfoResolver, StateSerializationOptions? options = null)
     {
-        var stateType = typeof(TState);
-
-        if (!serializerContext.GetInfo(stateType, out var stateEntry))
+        if (!typeInfoResolver.GetInfo(typeof(TState), out var stateEntry))
         {
-            throw new StateSerializationException(stateType);
+            throw new StateSerializationException(typeof(TState));
         }
 
-        var json = JsonSerializer.Serialize(state, serializerContext.JsonSerializerOptions);
+        var json = JsonSerializer.Serialize(state, options?.JsonSerializerOptions ?? _defaultJsonSerializerOptions);
 
         return new SerializedState(stateEntry, json);
     }
@@ -30,30 +31,32 @@ public static class StateSerializer
     /// <summary>
     /// </summary>
     /// <param name="serializedState"></param>
-    /// <param name="serializerContext"></param>
+    /// <param name="typeInfoResolver"></param>
+    /// <param name="options"></param>
     /// <returns></returns>
-    public static TState? Deserialize<TState>(SerializedState serializedState, IStateSerializerContext serializerContext)
+    public static TState? Deserialize<TState>(SerializedState serializedState, IStateTypeInfoResolver typeInfoResolver, StateSerializationOptions? options = null)
     {
-        if (!serializerContext.GetInfo(serializedState.StateEntry, out var stateType) && stateType != typeof(TState))
+        if (!typeInfoResolver.GetInfo(serializedState.StateEntry, out var stateType))
         {
             throw new StateSerializationException(serializedState.StateEntry);
         }
 
-        return (TState?)JsonSerializer.Deserialize(serializedState.SerializedInfo, stateType, serializerContext.JsonSerializerOptions);
+        return (TState?)JsonSerializer.Deserialize(serializedState.StateData, stateType, options?.JsonSerializerOptions ?? _defaultJsonSerializerOptions);
     }
 
     /// <summary>
     /// </summary>
     /// <param name="serializedState"></param>
-    /// <param name="serializerContext"></param>
+    /// <param name="typeInfoResolver"></param>
+    /// <param name="options"></param>
     /// <returns></returns>
-    public static object? Deserialize(SerializedState serializedState, IStateSerializerContext serializerContext)
+    public static object? Deserialize(SerializedState serializedState, IStateTypeInfoResolver typeInfoResolver, StateSerializationOptions? options = null)
     {
-        if (!serializerContext.GetInfo(serializedState.StateEntry, out var stateType))
+        if (!typeInfoResolver.GetInfo(serializedState.StateEntry, out var stateType))
         {
             throw new StateSerializationException(serializedState.StateEntry);
         }
 
-        return JsonSerializer.Deserialize(serializedState.SerializedInfo, stateType, serializerContext.JsonSerializerOptions);
+        return JsonSerializer.Deserialize(serializedState.StateData, stateType, options?.JsonSerializerOptions ?? _defaultJsonSerializerOptions);
     }
 }

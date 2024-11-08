@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -26,7 +25,7 @@ internal sealed class EntityFrameworkCoreRepository<TContext, TEntity> : IUserSt
         using var scope = _serviceProvider.CreateScope();
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
-        var options = scope.ServiceProvider.GetRequiredService<IOptions<StateManagementOptions>>();
+        var stateManagementOptions = scope.ServiceProvider.GetRequiredService<IOptions<StateManagementOptions>>().Value;
 
         _logger.LogInformation("Getting state of user with ID {UserId}.", userId);
 
@@ -38,9 +37,9 @@ internal sealed class EntityFrameworkCoreRepository<TContext, TEntity> : IUserSt
 
         var entry = new StateEntry(state.StateGroupName, state.StateId);
         var serialized = new SerializedState(entry, state.StateData);
-        var serializerContext = options.Value.StateSerializerContext ?? new EmptyStateSerializerContext(null);
+        var stateTypeInfoResolver = stateManagementOptions.StateTypeInfoResolver ?? EmptyStateTypeInfoResolver.Default;
 
-        return StateSerializer.Deserialize<TState>(serialized, serializerContext);
+        return StateSerializer.Deserialize<TState>(serialized, stateTypeInfoResolver, stateManagementOptions.StateSerializationOptions);
     }
 
     public async ValueTask SetState<TState>(long userId, TState state, CancellationToken cancellationToken = default)
@@ -48,19 +47,19 @@ internal sealed class EntityFrameworkCoreRepository<TContext, TEntity> : IUserSt
         using var scope = _serviceProvider.CreateScope();
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
-        var options = scope.ServiceProvider.GetRequiredService<IOptions<StateManagementOptions>>();
+        var stateManagementOptions = scope.ServiceProvider.GetRequiredService<IOptions<StateManagementOptions>>().Value;
 
         _logger.LogInformation("Setting state of user with ID {UserId}.", userId);
 
-        var serializerContext = options.Value.StateSerializerContext ?? new EmptyStateSerializerContext(null);
-        var serialised = StateSerializer.Serialize(state, serializerContext);
+        var stateTypeInfoResolver = stateManagementOptions.StateTypeInfoResolver ?? EmptyStateTypeInfoResolver.Default;
+        var serialised = StateSerializer.Serialize(state, stateTypeInfoResolver, stateManagementOptions.StateSerializationOptions);
         var existing = await dbContext.MinimalTelegramBotStates.FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
 
         if (existing is not null)
         {
             existing.StateGroupName = serialised.StateEntry.StateGroupName;
             existing.StateId = serialised.StateEntry.StateId;
-            existing.StateData = serialised.SerializedInfo;
+            existing.StateData = serialised.StateData;
         }
         else
         {
@@ -69,7 +68,7 @@ internal sealed class EntityFrameworkCoreRepository<TContext, TEntity> : IUserSt
                 UserId = userId,
                 StateGroupName = serialised.StateEntry.StateGroupName,
                 StateId = serialised.StateEntry.StateId,
-                StateData = serialised.SerializedInfo,
+                StateData = serialised.StateData,
             };
 
             dbContext.MinimalTelegramBotStates.Add(toAdd);
@@ -81,31 +80,33 @@ internal sealed class EntityFrameworkCoreRepository<TContext, TEntity> : IUserSt
     public async ValueTask DeleteState(long userId, CancellationToken cancellationToken = default)
     {
         using var scope = _serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<TContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
         _logger.LogInformation("Deleting state of user with ID {UserId}.", userId);
-        await context.MinimalTelegramBotStates
-            .Where(x => x.UserId == userId)
-            .ExecuteDeleteAsync(cancellationToken);
+        await dbContext.MinimalTelegramBotStates.Where(x => x.UserId == userId).ExecuteDeleteAsync(cancellationToken);
     }
 
-    private sealed class EmptyStateSerializerContext : IStateSerializerContext
+    private sealed class EmptyStateTypeInfoResolver : IStateTypeInfoResolver
     {
-        public EmptyStateSerializerContext(JsonSerializerOptions? jsonSerializerOptions)
-        {
-            JsonSerializerOptions = jsonSerializerOptions;
-        }
+        public static readonly EmptyStateTypeInfoResolver Default = new(default, default);
 
-        public JsonSerializerOptions? JsonSerializerOptions { get; }
+        private readonly StateEntry _stateEntry;
+        private readonly Type? _type;
+
+        private EmptyStateTypeInfoResolver(StateEntry stateEntry, Type? type)
+        {
+            _stateEntry = stateEntry;
+            _type = type;
+        }
 
         public bool GetInfo(Type type, out StateEntry stateEntry)
         {
-            stateEntry = default;
+            stateEntry = _stateEntry;
             return false;
         }
 
         public bool GetInfo(StateEntry stateEntry, [NotNullWhen(true)] out Type? stateType)
         {
-            stateType = default;
+            stateType = _type;
             return false;
         }
     }

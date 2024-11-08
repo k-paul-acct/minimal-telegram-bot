@@ -10,5 +10,9 @@ public sealed class StateManagementOptions
 
     /// <summary>
     /// </summary>
-    public IStateSerializerContext? StateSerializerContext { get; set; }
+    public IStateTypeInfoResolver? StateTypeInfoResolver { get; set; }
+
+    /// <summary>
+    /// </summary>
+    public StateSerializationOptions? StateSerializationOptions { get; set; }
 }

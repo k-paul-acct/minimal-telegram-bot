@@ -5,16 +5,16 @@ namespace MinimalTelegramBot.StateMachine;
 
 internal sealed class StateParameterHandlerDelegateBuilderInterceptor : IHandlerDelegateBuilderInterceptor
 {
-    private readonly ReflectionStateSerializerContext _serializerContext;
+    private readonly IStateTypeInfoResolver _typeInfoResolver;
 
-    public StateParameterHandlerDelegateBuilderInterceptor(ReflectionStateSerializerContext serializerContext)
+    public StateParameterHandlerDelegateBuilderInterceptor(IStateTypeInfoResolver typeInfoResolver)
     {
-        _serializerContext = serializerContext;
+        _typeInfoResolver = typeInfoResolver;
     }
 
     public Expression? CheckType(Type type, ParameterExpression context)
     {
-        if (!_serializerContext.GetInfo(type, out _))
+        if (!_typeInfoResolver.GetInfo(type, out _))
         {
             return null;
         }
