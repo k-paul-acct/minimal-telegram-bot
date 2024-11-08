@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using MinimalTelegramBot.Runner;
 using MinimalTelegramBot.Settings;
 using Telegram.Bot;
@@ -83,7 +85,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
     {
         var handlerResolverPipe = HandlerResolverPipeBuilder.Build(_handlerDispatcher.HandlerSources);
 
-        this.Use(handlerResolverPipe);
+        Use(handlerResolverPipe);
 
         var pipeline = _pipelineBuilder.Build();
 
@@ -129,8 +131,8 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
 
     private void UsePipesBeforeHandlerResolver()
     {
-        this.UsePipe<UpdateLoggingPipe>();
-        this.UsePipe<BotRequestContextAccessorPipe>();
+        this.UsePipe(new UpdateLoggingPipe(Services.GetRequiredService<ILogger<UpdateLoggingPipe>>()));
+        this.UsePipe(new BotRequestContextAccessorPipe(Services.GetRequiredService<IBotRequestContextAccessor>()));
     }
 
     private void UsePipesBeforeRun()

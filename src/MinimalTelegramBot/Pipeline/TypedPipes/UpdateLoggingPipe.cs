@@ -16,15 +16,15 @@ internal sealed class UpdateLoggingPipe : IPipe
     {
         _logger.LogInformation(0, "Received update with ID = {UpdateId}", context.Update.Id);
 
-        var stopWatch = Stopwatch.StartNew();
+        var startingTimestamp = Stopwatch.GetTimestamp();
 
         await next(context);
 
-        stopWatch.Stop();
+        var elapsed = Stopwatch.GetElapsedTime(startingTimestamp);
 
         if (context.Data.ContainsKey("__UpdateHandlingStarted"))
         {
-            _logger.LogInformation(200, "Update with ID = {UpdateId} is handled. Duration: {Milliseconds} ms", context.Update.Id, stopWatch.ElapsedMilliseconds);
+            _logger.LogInformation(200, "Update with ID = {UpdateId} is handled. Duration: {Milliseconds} ms", context.Update.Id, (long)elapsed.TotalMilliseconds);
         }
         else
         {
