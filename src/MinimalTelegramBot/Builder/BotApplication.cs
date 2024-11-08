@@ -1,11 +1,14 @@
 using Microsoft.Extensions.Hosting;
-using MinimalTelegramBot.Pipeline.TypedPipes;
 using MinimalTelegramBot.Runner;
 using MinimalTelegramBot.Settings;
 using Telegram.Bot;
 
 namespace MinimalTelegramBot.Builder;
 
+/// <summary>
+///     Represents the main application for the Telegram Bot, responsible for building pipeline (middleware), handling, filtering,
+///     and running the bot.
+/// </summary>
 public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher, IHost
 {
     private readonly PipelineBuilder _pipelineBuilder;
@@ -28,15 +31,26 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
         UsePipesBeforeHandlerResolver();
     }
 
+    /// <inheritdoc cref="Microsoft.Extensions.Hosting.IHost.Services"/>
     public IServiceProvider Services => _host.Services;
-    ICollection<HandlerSource> IHandlerDispatcher.HandlerSources => _handlerDispatcher.HandlerSources;
+
+    ICollection<IHandlerSource> IHandlerDispatcher.HandlerSources => _handlerDispatcher.HandlerSources;
     IDictionary<string, object?> IBotApplicationBuilder.Properties => _properties;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BotApplicationBuilder"/> with preconfigured defaults.
+    /// </summary>
+    /// <returns>The <see cref="BotApplicationBuilder"/>.</returns>
     public static BotApplicationBuilder CreateBuilder()
     {
         return CreateBuilder(new BotApplicationBuilderOptions());
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BotApplicationBuilder"/> with preconfigured defaults.
+    /// </summary>
+    /// <param name="args">The command line arguments.</param>
+    /// <returns>The <see cref="BotApplicationBuilder"/>.</returns>
     public static BotApplicationBuilder CreateBuilder(string[] args)
     {
         ArgumentNullException.ThrowIfNull(args);
@@ -56,6 +70,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
         return new BotApplicationBuilder(options);
     }
 
+    /// <inheritdoc cref="MinimalTelegramBot.Pipeline.PipelineBuilder.Use"/>
     public IBotApplicationBuilder Use(Func<BotRequestDelegate, BotRequestDelegate> pipe)
     {
         ArgumentNullException.ThrowIfNull(pipe);
@@ -75,26 +90,37 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
         return pipeline;
     }
 
+    /// <inheritdoc cref="Microsoft.Extensions.Hosting.IHost.StartAsync"/>
     public Task StartAsync(CancellationToken cancellationToken = default)
     {
         return _host.StartAsync(cancellationToken);
     }
 
+    /// <inheritdoc cref="Microsoft.Extensions.Hosting.IHost.StopAsync"/>
     public Task StopAsync(CancellationToken cancellationToken = default)
     {
         return _host.StopAsync(cancellationToken);
     }
 
+    /// <inheritdoc/>
     public void Dispose()
     {
         _host.Dispose();
     }
 
+    /// <summary>
+    ///     Synchronously runs the bot application.
+    /// </summary>
     public void Run()
     {
         RunAsync().GetAwaiter().GetResult();
     }
 
+    /// <summary>
+    ///     Asynchronously runs the bot application.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents an asynchronous operation.</returns>
     public Task RunAsync(CancellationToken cancellationToken = default)
     {
         UsePipesBeforeRun();

@@ -1,4 +1,4 @@
-namespace MinimalTelegramBot.Pipeline.TypedPipes;
+namespace MinimalTelegramBot.Pipeline;
 
 internal sealed class BotRequestContextAccessorPipe : IPipe
 {

@@ -34,6 +34,19 @@ internal static class HandlerDelegateBuilder
                 return Expression.Property(contextParameter, nameof(BotRequestContext.CallbackData));
             }
 
+            if (x.ParameterType == typeof(string) && x.Name is "query" or "inlineQuery")
+            {
+                var updateExpression = Expression.Property(contextParameter, nameof(BotRequestContext.Update));
+                var inlineQueryExpression = Expression.Property(updateExpression, nameof(BotRequestContext.Update.InlineQuery));
+                var queryExpression = Expression.Property(inlineQueryExpression, nameof(BotRequestContext.Update.InlineQuery.Query));
+
+                var nullQuery = Expression.Constant(null, typeof(string));
+                var nullInlineQuery = Expression.Constant(null, typeof(InlineQuery));
+                var finalQueryExpression = Expression.Condition(Expression.Equal(inlineQueryExpression, nullInlineQuery), nullQuery, queryExpression);
+
+                return finalQueryExpression;
+            }
+
             var genericCallbackModel = typeof(ICallbackDataParser<>).MakeGenericType(x.ParameterType);
 
             if (x.ParameterType.IsAssignableTo(genericCallbackModel))
@@ -56,8 +69,7 @@ internal static class HandlerDelegateBuilder
                     var userLocale = Expression.Property(contextParameter, nameof(BotRequestContext.UserLocale));
                     var cultureInfo = Expression.Property(userLocale, nameof(BotRequestContext.UserLocale.CultureInfo));
                     var cast = Expression.Convert(cultureInfo, typeof(IFormatProvider));
-                    var nullLocale = Expression.Constant(null, typeof(Locale));
-                    finalFormatProvider = Expression.Condition(Expression.Equal(userLocale, nullLocale), nullFormatProvider, cast);
+                    finalFormatProvider = cast;
                 }
                 else
                 {

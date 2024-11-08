@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
-namespace MinimalTelegramBot.Pipeline.TypedPipes;
+namespace MinimalTelegramBot.Pipeline;
 
 internal sealed class UpdateLoggingPipe : IPipe
 {

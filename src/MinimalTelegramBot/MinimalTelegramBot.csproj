@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <PackageId>MinimalTelegramBot</PackageId>
-    <Version>0.0.11</Version>
+    <Version>0.0.32</Version>
     <Authors>Pavel Kulakov</Authors>
     <RepositoryUrl>https://github.com/k-paul-acct/minimal-telegram-bot</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -19,10 +19,11 @@
     </Description>
     <PackageIcon>package-icon.png</PackageIcon>
     <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Telegram.Bot" Version="21.11.0"/>
+    <PackageReference Include="Telegram.Bot" Version="22.0.0"/>
   </ItemGroup>
 
   <ItemGroup>

@@ -9,7 +9,7 @@ internal sealed class PhotoResult : FileResult
     {
     }
 
-    public PhotoResult(string photoName, string? caption = null) : base(photoName, caption)
+    public PhotoResult(string photoPath, string? caption = null) : base(photoPath, caption)
     {
     }
 
@@ -19,6 +19,6 @@ internal sealed class PhotoResult : FileResult
 
     protected override Task<Message> Send(BotRequestContext context, InputFile inputFile)
     {
-        return context.Client.SendPhotoAsync(context.ChatId, inputFile, caption: Caption);
+        return context.Client.SendPhoto(context.ChatId, inputFile, Caption);
     }
 }

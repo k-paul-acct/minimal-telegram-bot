@@ -38,18 +38,18 @@ internal sealed class MessageResult : IResult
 
         var inline = (InlineKeyboardMarkup?)_replyMarkup;
         var messageId = context.Update.CallbackQuery!.Message!.MessageId;
-        return context.Client.EditMessageTextAsync(context.ChatId, messageId, _message, replyMarkup: inline);
+        return context.Client.EditMessageText(context.ChatId, messageId, _message, replyMarkup: inline);
     }
 
     private Task<Message> Reply(BotRequestContext context)
     {
         var messageId = context.Update.Message!.MessageId;
         var replyParameters = new ReplyParameters { ChatId = context.ChatId, MessageId = messageId, };
-        return context.Client.SendTextMessageAsync(context.ChatId, _message, replyParameters: replyParameters, replyMarkup: _replyMarkup);
+        return context.Client.SendMessage(context.ChatId, _message, replyParameters: replyParameters, replyMarkup: _replyMarkup);
     }
 
     private Task<Message> Send(BotRequestContext context)
     {
-        return context.Client.SendTextMessageAsync(context.ChatId, _message, replyMarkup: _replyMarkup);
+        return context.Client.SendMessage(context.ChatId, _message, replyMarkup: _replyMarkup);
     }
 }

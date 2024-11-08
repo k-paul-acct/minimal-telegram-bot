@@ -1,7 +1,7 @@
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
-namespace MinimalTelegramBot.Pipeline.TypedPipes;
+namespace MinimalTelegramBot.Pipeline;
 
 internal sealed class CallbackAutoAnsweringPipe : IPipe
 {
@@ -11,7 +11,7 @@ internal sealed class CallbackAutoAnsweringPipe : IPipe
         if (context.Update.Type == UpdateType.CallbackQuery && !context.Data.ContainsKey("__CallbackAnswered"))
         {
             context.Data["__CallbackAnswered"] = true;
-            await context.Client.AnswerCallbackQueryAsync(context.Update.CallbackQuery!.Id);
+            await context.Client.AnswerCallbackQuery(context.Update.CallbackQuery!.Id);
         }
     }
 }

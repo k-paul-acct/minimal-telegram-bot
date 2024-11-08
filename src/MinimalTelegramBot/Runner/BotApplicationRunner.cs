@@ -35,7 +35,7 @@ internal static class BotApplicationRunner
 
     private static async Task<BotStartupInfo> GetBotStartupInfo(this ITelegramBotClient client)
     {
-        var bot = await client.GetMeAsync();
+        var bot = await client.GetMe();
         return new BotStartupInfo
         {
             Id = bot.Id,

@@ -9,12 +9,12 @@ internal sealed class DocumentResult : FileResult
     {
     }
 
-    public DocumentResult(string documentName, string? caption = null) : base(documentName, caption)
+    public DocumentResult(string documentPath, string? caption = null) : base(documentPath, caption)
     {
     }
 
     protected override Task<Message> Send(BotRequestContext context, InputFile inputFile)
     {
-        return context.Client.SendDocumentAsync(context.ChatId, inputFile, caption: Caption);
+        return context.Client.SendDocument(context.ChatId, inputFile, Caption);
     }
 }

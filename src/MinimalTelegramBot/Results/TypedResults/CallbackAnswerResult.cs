@@ -14,6 +14,6 @@ internal sealed class CallbackAnswerResult : IResult
 
         context.Data["__CallbackAnswered"] = true;
 
-        return context.Client.AnswerCallbackQueryAsync(context.Update.CallbackQuery!.Id);
+        return context.Client.AnswerCallbackQuery(context.Update.CallbackQuery!.Id);
     }
 }

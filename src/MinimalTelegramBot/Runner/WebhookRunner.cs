@@ -18,7 +18,7 @@ internal static class WebhookRunner
         var webhookBuilder = (WebhookBuilder)((IBotApplicationBuilder)app).Properties["__WebhookEnabled"]!;
         var webhookConfiguration = webhookBuilder.Build();
 
-        updateServer._properties["__WebhookUrl"] = new Uri(webhookConfiguration.Options.Url);
+        updateServer._properties["__WebServerUrl"] = new Uri(webhookConfiguration.Options.Url);
 
         if (webhookConfiguration.DeleteWebhookOnShutdown)
         {
@@ -29,7 +29,7 @@ internal static class WebhookRunner
 
         await webApp.StartAsync();
 
-        await app._client.SetWebhookAsync(
+        await app._client.SetWebhook(
             webhookConfiguration.Options.Url,
             webhookConfiguration.Options.Certificate,
             webhookConfiguration.Options.IpAddress,
