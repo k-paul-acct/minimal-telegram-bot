@@ -2,25 +2,18 @@ namespace MinimalTelegramBot.Localization;
 
 internal sealed class LocaleStringSetRepositoryBuilder : ILocaleStringSetRepositoryBuilder
 {
-    private readonly InMemoryLocaleStringSetRepository _repository = new();
-    private readonly Dictionary<Locale, LocaleStringSetBuilder> _setBuilders = new();
+    private readonly List<LocaleStringSetBuilder> _setBuilders = [];
 
     public ILocaleStringSetBuilder AddLocale(Locale locale)
     {
         var setBuilder = new LocaleStringSetBuilder(locale);
-        _setBuilders.Add(locale, setBuilder);
+        _setBuilders.Add(setBuilder);
         return setBuilder;
     }
 
     public ILocaleStringSetRepository Build()
     {
-        var sets = _setBuilders.Select(x => x.Value.Build());
-
-        foreach (var set in sets)
-        {
-            _repository.AddLocaleStringSet(set);
-        }
-
-        return _repository;
+        var sets = _setBuilders.Select(x => x.Build());
+        return new InMemoryLocaleStringSetRepository(sets);
     }
 }
