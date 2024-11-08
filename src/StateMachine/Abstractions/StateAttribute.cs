@@ -16,18 +16,3 @@ public sealed class StateAttribute : Attribute
     /// </summary>
     public int StateId { get; }
 }
-
-/*/// <summary>
-/// </summary>
-[AttributeUsage(AttributeTargets.Class)]
-public sealed class StateSerializableAttribute : Attribute
-{
-    /// <summary>
-    /// </summary>
-    public StateSerializableAttribute(Type stateSerializableType)
-    {
-    }
-}*/
-
-// [StateSerializable(typeof(FullNameFsm))]
-// internal partial class AppStateSerializerContext : StateSerializerContext;
