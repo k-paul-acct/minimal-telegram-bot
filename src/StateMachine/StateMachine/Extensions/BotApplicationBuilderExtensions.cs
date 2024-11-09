@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MinimalTelegramBot.Builder;
 using MinimalTelegramBot.Pipeline;
 
@@ -13,7 +14,9 @@ public static class BotApplicationBuilderExtensions
         return app.Use(async (context, next) =>
         {
             var stateMachine = context.Services.GetRequiredService<IStateMachine>();
-            var state = await stateMachine.GetState<object>(context.ChatId);
+            var options = context.Services.GetRequiredService<IOptions<StateManagementOptions>>().Value;
+            var stateEntryContext = context.Update.CreateStateEntryContext(options.StateTrackingStrategy);
+            var state = await stateMachine.GetState<object>(stateEntryContext);
             context.Data["__State"] = state;
             await next(context);
         });

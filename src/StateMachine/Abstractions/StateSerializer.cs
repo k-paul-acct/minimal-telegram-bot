@@ -16,7 +16,7 @@ public static class StateSerializer
     /// <param name="options"></param>
     /// <typeparam name="TState"></typeparam>
     /// <returns></returns>
-    public static SerializedState Serialize<TState>(TState state, IStateTypeInfoResolver typeInfoResolver, StateSerializationOptions? options = null)
+    public static StateEntry Serialize<TState>(TState state, IStateTypeInfoResolver typeInfoResolver, StateSerializationOptions? options = null)
     {
         if (!typeInfoResolver.GetInfo(typeof(TState), out var stateEntry))
         {
@@ -25,38 +25,38 @@ public static class StateSerializer
 
         var json = JsonSerializer.Serialize(state, options?.JsonSerializerOptions ?? _defaultJsonSerializerOptions);
 
-        return new SerializedState(stateEntry, json);
+        return stateEntry with { StateData = json, };
     }
 
     /// <summary>
     /// </summary>
-    /// <param name="serializedState"></param>
+    /// <param name="stateEntry"></param>
     /// <param name="typeInfoResolver"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static TState? Deserialize<TState>(SerializedState serializedState, IStateTypeInfoResolver typeInfoResolver, StateSerializationOptions? options = null)
+    public static TState? Deserialize<TState>(StateEntry stateEntry, IStateTypeInfoResolver typeInfoResolver, StateSerializationOptions? options = null)
     {
-        if (!typeInfoResolver.GetInfo(serializedState.StateEntry, out var stateType))
+        if (!typeInfoResolver.GetInfo(stateEntry, out var stateType))
         {
-            throw new StateSerializationException(serializedState.StateEntry);
+            throw new StateSerializationException(stateEntry);
         }
 
-        return (TState?)JsonSerializer.Deserialize(serializedState.StateData, stateType, options?.JsonSerializerOptions ?? _defaultJsonSerializerOptions);
+        return (TState?)JsonSerializer.Deserialize(stateEntry.StateData, stateType, options?.JsonSerializerOptions ?? _defaultJsonSerializerOptions);
     }
 
     /// <summary>
     /// </summary>
-    /// <param name="serializedState"></param>
+    /// <param name="stateEntry"></param>
     /// <param name="typeInfoResolver"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static object? Deserialize(SerializedState serializedState, IStateTypeInfoResolver typeInfoResolver, StateSerializationOptions? options = null)
+    public static object? Deserialize(StateEntry stateEntry, IStateTypeInfoResolver typeInfoResolver, StateSerializationOptions? options = null)
     {
-        if (!typeInfoResolver.GetInfo(serializedState.StateEntry, out var stateType))
+        if (!typeInfoResolver.GetInfo(stateEntry, out var stateType))
         {
-            throw new StateSerializationException(serializedState.StateEntry);
+            throw new StateSerializationException(stateEntry);
         }
 
-        return JsonSerializer.Deserialize(serializedState.StateData, stateType, options?.JsonSerializerOptions ?? _defaultJsonSerializerOptions);
+        return JsonSerializer.Deserialize(stateEntry.StateData, stateType, options?.JsonSerializerOptions ?? _defaultJsonSerializerOptions);
     }
 }

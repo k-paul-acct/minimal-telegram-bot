@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace MinimalTelegramBot.StateMachine.Extensions;
 
@@ -17,7 +18,9 @@ public static class StateMachineExtensions
     {
         ArgumentNullException.ThrowIfNull(context);
         var stateMachine = context.Services.GetRequiredService<IStateMachine>();
-        return stateMachine.GetState<TState>(context.ChatId, cancellationToken);
+        var options = context.Services.GetRequiredService<IOptions<StateManagementOptions>>().Value;
+        var stateEntryContext = context.Update.CreateStateEntryContext(options.StateTrackingStrategy);
+        return stateMachine.GetState<TState>(stateEntryContext, cancellationToken);
     }
 
     /// <summary>
@@ -32,7 +35,9 @@ public static class StateMachineExtensions
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(state);
         var stateMachine = context.Services.GetRequiredService<IStateMachine>();
-        return stateMachine.SetState(context.ChatId, state, cancellationToken);
+        var options = context.Services.GetRequiredService<IOptions<StateManagementOptions>>().Value;
+        var stateEntryContext = context.Update.CreateStateEntryContext(options.StateTrackingStrategy);
+        return stateMachine.SetState(state, stateEntryContext, cancellationToken);
     }
 
     /// <summary>
@@ -45,6 +50,8 @@ public static class StateMachineExtensions
     {
         ArgumentNullException.ThrowIfNull(context);
         var stateMachine = context.Services.GetRequiredService<IStateMachine>();
-        return stateMachine.DropState(context.ChatId, cancellationToken);
+        var options = context.Services.GetRequiredService<IOptions<StateManagementOptions>>().Value;
+        var stateEntryContext = context.Update.CreateStateEntryContext(options.StateTrackingStrategy);
+        return stateMachine.DropState(stateEntryContext, cancellationToken);
     }
 }

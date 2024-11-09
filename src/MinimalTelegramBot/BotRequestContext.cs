@@ -1,3 +1,4 @@
+using MinimalTelegramBot.Extensions;
 using MinimalTelegramBot.Localization.Abstractions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -24,16 +25,7 @@ public sealed class BotRequestContext
 
         var messageText = update.Message?.Text;
         var callbackData = update.CallbackQuery?.Data;
-        var chatId = update.Message?.Chat.Id ??
-                     update.CallbackQuery?.Message?.Chat.Id ??
-                     update.EditedMessage?.Chat.Id ??
-                     update.ChannelPost?.Chat.Id ??
-                     update.EditedChannelPost?.Chat.Id ??
-                     update.MessageReaction?.Chat.Id ??
-                     update.MessageReactionCount?.Chat.Id ??
-                     update.ChatBoost?.Chat.Id ??
-                     update.RemovedChatBoost?.Chat.Id ??
-                     0;
+        var chatId = update.GetChatId();
 
         MessageText = messageText;
         CallbackData = callbackData;

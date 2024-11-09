@@ -6,6 +6,11 @@ public sealed class StateManagementOptions
 {
     /// <summary>
     /// </summary>
+    public StateTrackingStrategy StateTrackingStrategy { get; set; } =
+        StateTrackingStrategy.DifferentiateUsers | StateTrackingStrategy.DifferentiateChats;
+
+    /// <summary>
+    /// </summary>
     public IUserStateRepository? Repository { get; set; }
 
     /// <summary>

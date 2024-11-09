@@ -1,8 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore;
@@ -20,94 +19,83 @@ internal sealed class EntityFrameworkCoreRepository<TContext, TEntity> : IUserSt
         _logger = serviceProvider.GetRequiredService<ILogger<EntityFrameworkCoreRepository<TContext, TEntity>>>();
     }
 
-    public async ValueTask<TState?> GetState<TState>(long userId, CancellationToken cancellationToken = default)
+    public async ValueTask<SerializedState?> GetState(StateEntryContext stateEntryContext, CancellationToken cancellationToken = default)
     {
         using var scope = _serviceProvider.CreateScope();
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
-        var stateManagementOptions = scope.ServiceProvider.GetRequiredService<IOptions<StateManagementOptions>>().Value;
 
-        _logger.LogInformation("Getting state of user with ID {UserId}.", userId);
+        _logger.LogInformation("Getting state with context {StateEntryContext}.", stateEntryContext);
 
-        var state = await dbContext.MinimalTelegramBotStates.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
-        if (state is null)
-        {
-            return default;
-        }
-
-        var entry = new StateEntry(state.StateGroupName, state.StateId);
-        var serialized = new SerializedState(entry, state.StateData);
-        var stateTypeInfoResolver = stateManagementOptions.StateTypeInfoResolver ?? EmptyStateTypeInfoResolver.Default;
-
-        return StateSerializer.Deserialize<TState>(serialized, stateTypeInfoResolver, stateManagementOptions.StateSerializationOptions);
+        var (entity, serializedStates) = await GetUserStates(dbContext, stateEntryContext.UserId, cancellationToken);
+        return entity is null ? default : serializedStates.FirstOrDefault(x => x.StateEntryContext == stateEntryContext);
     }
 
-    public async ValueTask SetState<TState>(long userId, TState state, CancellationToken cancellationToken = default)
+    public async ValueTask SetState(SerializedState serializedState, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(serializedState);
+
         using var scope = _serviceProvider.CreateScope();
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
-        var stateManagementOptions = scope.ServiceProvider.GetRequiredService<IOptions<StateManagementOptions>>().Value;
 
-        _logger.LogInformation("Setting state of user with ID {UserId}.", userId);
+        _logger.LogInformation("Setting state with context {StateEntryContext}.", serializedState.StateEntryContext);
 
-        var stateTypeInfoResolver = stateManagementOptions.StateTypeInfoResolver ?? EmptyStateTypeInfoResolver.Default;
-        var serialised = StateSerializer.Serialize(state, stateTypeInfoResolver, stateManagementOptions.StateSerializationOptions);
-        var existing = await dbContext.MinimalTelegramBotStates.FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
+        var (entity, serializedStates) = await GetUserStates(dbContext, serializedState.StateEntryContext.UserId, cancellationToken);
 
-        if (existing is not null)
+        if (entity is null)
         {
-            existing.StateGroupName = serialised.StateEntry.StateGroupName;
-            existing.StateId = serialised.StateEntry.StateId;
-            existing.StateData = serialised.StateData;
+            SerializedState[] states = [serializedState,];
+            var newEntity = new TEntity
+            {
+                UserId = serializedState.StateEntryContext.UserId,
+                States = JsonSerializer.Serialize(states),
+            };
+
+            dbContext.MinimalTelegramBotStates.Add(newEntity);
         }
         else
         {
-            var toAdd = new TEntity
-            {
-                UserId = userId,
-                StateGroupName = serialised.StateEntry.StateGroupName,
-                StateId = serialised.StateEntry.StateId,
-                StateData = serialised.StateData,
-            };
+            var result = serializedStates
+                .Where(x => x.StateEntryContext != serializedState.StateEntryContext)
+                .Append(serializedState);
 
-            dbContext.MinimalTelegramBotStates.Add(toAdd);
+            entity.States = JsonSerializer.Serialize(result);
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async ValueTask DeleteState(long userId, CancellationToken cancellationToken = default)
+    public async ValueTask DeleteState(StateEntryContext stateEntryContext, CancellationToken cancellationToken = default)
     {
         using var scope = _serviceProvider.CreateScope();
+
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
-        _logger.LogInformation("Deleting state of user with ID {UserId}.", userId);
-        await dbContext.MinimalTelegramBotStates.Where(x => x.UserId == userId).ExecuteDeleteAsync(cancellationToken);
+
+        _logger.LogInformation("Deleting state with context {StateEntryContext}.", stateEntryContext);
+
+        var (entity, serializedStates) = await GetUserStates(dbContext, stateEntryContext.UserId, cancellationToken);
+        if (entity is null)
+        {
+            return;
+        }
+
+        var result = serializedStates.Where(x => x.StateEntryContext != stateEntryContext);
+
+        entity.States = JsonSerializer.Serialize(result);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private sealed class EmptyStateTypeInfoResolver : IStateTypeInfoResolver
+    private static async Task<(TEntity?, SerializedState[])> GetUserStates(TContext dbContext, long userId, CancellationToken cancellationToken)
     {
-        public static readonly EmptyStateTypeInfoResolver Default = new(default, default);
-
-        private readonly StateEntry _stateEntry;
-        private readonly Type? _type;
-
-        private EmptyStateTypeInfoResolver(StateEntry stateEntry, Type? type)
+        var entity = await dbContext.MinimalTelegramBotStates.FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
+        if (entity is null)
         {
-            _stateEntry = stateEntry;
-            _type = type;
+            return (null, []);
         }
 
-        public bool GetInfo(Type type, out StateEntry stateEntry)
-        {
-            stateEntry = _stateEntry;
-            return false;
-        }
-
-        public bool GetInfo(StateEntry stateEntry, [NotNullWhen(true)] out Type? stateType)
-        {
-            stateType = _type;
-            return false;
-        }
+        var serialized = JsonSerializer.Deserialize<SerializedState[]>(entity.States) ?? [];
+        return (entity, serialized);
     }
 }

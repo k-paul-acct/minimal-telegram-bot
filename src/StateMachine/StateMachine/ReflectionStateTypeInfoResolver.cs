@@ -37,7 +37,7 @@ internal sealed class ReflectionStateTypeInfoResolver : IStateTypeInfoResolver
                     continue;
                 }
 
-                var info = new StateEntry(stateGroupAttribute.StateGroupName, stateAttribute.StateId);
+                var info = new StateEntry(stateGroupAttribute.StateGroupName, stateAttribute.StateId, "{}");
 
                 stateInfo.Add(new KeyValuePair<Type, StateEntry>(nestedType, info));
                 stateInfoReverse.Add(new KeyValuePair<StateEntry, Type>(info, nestedType));
@@ -55,6 +55,6 @@ internal sealed class ReflectionStateTypeInfoResolver : IStateTypeInfoResolver
 
     public bool GetInfo(StateEntry stateEntry, [NotNullWhen(true)] out Type? stateType)
     {
-        return _stateInfoReverse.TryGetValue(stateEntry, out stateType);
+        return _stateInfoReverse.TryGetValue(stateEntry with { StateData = "{}", }, out stateType);
     }
 }
