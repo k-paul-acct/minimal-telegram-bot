@@ -1,4 +1,5 @@
 using MinimalTelegramBot.Extensions;
+using MinimalTelegramBot.StateMachine.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 

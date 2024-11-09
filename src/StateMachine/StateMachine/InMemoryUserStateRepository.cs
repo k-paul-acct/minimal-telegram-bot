@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine;
 
