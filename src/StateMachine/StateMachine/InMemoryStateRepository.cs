@@ -3,7 +3,7 @@ using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine;
 
-internal sealed class InMemoryUserStateRepository : IUserStateRepository
+internal sealed class InMemoryStateRepository : IStateRepository
 {
     private readonly ConcurrentDictionary<StateEntryContext, SerializedState> _states = new();
 

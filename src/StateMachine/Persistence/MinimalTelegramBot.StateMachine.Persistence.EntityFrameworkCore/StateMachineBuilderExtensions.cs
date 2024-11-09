@@ -14,7 +14,7 @@ public static class StateMachineBuilderExtensions
         {
             return new ConfigureOptions<StateManagementOptions>(options =>
             {
-                options.Repository = new EntityFrameworkCoreRepository<TContext, MinimalTelegramBotState>(services);
+                options.Repository = new EntityFrameworkCoreStateRepository<TContext, MinimalTelegramBotState>(services);
             });
         });
 
@@ -29,7 +29,7 @@ public static class StateMachineBuilderExtensions
         {
             return new ConfigureOptions<StateManagementOptions>(options =>
             {
-                options.Repository = new EntityFrameworkCoreRepository<TContext, TEntity>(services);
+                options.Repository = new EntityFrameworkCoreStateRepository<TContext, TEntity>(services);
             });
         });
 

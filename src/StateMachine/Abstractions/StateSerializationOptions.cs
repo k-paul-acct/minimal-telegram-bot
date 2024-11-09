@@ -8,9 +8,12 @@ public sealed class StateSerializationOptions
 {
     /// <summary>
     /// </summary>
-    public static StateSerializationOptions Default => new();
+    public StateSerializationOptions()
+    {
+        JsonSerializerOptions = new JsonSerializerOptions(JsonSerializerOptions.Default);
+    }
 
     /// <summary>
     /// </summary>
-    public JsonSerializerOptions JsonSerializerOptions { get; set; } = JsonSerializerOptions.Default;
+    public JsonSerializerOptions JsonSerializerOptions { get; set; }
 }

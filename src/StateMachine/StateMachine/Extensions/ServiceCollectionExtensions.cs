@@ -14,27 +14,27 @@ public static class ServiceCollectionExtensions
 
         services.Configure<StateManagementOptions>(options =>
         {
-            options.StateSerializationOptions = StateSerializationOptions.Default;
             configureOptions?.Invoke(options);
         });
 
         services.PostConfigure((StateManagementOptions options) =>
         {
-            options.StateTypeInfoResolver = new ReflectionStateTypeInfoResolver();
-            options.Repository ??= new InMemoryUserStateRepository();
+            options.Repository ??= new InMemoryStateRepository();
+            options.TypeInfoResolver ??= new ReflectionStateTypeInfoResolver();
+            options.Serializer ??= new StateSerializer(options.TypeInfoResolver, options.SerializationOptions);
         });
 
         services.AddSingleton<IConfigureOptions<HandlerDelegateBuilderOptions>>(configureServices =>
         {
             var stateManagementOptions = configureServices.GetRequiredService<IOptions<StateManagementOptions>>();
-            if (stateManagementOptions.Value.StateTypeInfoResolver is null)
+            if (stateManagementOptions.Value.TypeInfoResolver is null)
             {
                 return new ConfigureOptions<HandlerDelegateBuilderOptions>(_ =>
                 {
                 });
             }
 
-            var interceptor = new StateParameterHandlerDelegateBuilderInterceptor(stateManagementOptions.Value.StateTypeInfoResolver);
+            var interceptor = new StateParameterHandlerDelegateBuilderInterceptor(stateManagementOptions.Value.TypeInfoResolver);
 
             return new ConfigureOptions<HandlerDelegateBuilderOptions>(options => options.Interceptors.Add(interceptor));
         });

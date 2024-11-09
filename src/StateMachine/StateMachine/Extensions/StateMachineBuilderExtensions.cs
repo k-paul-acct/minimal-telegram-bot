@@ -7,7 +7,7 @@ namespace MinimalTelegramBot.StateMachine.Extensions;
 public static class StateMachineBuilderExtensions
 {
     public static IStateMachineBuilder UseRepository<TRepository>(this IStateMachineBuilder builder)
-        where TRepository : IUserStateRepository
+        where TRepository : IStateRepository
     {
         builder.Services.AddSingleton<IConfigureOptions<StateManagementOptions>>(services =>
         {
@@ -21,7 +21,7 @@ public static class StateMachineBuilderExtensions
     }
 
     public static IStateMachineBuilder UseRepository<TRepository>(this IStateMachineBuilder builder, TRepository repository)
-        where TRepository : IUserStateRepository
+        where TRepository : IStateRepository
     {
         builder.Services.Configure<StateManagementOptions>(options =>
         {

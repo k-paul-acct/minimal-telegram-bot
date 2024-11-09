@@ -3,7 +3,7 @@ namespace MinimalTelegramBot.StateMachine.Abstractions;
 /// <summary>
 ///     Interface for managing user states in the state machine.
 /// </summary>
-public interface IUserStateRepository
+public interface IStateRepository
 {
     /// <summary>
     ///     Gets the state of the user with the specified ID.

@@ -16,7 +16,7 @@ public static class BotApplicationBuilderExtensions
         {
             var stateMachine = context.Services.GetRequiredService<IStateMachine>();
             var options = context.Services.GetRequiredService<IOptions<StateManagementOptions>>().Value;
-            var stateEntryContext = context.Update.CreateStateEntryContext(options.StateTrackingStrategy);
+            var stateEntryContext = context.Update.CreateStateEntryContext(options.TrackingStrategy);
             var state = await stateMachine.GetState<object>(stateEntryContext);
             context.Data["__State"] = state;
             await next(context);

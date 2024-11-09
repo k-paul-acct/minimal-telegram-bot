@@ -6,17 +6,17 @@ using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore;
 
-internal sealed class EntityFrameworkCoreRepository<TContext, TEntity> : IUserStateRepository
+internal sealed class EntityFrameworkCoreStateRepository<TContext, TEntity> : IStateRepository
     where TContext : DbContext, IStateMachineDbContext<TEntity>
     where TEntity : class, IMinimalTelegramBotState, new()
 {
-    private readonly ILogger<EntityFrameworkCoreRepository<TContext, TEntity>> _logger;
+    private readonly ILogger<EntityFrameworkCoreStateRepository<TContext, TEntity>> _logger;
     private readonly IServiceProvider _serviceProvider;
 
-    public EntityFrameworkCoreRepository(IServiceProvider serviceProvider)
+    public EntityFrameworkCoreStateRepository(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _logger = serviceProvider.GetRequiredService<ILogger<EntityFrameworkCoreRepository<TContext, TEntity>>>();
+        _logger = serviceProvider.GetRequiredService<ILogger<EntityFrameworkCoreStateRepository<TContext, TEntity>>>();
     }
 
     public async ValueTask<SerializedState?> GetState(StateEntryContext stateEntryContext, CancellationToken cancellationToken = default)

@@ -6,18 +6,22 @@ public sealed class StateManagementOptions
 {
     /// <summary>
     /// </summary>
-    public StateTrackingStrategy StateTrackingStrategy { get; set; } =
+    public StateTrackingStrategy TrackingStrategy { get; set; } =
         StateTrackingStrategy.DifferentiateUsers | StateTrackingStrategy.DifferentiateChats;
 
     /// <summary>
     /// </summary>
-    public IUserStateRepository? Repository { get; set; }
+    public IStateRepository? Repository { get; set; }
 
     /// <summary>
     /// </summary>
-    public IStateTypeInfoResolver? StateTypeInfoResolver { get; set; }
+    public IStateSerializer? Serializer { get; set; }
 
     /// <summary>
     /// </summary>
-    public StateSerializationOptions? StateSerializationOptions { get; set; }
+    public StateSerializationOptions? SerializationOptions { get; set; }
+
+    /// <summary>
+    /// </summary>
+    public IStateTypeInfoResolver? TypeInfoResolver { get; set; }
 }
