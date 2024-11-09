@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MinimalTelegramBot.Localization\MinimalTelegramBot.Localization.csproj"/>
-    <ProjectReference Include="..\..\MinimalTelegramBot\MinimalTelegramBot.csproj"/>
+    <ProjectReference Include="..\..\src\MinimalTelegramBot.Localization\MinimalTelegramBot.Localization.csproj"/>
+    <ProjectReference Include="..\..\src\MinimalTelegramBot\MinimalTelegramBot.csproj"/>
   </ItemGroup>
 
 </Project>

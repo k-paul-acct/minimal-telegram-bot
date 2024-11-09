@@ -12,9 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MinimalTelegramBot\MinimalTelegramBot.csproj"/>
-    <ProjectReference Include="..\..\StateMachine\StateMachine\MinimalTelegramBot.StateMachine.csproj"/>
-    <ProjectReference Include="..\..\StateMachine\Persistence\MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore\MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore.csproj"/>
+    <ProjectReference Include="..\..\src\MinimalTelegramBot\MinimalTelegramBot.csproj"/>
+    <ProjectReference Include="..\..\src\StateMachine\StateMachine\MinimalTelegramBot.StateMachine.csproj"/>
+    <ProjectReference Include="..\..\src\StateMachine\Persistence\EntityFrameworkCore\MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore.csproj"/>
   </ItemGroup>
 
 </Project>

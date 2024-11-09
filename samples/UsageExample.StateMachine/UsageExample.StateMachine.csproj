@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MinimalTelegramBot\MinimalTelegramBot.csproj"/>
-    <ProjectReference Include="..\..\StateMachine\StateMachine\MinimalTelegramBot.StateMachine.csproj"/>
+    <ProjectReference Include="..\..\src\MinimalTelegramBot\MinimalTelegramBot.csproj"/>
+    <ProjectReference Include="..\..\src\StateMachine\StateMachine\MinimalTelegramBot.StateMachine.csproj"/>
   </ItemGroup>
 
 </Project>
