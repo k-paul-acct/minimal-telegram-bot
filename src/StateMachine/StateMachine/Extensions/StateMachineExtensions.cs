@@ -20,8 +20,8 @@ public static class StateMachineExtensions
         ArgumentNullException.ThrowIfNull(context);
         var stateMachine = context.Services.GetRequiredService<IStateMachine>();
         var options = context.Services.GetRequiredService<IOptions<StateManagementOptions>>().Value;
-        var stateEntryContext = context.Update.CreateStateEntryContext(options.TrackingStrategy);
-        return stateMachine.GetState<TState>(stateEntryContext, cancellationToken);
+        var entryContext = context.Update.CreateStateEntryContext(options.TrackingStrategy);
+        return stateMachine.GetState<TState>(entryContext, cancellationToken);
     }
 
     /// <summary>
@@ -37,8 +37,8 @@ public static class StateMachineExtensions
         ArgumentNullException.ThrowIfNull(state);
         var stateMachine = context.Services.GetRequiredService<IStateMachine>();
         var options = context.Services.GetRequiredService<IOptions<StateManagementOptions>>().Value;
-        var stateEntryContext = context.Update.CreateStateEntryContext(options.TrackingStrategy);
-        return stateMachine.SetState(state, stateEntryContext, cancellationToken);
+        var entryContext = context.Update.CreateStateEntryContext(options.TrackingStrategy);
+        return stateMachine.SetState(entryContext, state, cancellationToken);
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public static class StateMachineExtensions
         ArgumentNullException.ThrowIfNull(context);
         var stateMachine = context.Services.GetRequiredService<IStateMachine>();
         var options = context.Services.GetRequiredService<IOptions<StateManagementOptions>>().Value;
-        var stateEntryContext = context.Update.CreateStateEntryContext(options.TrackingStrategy);
-        return stateMachine.DropState(stateEntryContext, cancellationToken);
+        var entryContext = context.Update.CreateStateEntryContext(options.TrackingStrategy);
+        return stateMachine.DropState(entryContext, cancellationToken);
     }
 }

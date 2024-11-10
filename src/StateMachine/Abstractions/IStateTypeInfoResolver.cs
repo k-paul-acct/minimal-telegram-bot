@@ -9,14 +9,14 @@ public interface IStateTypeInfoResolver
     /// <summary>
     /// </summary>
     /// <param name="type"></param>
-    /// <param name="stateEntry"></param>
+    /// <param name="typeInfo"></param>
     /// <returns></returns>
-    bool GetInfo(Type type, out StateEntry stateEntry);
+    bool GetInfo(Type type, out StateTypeInfo typeInfo);
 
     /// <summary>
     /// </summary>
-    /// <param name="stateEntry"></param>
+    /// <param name="typeInfo"></param>
     /// <param name="stateType"></param>
     /// <returns></returns>
-    bool GetInfo(StateEntry stateEntry, [NotNullWhen(true)] out Type? stateType);
+    bool GetInfo(StateTypeInfo typeInfo, [NotNullWhen(true)] out Type? stateType);
 }

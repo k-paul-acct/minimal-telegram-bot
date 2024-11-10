@@ -19,7 +19,7 @@ public sealed class StateManagementOptions
 
     /// <summary>
     /// </summary>
-    public StateSerializationOptions? SerializationOptions { get; set; }
+    public StateSerializerOptions? SerializerOptions { get; set; }
 
     /// <summary>
     /// </summary>

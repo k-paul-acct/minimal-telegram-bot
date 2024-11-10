@@ -7,13 +7,13 @@ namespace MinimalTelegramBot.StateMachine;
 
 internal sealed class ReflectionStateTypeInfoResolver : IStateTypeInfoResolver
 {
-    private readonly FrozenDictionary<Type, StateEntry> _stateInfo;
-    private readonly FrozenDictionary<StateEntry, Type> _stateInfoReverse;
+    private readonly FrozenDictionary<Type, StateTypeInfo> _stateInfo;
+    private readonly FrozenDictionary<StateTypeInfo, Type> _stateInfoReverse;
 
     public ReflectionStateTypeInfoResolver()
     {
-        var stateInfo = new List<KeyValuePair<Type, StateEntry>>();
-        var stateInfoReverse = new List<KeyValuePair<StateEntry, Type>>();
+        var stateInfo = new List<KeyValuePair<Type, StateTypeInfo>>();
+        var stateInfoReverse = new List<KeyValuePair<StateTypeInfo, Type>>();
         var assemblies = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => a.FullName is not null && !a.FullName.StartsWith("System.") && !a.FullName.StartsWith("Microsoft."));
 
@@ -38,10 +38,10 @@ internal sealed class ReflectionStateTypeInfoResolver : IStateTypeInfoResolver
                     continue;
                 }
 
-                var info = new StateEntry(stateGroupAttribute.StateGroupName, stateAttribute.StateId, "{}");
+                var info = new StateTypeInfo(stateGroupAttribute.StateGroupName, stateAttribute.StateId);
 
-                stateInfo.Add(new KeyValuePair<Type, StateEntry>(nestedType, info));
-                stateInfoReverse.Add(new KeyValuePair<StateEntry, Type>(info, nestedType));
+                stateInfo.Add(new KeyValuePair<Type, StateTypeInfo>(nestedType, info));
+                stateInfoReverse.Add(new KeyValuePair<StateTypeInfo, Type>(info, nestedType));
             }
         }
 
@@ -49,13 +49,13 @@ internal sealed class ReflectionStateTypeInfoResolver : IStateTypeInfoResolver
         _stateInfoReverse = stateInfoReverse.ToFrozenDictionary();
     }
 
-    public bool GetInfo(Type type, out StateEntry stateEntry)
+    public bool GetInfo(Type type, out StateTypeInfo typeInfo)
     {
-        return _stateInfo.TryGetValue(type, out stateEntry);
+        return _stateInfo.TryGetValue(type, out typeInfo);
     }
 
-    public bool GetInfo(StateEntry stateEntry, [NotNullWhen(true)] out Type? stateType)
+    public bool GetInfo(StateTypeInfo typeInfo, [NotNullWhen(true)] out Type? stateType)
     {
-        return _stateInfoReverse.TryGetValue(stateEntry with { StateData = "{}", }, out stateType);
+        return _stateInfoReverse.TryGetValue(typeInfo, out stateType);
     }
 }

@@ -13,8 +13,8 @@ public interface IStateSerializer
 
     /// <summary>
     /// </summary>
-    /// <param name="stateEntry"></param>
+    /// <param name="entry"></param>
     /// <typeparam name="TState"></typeparam>
     /// <returns></returns>
-    TState? Deserialize<TState>(StateEntry stateEntry);
+    TState? Deserialize<TState>(StateEntry entry);
 }

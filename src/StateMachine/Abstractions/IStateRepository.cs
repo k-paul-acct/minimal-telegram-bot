@@ -8,27 +8,27 @@ public interface IStateRepository
     /// <summary>
     ///     Gets the state of the user with the specified ID.
     /// </summary>
-    /// <param name="stateEntryContext"></param>
+    /// <param name="entryContext"></param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
     /// <returns>
     ///     The <see cref="ValueTask"/> that represents the asynchronous operation,
     ///     containing the state of the user or null if the user has no state.
     /// </returns>
-    ValueTask<SerializedState?> GetState(StateEntryContext stateEntryContext, CancellationToken cancellationToken = default);
+    ValueTask<StateEntry?> GetState(StateEntryContext entryContext, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Sets or updates the state of the user with the specified ID.
     /// </summary>
-    /// <param name="serializedState"></param>
-    /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-    /// <returns>The <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
-    ValueTask SetState(SerializedState serializedState, CancellationToken cancellationToken = default);
+    /// <param name="entryContext"></param>
+    /// <param name="entry"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    ValueTask SetState(StateEntryContext entryContext, StateEntry entry, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Deletes the state of the user with the specified ID.
     /// </summary>
-    /// <param name="stateEntryContext"></param>
+    /// <param name="entryContext"></param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
     /// <returns>The <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
-    ValueTask DeleteState(StateEntryContext stateEntryContext, CancellationToken cancellationToken = default);
+    ValueTask DeleteState(StateEntryContext entryContext, CancellationToken cancellationToken = default);
 }

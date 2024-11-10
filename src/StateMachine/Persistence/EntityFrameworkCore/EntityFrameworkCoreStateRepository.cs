@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,83 +18,75 @@ internal sealed class EntityFrameworkCoreStateRepository<TContext, TEntity> : IS
         _logger = serviceProvider.GetRequiredService<ILogger<EntityFrameworkCoreStateRepository<TContext, TEntity>>>();
     }
 
-    public async ValueTask<SerializedState?> GetState(StateEntryContext stateEntryContext, CancellationToken cancellationToken = default)
+    public async ValueTask<StateEntry?> GetState(StateEntryContext entryContext, CancellationToken cancellationToken = default)
     {
-        using var scope = _serviceProvider.CreateScope();
+        await using var scope = _serviceProvider.CreateAsyncScope();
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
 
-        _logger.LogInformation("Getting state with context {StateEntryContext}.", stateEntryContext);
+        _logger.LogInformation("Getting state with context {StateEntryContext}.", entryContext);
 
-        var (entity, serializedStates) = await GetUserStates(dbContext, stateEntryContext.UserId, cancellationToken);
-        return entity is null ? default : serializedStates.FirstOrDefault(x => x.StateEntryContext == stateEntryContext);
+        var state = await dbContext.MinimalTelegramBotStates.AsNoTracking().FirstOrDefaultAsync(
+            x => x.UserId == entryContext.UserId &&
+                 x.ChatId == entryContext.ChatId &&
+                 x.MessageThreadId == entryContext.MessageThreadId,
+            cancellationToken);
+
+        return state is null
+            ? new StateEntry?()
+            : new StateEntry(new StateTypeInfo(state.StateGroupName, state.StateId), state.StateData);
     }
 
-    public async ValueTask SetState(SerializedState serializedState, CancellationToken cancellationToken = default)
+    public async ValueTask SetState(StateEntryContext entryContext, StateEntry entry, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(serializedState);
-
-        using var scope = _serviceProvider.CreateScope();
+        await using var scope = _serviceProvider.CreateAsyncScope();
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
 
-        _logger.LogInformation("Setting state with context {StateEntryContext}.", serializedState.StateEntryContext);
+        _logger.LogInformation("Setting state with context {StateEntryContext}.", entryContext);
 
-        var (entity, serializedStates) = await GetUserStates(dbContext, serializedState.StateEntryContext.UserId, cancellationToken);
+        var state = await dbContext.MinimalTelegramBotStates.FirstOrDefaultAsync(
+            x => x.UserId == entryContext.UserId &&
+                 x.ChatId == entryContext.ChatId &&
+                 x.MessageThreadId == entryContext.MessageThreadId,
+            cancellationToken);
 
-        if (entity is null)
+        if (state is null)
         {
-            SerializedState[] states = [serializedState,];
-            var newEntity = new TEntity
+            var newState = new TEntity
             {
-                UserId = serializedState.StateEntryContext.UserId,
-                States = JsonSerializer.Serialize(states),
+                UserId = entryContext.UserId,
+                ChatId = entryContext.ChatId,
+                MessageThreadId = entryContext.MessageThreadId,
+                StateGroupName = entry.TypeInfo.StateGroupName,
+                StateId = entry.TypeInfo.StateId,
+                StateData = entry.StateData,
             };
 
-            dbContext.MinimalTelegramBotStates.Add(newEntity);
+            dbContext.MinimalTelegramBotStates.Add(newState);
         }
         else
         {
-            var result = serializedStates
-                .Where(x => x.StateEntryContext != serializedState.StateEntryContext)
-                .Append(serializedState);
-
-            entity.States = JsonSerializer.Serialize(result);
+            state.StateGroupName = entry.TypeInfo.StateGroupName;
+            state.StateId = entry.TypeInfo.StateId;
+            state.StateData = entry.StateData;
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async ValueTask DeleteState(StateEntryContext stateEntryContext, CancellationToken cancellationToken = default)
+    public async ValueTask DeleteState(StateEntryContext entryContext, CancellationToken cancellationToken = default)
     {
-        using var scope = _serviceProvider.CreateScope();
+        await using var scope = _serviceProvider.CreateAsyncScope();
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
 
-        _logger.LogInformation("Deleting state with context {StateEntryContext}.", stateEntryContext);
+        _logger.LogInformation("Deleting state with context {StateEntryContext}.", entryContext);
 
-        var (entity, serializedStates) = await GetUserStates(dbContext, stateEntryContext.UserId, cancellationToken);
-        if (entity is null)
-        {
-            return;
-        }
-
-        var result = serializedStates.Where(x => x.StateEntryContext != stateEntryContext);
-
-        entity.States = JsonSerializer.Serialize(result);
-
-        await dbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    private static async Task<(TEntity?, SerializedState[])> GetUserStates(TContext dbContext, long userId, CancellationToken cancellationToken)
-    {
-        var entity = await dbContext.MinimalTelegramBotStates.FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
-        if (entity is null)
-        {
-            return (null, []);
-        }
-
-        var serialized = JsonSerializer.Deserialize<SerializedState[]>(entity.States) ?? [];
-        return (entity, serialized);
+        await dbContext.MinimalTelegramBotStates
+            .Where(x => x.UserId == entryContext.UserId &&
+                        x.ChatId == entryContext.ChatId &&
+                        x.MessageThreadId == entryContext.MessageThreadId)
+            .ExecuteDeleteAsync(cancellationToken);
     }
 }

@@ -14,9 +14,9 @@ public sealed class StateSerializationException : Exception
 
     /// <summary>
     /// </summary>
-    /// <param name="stateEntry"></param>
-    public StateSerializationException(StateEntry stateEntry)
-        : base($"Cannot find proper state type for state entry {stateEntry}.")
+    /// <param name="entry"></param>
+    public StateSerializationException(StateEntry entry)
+        : base($"Cannot find proper state type for state entry {entry}.")
     {
     }
 }

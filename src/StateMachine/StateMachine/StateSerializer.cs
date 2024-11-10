@@ -6,34 +6,36 @@ namespace MinimalTelegramBot.StateMachine;
 
 internal sealed class StateSerializer : IStateSerializer
 {
-    private readonly StateSerializationOptions _serializationOptions;
+    private readonly StateSerializerOptions _serializerOptions;
     private readonly IStateTypeInfoResolver _typeInfoResolver;
 
-    public StateSerializer(IStateTypeInfoResolver typeInfoResolver, StateSerializationOptions? serializationOptions = null)
+    public StateSerializer(IStateTypeInfoResolver typeInfoResolver, StateSerializerOptions? serializerOptions = null)
     {
         _typeInfoResolver = typeInfoResolver;
-        _serializationOptions = serializationOptions ?? new StateSerializationOptions();
+        _serializerOptions = serializerOptions ?? new StateSerializerOptions();
     }
 
     public StateEntry Serialize<TState>(TState state)
     {
-        if (!_typeInfoResolver.GetInfo(typeof(TState), out var stateEntry))
+        ArgumentNullException.ThrowIfNull(state);
+
+        if (!_typeInfoResolver.GetInfo(typeof(TState), out var typeInfo))
         {
             throw new StateSerializationException(typeof(TState));
         }
 
-        var json = JsonSerializer.Serialize(state, _serializationOptions.JsonSerializerOptions);
+        var json = JsonSerializer.Serialize(state, _serializerOptions.JsonSerializerOptions);
 
-        return stateEntry with { StateData = json, };
+        return new StateEntry(typeInfo, json);
     }
 
-    public TState? Deserialize<TState>(StateEntry stateEntry)
+    public TState? Deserialize<TState>(StateEntry entry)
     {
-        if (!_typeInfoResolver.GetInfo(stateEntry, out var stateType))
+        if (!_typeInfoResolver.GetInfo(entry.TypeInfo, out var stateType))
         {
-            throw new StateSerializationException(stateEntry);
+            throw new StateSerializationException(entry);
         }
 
-        return (TState?)JsonSerializer.Deserialize(stateEntry.StateData, stateType, _serializationOptions.JsonSerializerOptions);
+        return (TState?)JsonSerializer.Deserialize(entry.StateData, stateType, _serializerOptions.JsonSerializerOptions);
     }
 }

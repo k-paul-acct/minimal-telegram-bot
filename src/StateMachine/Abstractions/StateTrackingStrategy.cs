@@ -15,5 +15,5 @@ public enum StateTrackingStrategy
 
     /// <summary>
     /// </summary>
-    DifferentiateTopics = 4,
+    DifferentiateTopics = 4 | 2,
 }

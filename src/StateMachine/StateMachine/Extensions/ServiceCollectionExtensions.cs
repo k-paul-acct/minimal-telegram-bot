@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
         {
             options.Repository ??= new InMemoryStateRepository();
             options.TypeInfoResolver ??= new ReflectionStateTypeInfoResolver();
-            options.Serializer ??= new StateSerializer(options.TypeInfoResolver, options.SerializationOptions);
+            options.Serializer ??= new StateSerializer(options.TypeInfoResolver, options.SerializerOptions);
         });
 
         services.AddSingleton<IConfigureOptions<HandlerDelegateBuilderOptions>>(configureServices =>
