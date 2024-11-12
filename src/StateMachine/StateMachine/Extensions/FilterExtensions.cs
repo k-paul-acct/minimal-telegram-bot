@@ -4,6 +4,7 @@ using MinimalTelegramBot.Results;
 
 namespace MinimalTelegramBot.StateMachine.Extensions;
 
+// TODO: Docs.
 public static class FilterExtensions
 {
     public static HandlerGroupBuilder FilterState<TState>(this HandlerGroupBuilder builder)

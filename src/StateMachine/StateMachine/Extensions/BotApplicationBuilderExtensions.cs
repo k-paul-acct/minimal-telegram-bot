@@ -6,6 +6,7 @@ using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine.Extensions;
 
+// TODO: Docs.
 public static class BotApplicationBuilderExtensions
 {
     public static IBotApplicationBuilder UseStateMachine(this IBotApplicationBuilder app)

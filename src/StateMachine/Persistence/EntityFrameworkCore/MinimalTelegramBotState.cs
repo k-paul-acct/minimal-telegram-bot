@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore;
 
+// TODO: Docs.
 [PrimaryKey(nameof(UserId), nameof(ChatId), nameof(MessageThreadId))]
 public class MinimalTelegramBotState : IMinimalTelegramBotState
 {

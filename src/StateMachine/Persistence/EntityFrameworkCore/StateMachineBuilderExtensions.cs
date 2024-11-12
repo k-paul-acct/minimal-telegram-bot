@@ -5,6 +5,7 @@ using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore;
 
+// TODO: Docs.
 public static class StateMachineBuilderExtensions
 {
     public static IStateMachineBuilder PersistStatesToDbContext<TContext>(this IStateMachineBuilder builder)

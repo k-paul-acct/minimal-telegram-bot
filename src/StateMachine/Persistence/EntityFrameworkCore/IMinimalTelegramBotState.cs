@@ -1,5 +1,6 @@
 namespace MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore;
 
+// TODO: Docs.
 public interface IMinimalTelegramBotState
 {
     public long UserId { get; set; }

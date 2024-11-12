@@ -3,6 +3,7 @@ using System.Text.Json;
 
 namespace MinimalTelegramBot.StateMachine.Abstractions;
 
+// TODO: Docs.
 /// <summary>
 /// </summary>
 public sealed class StateSerializerOptions

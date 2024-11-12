@@ -1,5 +1,6 @@
 namespace MinimalTelegramBot.StateMachine.Abstractions;
 
+// TODO: Docs.
 /// <summary>
 /// </summary>
 /// <param name="StateGroupName"></param>

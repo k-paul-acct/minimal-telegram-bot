@@ -4,6 +4,7 @@ using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine.Extensions;
 
+// TODO: Docs.
 public static class StateMachineBuilderExtensions
 {
     public static IStateMachineBuilder PersistStatesToRepository<TRepository>(this IStateMachineBuilder builder)

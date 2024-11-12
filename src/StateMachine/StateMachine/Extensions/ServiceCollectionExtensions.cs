@@ -6,6 +6,7 @@ using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine.Extensions;
 
+// TODO: Docs.
 public static class ServiceCollectionExtensions
 {
     public static IStateMachineBuilder AddStateMachine(this IServiceCollection services, Action<StateManagementOptions>? configureOptions = null)

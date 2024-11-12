@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MinimalTelegramBot.StateMachine.Abstractions;
 
+// TODO: Docs.
 /// <summary>
 /// </summary>
 public interface IStateTypeInfoResolver

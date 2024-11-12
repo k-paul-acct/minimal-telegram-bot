@@ -4,6 +4,7 @@ using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine.Extensions;
 
+// TODO: Docs.
 public static class StateMachineExtensions
 {
     /// <summary>

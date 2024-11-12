@@ -1,5 +1,6 @@
 namespace MinimalTelegramBot.StateMachine.Abstractions.Exceptions;
 
+// TODO: Docs.
 /// <summary>
 /// </summary>
 public sealed class StateSerializationException : Exception

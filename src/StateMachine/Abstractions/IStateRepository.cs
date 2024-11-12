@@ -1,5 +1,6 @@
 namespace MinimalTelegramBot.StateMachine.Abstractions;
 
+// TODO: Docs.
 /// <summary>
 ///     Interface for managing user states in the state machine.
 /// </summary>

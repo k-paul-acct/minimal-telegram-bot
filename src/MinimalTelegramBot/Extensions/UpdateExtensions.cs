@@ -3,6 +3,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace MinimalTelegramBot.Extensions;
 
+// TODO: Docs.
 /// <summary>
 /// </summary>
 public static class UpdateExtensions

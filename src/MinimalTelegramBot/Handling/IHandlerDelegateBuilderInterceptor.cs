@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 
 namespace MinimalTelegramBot.Handling;
 
+// TODO: Docs.
 /// <summary>
 /// </summary>
 public interface IHandlerDelegateBuilderInterceptor

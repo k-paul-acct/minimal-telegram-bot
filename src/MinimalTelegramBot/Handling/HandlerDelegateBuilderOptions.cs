@@ -1,5 +1,6 @@
 namespace MinimalTelegramBot.Handling;
 
+// TODO: Docs.
 /// <summary>
 /// </summary>
 public sealed class HandlerDelegateBuilderOptions

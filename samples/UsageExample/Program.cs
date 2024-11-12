@@ -11,9 +11,6 @@ using UsageExample.Services;
 using Results = MinimalTelegramBot.Results.Results;
 
 // TODO: More Result templates.
-// TODO: Different state models.
-// TODO: Notifications.
-// TODO: Different persistence and builder options in builders (State Machine, Notification Service).
 
 var builder = BotApplication.CreateBuilder(args);
 
