@@ -32,7 +32,7 @@ internal sealed class EntityFrameworkCoreStateRepository<TContext, TEntity> : IS
                  x.MessageThreadId == entryContext.MessageThreadId,
             cancellationToken);
 
-        return state is null
+        return state is null || state.StateData == ""
             ? new StateEntry?()
             : new StateEntry(new StateTypeInfo(state.StateGroupName, state.StateId), state.StateData);
     }
@@ -45,32 +45,29 @@ internal sealed class EntityFrameworkCoreStateRepository<TContext, TEntity> : IS
 
         _logger.LogInformation("Setting state with context {StateEntryContext}.", entryContext);
 
-        var state = await dbContext.MinimalTelegramBotStates.FirstOrDefaultAsync(
-            x => x.UserId == entryContext.UserId &&
-                 x.ChatId == entryContext.ChatId &&
-                 x.MessageThreadId == entryContext.MessageThreadId,
-            cancellationToken);
+        var affected = await dbContext.MinimalTelegramBotStates
+            .Where(x => x.UserId == entryContext.UserId &&
+                        x.ChatId == entryContext.ChatId &&
+                        x.MessageThreadId == entryContext.MessageThreadId)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(state => state.StateGroupName, entry.TypeInfo.StateGroupName)
+                .SetProperty(state => state.StateId, entry.TypeInfo.StateId)
+                .SetProperty(state => state.StateData, entry.StateData), cancellationToken);
 
-        if (state is null)
+        if (affected != 0)
         {
-            var newState = new TEntity
-            {
-                UserId = entryContext.UserId,
-                ChatId = entryContext.ChatId,
-                MessageThreadId = entryContext.MessageThreadId,
-                StateGroupName = entry.TypeInfo.StateGroupName,
-                StateId = entry.TypeInfo.StateId,
-                StateData = entry.StateData,
-            };
+            return;
+        }
 
-            dbContext.MinimalTelegramBotStates.Add(newState);
-        }
-        else
+        dbContext.MinimalTelegramBotStates.Add(new TEntity
         {
-            state.StateGroupName = entry.TypeInfo.StateGroupName;
-            state.StateId = entry.TypeInfo.StateId;
-            state.StateData = entry.StateData;
-        }
+            UserId = entryContext.UserId,
+            ChatId = entryContext.ChatId,
+            MessageThreadId = entryContext.MessageThreadId,
+            StateGroupName = entry.TypeInfo.StateGroupName,
+            StateId = entry.TypeInfo.StateId,
+            StateData = entry.StateData,
+        });
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }
@@ -87,6 +84,6 @@ internal sealed class EntityFrameworkCoreStateRepository<TContext, TEntity> : IS
             .Where(x => x.UserId == entryContext.UserId &&
                         x.ChatId == entryContext.ChatId &&
                         x.MessageThreadId == entryContext.MessageThreadId)
-            .ExecuteDeleteAsync(cancellationToken);
+            .ExecuteUpdateAsync(setters => setters.SetProperty(state => state.StateData, ""), cancellationToken);
     }
 }

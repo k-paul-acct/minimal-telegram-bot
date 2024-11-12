@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MinimalTelegramBot.StateMachine.Abstractions;
 
@@ -5,31 +7,78 @@ namespace MinimalTelegramBot.StateMachine;
 
 internal sealed class StateMachine : IStateMachine
 {
+    private readonly StateCachingOptions _cacheOptions;
     private readonly IStateRepository _repository;
     private readonly IStateSerializer _serializer;
+    private readonly IServiceProvider _serviceProvider;
 
-    public StateMachine(IOptions<StateManagementOptions> stateManagementOptions)
+    public StateMachine(IServiceProvider serviceProvider, IOptions<StateManagementOptions> stateManagementOptions, IOptions<StateCachingOptions> stateCachingOptions)
     {
+        _serviceProvider = serviceProvider;
         _repository = stateManagementOptions.Value.Repository ?? EmptyStateRepository.Default;
         _serializer = stateManagementOptions.Value.Serializer ?? EmptyStateSerializer.Default;
+        _cacheOptions = stateCachingOptions.Value;
     }
 
     public async ValueTask<TState?> GetState<TState>(StateEntryContext entryContext, CancellationToken cancellationToken = default)
     {
-        var entry = await _repository.GetState(entryContext, cancellationToken);
+        StateEntry? entry;
+
+        if (!_cacheOptions.UseCaching)
+        {
+            entry = await _repository.GetState(entryContext, cancellationToken);
+            return entry is null ? default : _serializer.Deserialize<TState>(entry.Value);
+        }
+
+        var cache = _serviceProvider.GetRequiredService<HybridCache>();
+
+        entry = await cache.GetOrCreateAsync(
+            $"{entryContext.UserId:X}-{entryContext.ChatId:X}-{entryContext.MessageThreadId:X}",
+            (EntryContext: entryContext, Service: this),
+            static (state, ct) => state.Service._repository.GetState(state.EntryContext, ct),
+            _cacheOptions.CacheEntryOptions,
+            cancellationToken: cancellationToken);
+
         return entry is null ? default : _serializer.Deserialize<TState>(entry.Value);
     }
 
-    public ValueTask SetState<TState>(StateEntryContext entryContext, TState state, CancellationToken cancellationToken = default)
+    public async ValueTask SetState<TState>(StateEntryContext entryContext, TState state, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(state);
+
         var entry = _serializer.Serialize(state);
-        return _repository.SetState(entryContext, entry, cancellationToken);
+        await _repository.SetState(entryContext, entry, cancellationToken);
+
+        if (!_cacheOptions.UseCaching)
+        {
+            return;
+        }
+
+        var cache = _serviceProvider.GetRequiredService<HybridCache>();
+
+        await cache.SetAsync(
+            $"{entryContext.UserId:X}-{entryContext.ChatId:X}-{entryContext.MessageThreadId:X}",
+            (StateEntry?)entry,
+            _cacheOptions.CacheEntryOptions,
+            cancellationToken: cancellationToken);
     }
 
-    public ValueTask DropState(StateEntryContext entryContext, CancellationToken cancellationToken = default)
+    public async ValueTask DropState(StateEntryContext entryContext, CancellationToken cancellationToken = default)
     {
-        return _repository.DeleteState(entryContext, cancellationToken);
+        await _repository.DeleteState(entryContext, cancellationToken);
+
+        if (!_cacheOptions.UseCaching)
+        {
+            return;
+        }
+
+        var cache = _serviceProvider.GetRequiredService<HybridCache>();
+
+        await cache.SetAsync(
+            $"{entryContext.UserId:X}-{entryContext.ChatId:X}-{entryContext.MessageThreadId:X}",
+            new StateEntry?(),
+            _cacheOptions.CacheEntryOptions,
+            cancellationToken: cancellationToken);
     }
 
     private sealed class EmptyStateRepository : IStateRepository

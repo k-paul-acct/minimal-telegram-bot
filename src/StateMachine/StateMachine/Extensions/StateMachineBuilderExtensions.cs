@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MinimalTelegramBot.StateMachine.Abstractions;
@@ -27,6 +28,21 @@ public static class StateMachineBuilderExtensions
         builder.Services.Configure<StateManagementOptions>(options =>
         {
             options.Repository = repository;
+        });
+
+        return builder;
+    }
+
+    public static IStateMachineBuilder WithHybridCache(this IStateMachineBuilder builder, HybridCacheEntryOptions? cacheEntryOptions = null)
+    {
+#pragma warning disable EXTEXP0018
+        builder.Services.AddHybridCache();
+#pragma warning restore EXTEXP0018
+
+        builder.Services.Configure<StateCachingOptions>(options =>
+        {
+            options.UseCaching = true;
+            options.CacheEntryOptions = cacheEntryOptions;
         });
 
         return builder;

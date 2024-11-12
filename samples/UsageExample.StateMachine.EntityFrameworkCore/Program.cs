@@ -11,7 +11,10 @@ var builder = BotApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=db.db"));
 
-builder.Services.AddStateMachine().PersistStatesToDbContext<AppDbContext>();
+builder.Services
+    .AddStateMachine()
+    .PersistStatesToDbContext<AppDbContext>()
+    .WithHybridCache();
 
 var bot = builder.Build();
 
