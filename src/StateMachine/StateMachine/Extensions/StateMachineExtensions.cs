@@ -4,17 +4,20 @@ using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine.Extensions;
 
-// TODO: Docs.
+/// <summary>
+///     StateMachineExtensions.
+/// </summary>
 public static class StateMachineExtensions
 {
     /// <summary>
-    ///     Gets the state of the current user in the <see cref="BotRequestContext"/>.
+    ///     Gets the state for the <see cref="StateEntryContext"/> of the current <see cref="BotRequestContext"/>.
     /// </summary>
     /// <param name="context">The current instance of <see cref="BotRequestContext"/>.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+    /// <typeparam name="TState">The type of state to retrieve.</typeparam>
     /// <returns>
     ///     The <see cref="ValueTask"/> that represents the asynchronous operation,
-    ///     containing the state of the user or null if the user has no state.
+    ///     containing the state or null if the is no state.
     /// </returns>
     public static ValueTask<TState?> GetState<TState>(this BotRequestContext context, CancellationToken cancellationToken = default)
     {
@@ -26,12 +29,13 @@ public static class StateMachineExtensions
     }
 
     /// <summary>
+    ///     Sets the state for the <see cref="StateEntryContext"/> of the current <see cref="BotRequestContext"/>.
     /// </summary>
-    /// <param name="context"></param>
-    /// <param name="state"></param>
-    /// <param name="cancellationToken"></param>
-    /// <typeparam name="TState"></typeparam>
-    /// <returns></returns>
+    /// <param name="context">The current instance of <see cref="BotRequestContext"/>.</param>
+    /// <param name="state">The state to set.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+    /// <typeparam name="TState">The type of state to set.</typeparam>
+    /// <returns>The <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
     public static ValueTask SetState<TState>(this BotRequestContext context, TState state, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -43,7 +47,7 @@ public static class StateMachineExtensions
     }
 
     /// <summary>
-    ///     Deletes the state of the current user in the <see cref="BotRequestContext"/>.
+    ///     Deletes the state for the <see cref="StateEntryContext"/> of the current <see cref="BotRequestContext"/>.
     /// </summary>
     /// <param name="context">The current instance of <see cref="BotRequestContext"/>.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>

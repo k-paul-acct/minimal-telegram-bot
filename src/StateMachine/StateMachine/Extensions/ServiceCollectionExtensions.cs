@@ -6,9 +6,17 @@ using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine.Extensions;
 
-// TODO: Docs.
+/// <summary>
+///     ServiceCollectionExtensions.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    ///     Adds state machine services to the <see cref="IServiceCollection"/>.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+    /// <param name="configureOptions">An optional action to configure the <see cref="StateManagementOptions"/>.</param>
+    /// <returns>The current instance of <see cref="IServiceCollection"/>.</returns>
     public static IStateMachineBuilder AddStateMachine(this IServiceCollection services, Action<StateManagementOptions>? configureOptions = null)
     {
         ArgumentNullException.ThrowIfNull(services);

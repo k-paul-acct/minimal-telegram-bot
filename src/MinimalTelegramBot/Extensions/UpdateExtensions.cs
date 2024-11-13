@@ -3,17 +3,20 @@ using Telegram.Bot.Types.Enums;
 
 namespace MinimalTelegramBot.Extensions;
 
-// TODO: Docs.
 /// <summary>
+///     UpdateExtensions.
 /// </summary>
 public static class UpdateExtensions
 {
     /// <summary>
+    ///     Gets the ID of the <see cref="User"/> from the <see cref="Update"/>.
     /// </summary>
-    /// <param name="update"></param>
-    /// <returns></returns>
+    /// <param name="update">The <see cref="Update"/>.</param>
+    /// <returns>The ID of the <see cref="User"/> or 0 if ID cannot be retrieved.</returns>
     public static long GetUserId(this Update update)
     {
+        ArgumentNullException.ThrowIfNull(update);
+
         return update.Message?.From?.Id ??
                update.CallbackQuery?.From.Id ??
                update.EditedMessage?.From?.Id ??
@@ -27,11 +30,14 @@ public static class UpdateExtensions
     }
 
     /// <summary>
+    ///     Gets the <see cref="Chat"/> from the <see cref="Update"/>.
     /// </summary>
-    /// <param name="update"></param>
-    /// <returns></returns>
+    /// <param name="update">The <see cref="Update"/>.</param>
+    /// <returns>The <see cref="Chat"/> or null if <see cref="Chat"/> cannot be retrieved.</returns>
     public static Chat? GetChat(this Update update)
     {
+        ArgumentNullException.ThrowIfNull(update);
+
         return update.Message?.Chat ??
                update.CallbackQuery?.Message?.Chat ??
                update.EditedMessage?.Chat ??
@@ -48,11 +54,14 @@ public static class UpdateExtensions
     }
 
     /// <summary>
+    ///     Gets the ID of the <see cref="Chat"/> from the <see cref="Update"/>.
     /// </summary>
-    /// <param name="update"></param>
-    /// <returns></returns>
+    /// <param name="update">The <see cref="Update"/>.</param>
+    /// <returns>The ID of the <see cref="Chat"/> or 0 if ID cannot be retrieved.</returns>
     public static long GetChatId(this Update update)
     {
+        ArgumentNullException.ThrowIfNull(update);
+
         return update.Message?.Chat.Id ??
                update.CallbackQuery?.Message?.Chat.Id ??
                update.EditedMessage?.Chat.Id ??
@@ -69,11 +78,14 @@ public static class UpdateExtensions
     }
 
     /// <summary>
+    ///     Gets the type of the <see cref="Chat"/> from the <see cref="Update"/>.
     /// </summary>
-    /// <param name="update"></param>
-    /// <returns></returns>
+    /// <param name="update">The <see cref="Update"/>.</param>
+    /// <returns>The type of the <see cref="Chat"/> or <see cref="ChatType.Private"/> by default if type cannot be retrieved.</returns>
     public static ChatType GetChatType(this Update update)
     {
+        ArgumentNullException.ThrowIfNull(update);
+
         return update.Message?.Chat.Type ??
                update.CallbackQuery?.Message?.Chat.Type ??
                update.EditedMessage?.Chat.Type ??
@@ -90,11 +102,14 @@ public static class UpdateExtensions
     }
 
     /// <summary>
+    ///     Determines if the <see cref="Chat"/> is a forum from the <see cref="Update"/>.
     /// </summary>
-    /// <param name="update"></param>
-    /// <returns></returns>
+    /// <param name="update">The <see cref="Update"/>.</param>
+    /// <returns>True if the <see cref="Chat"/> is a forum, otherwise false.</returns>
     public static bool IsChatForum(this Update update)
     {
+        ArgumentNullException.ThrowIfNull(update);
+
         return update.Message?.Chat.IsForum ??
                update.CallbackQuery?.Message?.Chat.IsForum ??
                update.EditedMessage?.Chat.IsForum ??
@@ -111,11 +126,14 @@ public static class UpdateExtensions
     }
 
     /// <summary>
+    ///     Gets the message thread ID from the <see cref="Update"/>.
     /// </summary>
-    /// <param name="update"></param>
-    /// <returns></returns>
+    /// <param name="update">The <see cref="Update"/>.</param>
+    /// <returns>The message thread ID or 0 if ID cannot be retrieved.</returns>
     public static long GetMessageThreadId(this Update update)
     {
+        ArgumentNullException.ThrowIfNull(update);
+
         return update.Message?.MessageThreadId ??
                update.CallbackQuery?.Message?.MessageThreadId ??
                update.EditedMessage?.MessageThreadId ??
