@@ -83,6 +83,6 @@ public sealed class BotApplicationBuilder : IHostApplicationBuilder
 
     private void TrySetBotToken()
     {
-        _options.Token = Configuration["TelegramBotToken"] ?? Configuration["BotToken"] ?? Configuration["Token"];
+        _options.Token ??= Configuration["TelegramBotToken"] ?? Configuration["BotToken"] ?? Configuration["Token"];
     }
 }
