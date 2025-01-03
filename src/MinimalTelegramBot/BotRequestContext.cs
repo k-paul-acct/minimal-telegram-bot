@@ -11,14 +11,12 @@ namespace MinimalTelegramBot;
 public sealed class BotRequestContext
 {
     private readonly List<IDisposable> _disposables;
-    internal readonly IDictionary<string, object?> _properties;
 
-    internal BotRequestContext(IServiceProvider services, Update update, ITelegramBotClient client, IDictionary<string, object?> properties)
+    internal BotRequestContext(IServiceProvider services, Update update, ITelegramBotClient client)
     {
         Services = services;
         Update = update;
         Client = client;
-        _properties = properties;
         _disposables = [];
         UserLocale = Locale.Default;
         Data = new Dictionary<string, object?>();

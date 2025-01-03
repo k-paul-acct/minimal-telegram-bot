@@ -49,7 +49,7 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
             _handlerBuilder = handlerBuilder;
         }
 
-        public IReadOnlyList<Handler> GetHandlers(IReadOnlyList<Action<HandlerBuilder>> conventions)
+        public IReadOnlyCollection<Handler> GetHandlers(IReadOnlyCollection<Action<HandlerBuilder>> conventions)
         {
             IEnumerable<Action<HandlerBuilder>> fullConventions = [..conventions, .._handlerBuilder._conventions,];
 

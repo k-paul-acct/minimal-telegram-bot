@@ -8,7 +8,7 @@ internal sealed partial class InfrastructureLogger : ILogger
 
     public InfrastructureLogger(ILoggerFactory loggerFactory)
     {
-        _generalLogger = loggerFactory.CreateLogger("MinimalTelegramBot.Infrastructure.Runner");
+        _generalLogger = loggerFactory.CreateLogger("MinimalTelegramBot.Runner");
     }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)

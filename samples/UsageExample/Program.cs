@@ -90,7 +90,7 @@ app.Handle(() =>
     return Results.MessageEdit("Button pressed", keyboard);
 }).FilterCallbackData(x => x == "Hello");
 
-app.Handle(() => Results.Photo(new Uri("cat.jpeg", UriKind.Relative), "Little cat")).FilterCallbackData(x => x == "Photo");
+app.Handle(() => Results.Photo("wwwroot/cat.jpeg", "Little cat")).FilterCallbackData(x => x == "Photo");
 
 app.Handle(() => Results.MessageReply("I'm replied!")).FilterMessageText(x => x.Equals("reply", StringComparison.OrdinalIgnoreCase));
 

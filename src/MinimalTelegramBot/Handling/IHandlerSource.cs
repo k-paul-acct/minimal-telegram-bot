@@ -10,5 +10,5 @@ public interface IHandlerSource
     /// </summary>
     /// <param name="conventions">A list of conventions to apply to the handlers from this source.</param>
     /// <returns>Handlers with the given conventions applied.</returns>
-    IReadOnlyList<Handler> GetHandlers(IReadOnlyList<Action<HandlerBuilder>> conventions);
+    IReadOnlyCollection<Handler> GetHandlers(IReadOnlyCollection<Action<HandlerBuilder>> conventions);
 }

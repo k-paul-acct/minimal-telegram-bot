@@ -1,37 +1,40 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
+using Telegram.Bot.Polling;
 
 namespace MinimalTelegramBot.Runner;
 
 internal static class FeatureHandler
 {
-    public static async Task HandleStartupFeatures(this BotApplication app)
+    public static Task HandleStartupFeatures(this IBotApplicationBuilder app, CancellationToken cancellationToken = default)
     {
-        IBotApplicationBuilder builder = app;
-        await HandleDeleteWebhookOnStartupFeature(app, builder);
+        return HandleDeleteWebhookOnStartupFeature(app, cancellationToken);
     }
 
-    public static async Task HandleShutdownFeatures(this BotApplication app)
+    public static Task HandleShutdownFeatures(this IBotApplicationBuilder app, CancellationToken cancellationToken = default)
     {
-        IBotApplicationBuilder builder = app;
-        await HandleDeleteWebhookOnShutdownFeature(app, builder);
+        return HandleDeleteWebhookOnShutdownFeature(app, cancellationToken);
     }
 
-    private static Task HandleDeleteWebhookOnStartupFeature(BotApplication app, IBotApplicationBuilder builder)
+    private static Task HandleDeleteWebhookOnStartupFeature(IBotApplicationBuilder app, CancellationToken cancellationToken = default)
     {
-        return builder.Properties.ContainsKey("__DeleteWebhookOnStartup")
-            ? DeleteWebhook(app._client, app._options.ReceiverOptions.DropPendingUpdates)
+        return app.Properties.ContainsKey("__DeleteWebhookOnStartup")
+            ? DeleteWebhook(app, cancellationToken)
             : Task.CompletedTask;
     }
 
-    private static Task HandleDeleteWebhookOnShutdownFeature(BotApplication app, IBotApplicationBuilder builder)
+    private static Task HandleDeleteWebhookOnShutdownFeature(IBotApplicationBuilder app, CancellationToken cancellationToken = default)
     {
-        return builder.Properties.ContainsKey("__DeleteWebhookOnShutdown")
-            ? DeleteWebhook(app._client, app._options.ReceiverOptions.DropPendingUpdates)
+        return app.Properties.ContainsKey("__DeleteWebhookOnShutdown")
+            ? DeleteWebhook(app, cancellationToken)
             : Task.CompletedTask;
     }
 
-    private static Task DeleteWebhook(ITelegramBotClient client, bool dropPendingUpdates)
+    private static Task DeleteWebhook(IBotApplicationBuilder app, CancellationToken cancellationToken = default)
     {
-        return client.DeleteWebhook(dropPendingUpdates);
+        var client = app.Services.GetRequiredService<ITelegramBotClient>();
+        var receiverOptions = app.Services.GetRequiredService<IOptions<ReceiverOptions>>().Value;
+        return client.DeleteWebhook(receiverOptions.DropPendingUpdates, cancellationToken);
     }
 }
