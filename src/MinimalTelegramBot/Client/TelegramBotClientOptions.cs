@@ -1,27 +1,20 @@
 namespace MinimalTelegramBot.Client;
 
-// TODO: Docs.
-/// <summary>
-/// </summary>
+/// <inheritdoc cref="Telegram.Bot.TelegramBotClientOptions"/>
 public sealed class TelegramBotClientOptions
 {
-    /// <summary>
-    /// </summary>
+    /// <inheritdoc cref="Telegram.Bot.TelegramBotClientOptions.Token"/>
     public string? Token { get; set; }
 
-    /// <summary>
-    /// </summary>
+    /// <inheritdoc cref="Telegram.Bot.TelegramBotClientOptions.BaseUrl"/>
     public string? BaseUrl { get; set; }
 
-    /// <summary>
-    /// </summary>
+    /// <inheritdoc cref="Telegram.Bot.TelegramBotClientOptions.UseTestEnvironment"/>
     public bool UseTestEnvironment { get; set; }
 
-    /// <summary>
-    /// </summary>
+    /// <inheritdoc cref="Telegram.Bot.TelegramBotClientOptions.RetryThreshold"/>
     public int RetryThreshold { get; set; } = 60;
 
-    /// <summary>
-    /// </summary>
+    /// <inheritdoc cref="Telegram.Bot.TelegramBotClientOptions.RetryCount"/>
     public int RetryCount { get; set; } = 3;
 }

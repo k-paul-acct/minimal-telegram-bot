@@ -1,15 +1,14 @@
 namespace MinimalTelegramBot.StateMachine.Abstractions;
 
-// TODO: Docs.
 /// <summary>
-///     Interface for managing user states in the state machine.
+///     Interface for managing user states and its persistence in the state machine.
 /// </summary>
 public interface IStateRepository
 {
     /// <summary>
-    ///     Gets the state of the user with the specified ID.
+    ///     Retrieves the state of the user with the specified <see cref="StateEntryContext"/>.
     /// </summary>
-    /// <param name="entryContext"></param>
+    /// <param name="entryContext">The <see cref="StateEntryContext"/> to retrieve state for.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
     /// <returns>
     ///     The <see cref="ValueTask"/> that represents the asynchronous operation,
@@ -18,17 +17,18 @@ public interface IStateRepository
     ValueTask<StateEntry?> GetState(StateEntryContext entryContext, CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Sets the state of the user with the specified <see cref="StateEntryContext"/>.
     /// </summary>
-    /// <param name="entryContext"></param>
-    /// <param name="entry"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="entryContext">The <see cref="StateEntryContext"/> to set state for.</param>
+    /// <param name="entry">The <see cref="StateEntry"/> to set.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
     ValueTask SetState(StateEntryContext entryContext, StateEntry entry, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Deletes the state of the user with the specified ID.
+    ///     Deletes the state of the user with the specified <see cref="StateEntryContext"/>.
     /// </summary>
-    /// <param name="entryContext"></param>
+    /// <param name="entryContext">The <see cref="StateEntryContext"/> to delete state for.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
     /// <returns>The <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
     ValueTask DeleteState(StateEntryContext entryContext, CancellationToken cancellationToken = default);

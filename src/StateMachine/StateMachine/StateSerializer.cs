@@ -1,6 +1,5 @@
 using System.Text.Json;
 using MinimalTelegramBot.StateMachine.Abstractions;
-using MinimalTelegramBot.StateMachine.Abstractions.Exceptions;
 
 namespace MinimalTelegramBot.StateMachine;
 
@@ -19,9 +18,11 @@ internal sealed class StateSerializer : IStateSerializer
     {
         ArgumentNullException.ThrowIfNull(state);
 
-        if (!_typeInfoResolver.GetInfo(typeof(TState), out var typeInfo))
+        var type = typeof(TState);
+
+        if (!_typeInfoResolver.GetInfo(type, out var typeInfo))
         {
-            throw new StateSerializationException(typeof(TState));
+            throw new InvalidOperationException($"Cannot find state type info for type {type.FullName ?? type.Name}.");
         }
 
         var json = JsonSerializer.Serialize(state, _serializerOptions.JsonSerializerOptions);
@@ -33,7 +34,7 @@ internal sealed class StateSerializer : IStateSerializer
     {
         if (!_typeInfoResolver.GetInfo(entry.TypeInfo, out var stateType))
         {
-            throw new StateSerializationException(entry);
+            throw new InvalidOperationException($"Cannot find type for state type info {entry.TypeInfo}.");
         }
 
         return (TState?)JsonSerializer.Deserialize(entry.StateData, stateType, _serializerOptions.JsonSerializerOptions);

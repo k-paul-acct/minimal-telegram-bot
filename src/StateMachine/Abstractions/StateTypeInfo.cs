@@ -1,8 +1,8 @@
 namespace MinimalTelegramBot.StateMachine.Abstractions;
 
-// TODO: Docs.
 /// <summary>
+///     Represents the state type information.
 /// </summary>
-/// <param name="StateGroupName"></param>
-/// <param name="StateId"></param>
+/// <param name="StateGroupName">The name of the state group.</param>
+/// <param name="StateId">The identifier of the state in the group.</param>
 public readonly record struct StateTypeInfo(string StateGroupName, int StateId);

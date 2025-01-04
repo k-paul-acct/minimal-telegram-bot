@@ -3,12 +3,13 @@ using System.Text.Json;
 
 namespace MinimalTelegramBot.StateMachine.Abstractions;
 
-// TODO: Docs.
 /// <summary>
+///     Provides options for state serialization.
 /// </summary>
 public sealed class StateSerializerOptions
 {
     /// <summary>
+    ///     Initializes a new instance of the <see cref="StateSerializerOptions"/>.
     /// </summary>
     public StateSerializerOptions()
     {
@@ -19,6 +20,7 @@ public sealed class StateSerializerOptions
     }
 
     /// <summary>
+    ///     Gets or sets the JSON serializer options for state properties.
     /// </summary>
     public JsonSerializerOptions JsonSerializerOptions { get; set; }
 }

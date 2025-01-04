@@ -9,13 +9,12 @@ namespace MinimalTelegramBot.Builder;
 /// </summary>
 public static class ConfigurationExtensions
 {
-    // TODO: Docs.
     /// <summary>
-    ///     Sets the bot token for the application.
+    ///     Configures the bot token for the <see cref="Telegram.Bot.ITelegramBotClient"/>.
     /// </summary>
-    /// <param name="services"></param>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the configuration to.</param>
     /// <param name="token">The bot token.</param>
-    /// <returns></returns>
+    /// <returns>The current instance of <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection ConfigureBotToken(this IServiceCollection services, string token)
     {
         ArgumentNullException.ThrowIfNull(services);
@@ -27,11 +26,11 @@ public static class ConfigurationExtensions
     }
 
     /// <summary>
-    ///     Configures the receiver options for the bot.
+    ///     Configures the <see cref="ReceiverOptions"/> for the <see cref="Telegram.Bot.ITelegramBotClient"/>.
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="configure">The action to configure the receiver options.</param>
-    /// <returns></returns>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the configuration to.</param>
+    /// <param name="configure">The action to configure the <see cref="ReceiverOptions"/>.</param>
+    /// <returns>The current instance of <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection ConfigureReceiverOptions(this IServiceCollection services, Action<ReceiverOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(services);
@@ -43,11 +42,11 @@ public static class ConfigurationExtensions
     }
 
     /// <summary>
-    ///     Configures the Telegram bot client options.
+    ///     Configures the <see cref="TelegramBotClientOptions"/> for the <see cref="Telegram.Bot.ITelegramBotClient"/>.
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="configure">The action to configure the Telegram bot client options.</param>
-    /// <returns></returns>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the configuration to.</param>
+    /// <param name="configure">The action to configure the <see cref="TelegramBotClientOptions"/>.</param>
+    /// <returns>The current instance of <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection ConfigureTelegramBotClientOptions(this IServiceCollection services, Action<TelegramBotClientOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(services);
