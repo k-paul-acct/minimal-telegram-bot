@@ -15,6 +15,32 @@ public static class FilterExtensions
     ///     Adds a filter of type <typeparamref name="TFilter"/> to the handler or handler group.
     /// </summary>
     /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <typeparam name="TFilter">The type of the <see cref="IHandlerFilter"/> to add.</typeparam>
+    /// <returns>A <see cref="HandlerGroupBuilder"/> that can be used to further customize the handler or handler group.</returns>
+    public static HandlerGroupBuilder Filter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(this HandlerGroupBuilder builder)
+        where TFilter : IHandlerFilter
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        return builder.Filter<HandlerGroupBuilder, TFilter>();
+    }
+
+    /// <summary>
+    ///     Adds a filter of type <typeparamref name="TFilter"/> to the handler or handler group.
+    /// </summary>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <typeparam name="TFilter">The type of the <see cref="IHandlerFilter"/> to add.</typeparam>
+    /// <returns>A <see cref="HandlerBuilder"/> that can be used to further customize the handler or handler group.</returns>
+    public static HandlerBuilder Filter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(this HandlerBuilder builder)
+        where TFilter : IHandlerFilter
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        return builder.Filter<HandlerBuilder, TFilter>();
+    }
+
+    /// <summary>
+    ///     Adds a filter of type <typeparamref name="TFilter"/> to the handler or handler group.
+    /// </summary>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
     /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
     /// <typeparam name="TFilter">The type of the <see cref="IHandlerFilter"/> to add.</typeparam>
     /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
@@ -22,8 +48,6 @@ public static class FilterExtensions
         where TFilter : IHandlerFilter
         where TBuilder : IHandlerConventionBuilder
     {
-        ArgumentNullException.ThrowIfNull(builder);
-
         ObjectFactory filterFactory;
 
         try
@@ -52,6 +76,36 @@ public static class FilterExtensions
     /// </summary>
     /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
     /// <param name="configure">The action to configure the <see cref="BotRequestFilterContext"/> before filter invocation.</param>
+    /// <typeparam name="TFilter">The type of the <see cref="IHandlerFilter"/> to add.</typeparam>
+    /// <returns>A <see cref="HandlerGroupBuilder"/> that can be used to further customize the handler or handler group.</returns>
+    public static HandlerGroupBuilder Filter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(this HandlerGroupBuilder builder, Action<BotRequestFilterContext> configure)
+        where TFilter : IHandlerFilter
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(configure);
+        return builder.Filter<HandlerGroupBuilder, TFilter>(configure);
+    }
+
+    /// <summary>
+    ///     Adds a filter of type <typeparamref name="TFilter"/> to the handler or handler group.
+    /// </summary>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="configure">The action to configure the <see cref="BotRequestFilterContext"/> before filter invocation.</param>
+    /// <typeparam name="TFilter">The type of the <see cref="IHandlerFilter"/> to add.</typeparam>
+    /// <returns>A <see cref="HandlerBuilder"/> that can be used to further customize the handler or handler group.</returns>
+    public static HandlerBuilder Filter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilter>(this HandlerBuilder builder, Action<BotRequestFilterContext> configure)
+        where TFilter : IHandlerFilter
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(configure);
+        return builder.Filter<HandlerBuilder, TFilter>(configure);
+    }
+
+    /// <summary>
+    ///     Adds a filter of type <typeparamref name="TFilter"/> to the handler or handler group.
+    /// </summary>
+    /// <param name="builder">The handler or handler group that implements <see cref="IHandlerConventionBuilder"/>.</param>
+    /// <param name="configure">The action to configure the <see cref="BotRequestFilterContext"/> before filter invocation.</param>
     /// <typeparam name="TBuilder">The type of <see cref="IHandlerConventionBuilder"/> to configure.</typeparam>
     /// <typeparam name="TFilter">The type of the <see cref="IHandlerFilter"/> to add.</typeparam>
     /// <returns>A <typeparamref name="TBuilder"/> that can be used to further customize the handler or handler group.</returns>
@@ -59,9 +113,6 @@ public static class FilterExtensions
         where TFilter : IHandlerFilter
         where TBuilder : IHandlerConventionBuilder
     {
-        ArgumentNullException.ThrowIfNull(builder);
-        ArgumentNullException.ThrowIfNull(configure);
-
         ObjectFactory filterFactory;
 
         try
