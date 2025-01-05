@@ -1,11 +1,18 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.Metrics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MinimalTelegramBot.Runner;
 using MinimalTelegramBot.Settings;
 using Telegram.Bot;
+using Telegram.Bot.Polling;
+using Telegram.Bot.Types.Enums;
+using TelegramBotClientOptions = MinimalTelegramBot.Client.TelegramBotClientOptions;
 
 namespace MinimalTelegramBot.Builder;
 
@@ -14,39 +21,49 @@ namespace MinimalTelegramBot.Builder;
 /// </summary>
 public sealed class BotApplicationBuilder : IHostApplicationBuilder
 {
-    private readonly HostApplicationBuilder _hostBuilder;
+    private readonly WebApplicationBuilder _hostBuilder;
 
-    internal readonly BotApplicationBuilderOptions _options;
-
-    internal BotApplicationBuilder(BotApplicationBuilderOptions options)
+    internal BotApplicationBuilder(BotApplicationOptions options)
     {
-        _hostBuilder = Host.CreateApplicationBuilder(options.HostApplicationBuilderSettings);
-        _options = options;
-        TrySetBotToken();
+        _hostBuilder = WebApplication.CreateSlimBuilder(options.WebApplicationOptions ?? new WebApplicationOptions());
+
+        ApplyDefaultConfiguration(_hostBuilder.Configuration, _hostBuilder.Services, options);
+        AddDefaultServices(_hostBuilder.Services);
     }
 
-    /// <inheritdoc cref="Microsoft.Extensions.Hosting.HostApplicationBuilder.Configuration"/>
-    public IConfigurationManager Configuration => _hostBuilder.Configuration;
+    /// <inheritdoc cref="Microsoft.AspNetCore.Builder.WebApplicationBuilder.Configuration"/>
+    public ConfigurationManager Configuration => _hostBuilder.Configuration;
 
-    /// <inheritdoc cref="Microsoft.Extensions.Hosting.HostApplicationBuilder.Services"/>
+    /// <inheritdoc cref="Microsoft.AspNetCore.Builder.WebApplicationBuilder.Services"/>
     public IServiceCollection Services => _hostBuilder.Services;
 
-    /// <inheritdoc cref="Microsoft.Extensions.Hosting.HostApplicationBuilder.Logging"/>
+    /// <inheritdoc cref="Microsoft.AspNetCore.Builder.WebApplicationBuilder.Logging"/>
     public ILoggingBuilder Logging => _hostBuilder.Logging;
 
-    /// <inheritdoc cref="Microsoft.Extensions.Hosting.HostApplicationBuilder.Environment"/>
-    public IHostEnvironment Environment => _hostBuilder.Environment;
+    /// <inheritdoc cref="Microsoft.AspNetCore.Builder.WebApplicationBuilder.Environment"/>
+    public IWebHostEnvironment Environment => _hostBuilder.Environment;
 
-    /// <inheritdoc cref="Microsoft.Extensions.Hosting.HostApplicationBuilder.Metrics"/>
+    /// <inheritdoc cref="Microsoft.AspNetCore.Builder.WebApplicationBuilder.Metrics"/>
     public IMetricsBuilder Metrics => _hostBuilder.Metrics;
 
-    IDictionary<object, object> IHostApplicationBuilder.Properties => ((IHostApplicationBuilder)_hostBuilder).Properties;
+    /// <inheritdoc cref="Microsoft.AspNetCore.Builder.WebApplicationBuilder.Host"/>
+    public ConfigureHostBuilder Host => _hostBuilder.Host;
 
-    /// <inheritdoc cref="Microsoft.Extensions.Hosting.HostApplicationBuilder.ConfigureContainer{TContainerBuilder}"/>
-    public void ConfigureContainer<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory, Action<TContainerBuilder>? configure = null)
-        where TContainerBuilder : notnull
+    /// <inheritdoc cref="Microsoft.AspNetCore.Builder.WebApplicationBuilder.WebHost"/>
+    public ConfigureWebHostBuilder WebHost => _hostBuilder.WebHost;
+
+    /// <summary>
+    ///     Provides access to the <see cref="WebApplicationBuilder"/> under the <see cref="BotApplicationBuilder"/>.
+    /// </summary>
+    public WebApplicationBuilder WebApplicationBuilderAccessor => _hostBuilder;
+
+    IDictionary<object, object> IHostApplicationBuilder.Properties => ((IHostApplicationBuilder)_hostBuilder).Properties;
+    IConfigurationManager IHostApplicationBuilder.Configuration => _hostBuilder.Configuration;
+    IHostEnvironment IHostApplicationBuilder.Environment => _hostBuilder.Environment;
+
+    void IHostApplicationBuilder.ConfigureContainer<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory, Action<TContainerBuilder>? configure)
     {
-        _hostBuilder.ConfigureContainer(factory, configure);
+        ((IHostApplicationBuilder)_hostBuilder).ConfigureContainer(factory, configure);
     }
 
     /// <summary>
@@ -56,33 +73,52 @@ public sealed class BotApplicationBuilder : IHostApplicationBuilder
     /// <exception cref="InvalidOperationException">Thrown if the bot token is not configured.</exception>
     public BotApplication Build()
     {
-        TrySetBotToken();
-
-        if (_options.Token is null)
-        {
-            throw new InvalidOperationException($"Cannot build a {nameof(BotApplication)} without a bot token configured");
-        }
-
-        var telegramBotClientOptions = new TelegramBotClientOptions(_options.Token);
-        _options.TelegramBotClientOptionsConfigure?.Invoke(telegramBotClientOptions);
-
-        var client = new TelegramBotClient(telegramBotClientOptions);
-
-        AddDefaultServices(client);
-
+        _hostBuilder.Services.AddHostedService<BotHostedService>();
         var host = _hostBuilder.Build();
-
-        return new BotApplication(host, client, new BotApplicationOptions(_options, _options.Token));
+        return new BotApplication(host);
     }
 
-    private void AddDefaultServices(ITelegramBotClient client)
+    private static void ApplyDefaultConfiguration(ConfigurationManager configuration, IServiceCollection services, BotApplicationOptions options)
     {
-        Services.TryAddSingleton(client);
-        Services.TryAddSingleton<IBotRequestContextAccessor, BotRequestContextAccessor>();
+        services.Configure<JsonOptions>(o => JsonBotAPI.Configure(o.SerializerOptions));
+
+        services.Configure<ReceiverOptions>(o =>
+        {
+            o.DropPendingUpdates = true;
+            o.AllowedUpdates = [UpdateType.Message, UpdateType.CallbackQuery];
+        });
+
+        services.PostConfigure((TelegramBotClientOptions o) =>
+        {
+            o.Token ??= options.Token ??
+                        configuration["TelegramBotToken"] ??
+                        configuration["BotToken"] ??
+                        configuration["Token"];
+        });
     }
 
-    private void TrySetBotToken()
+    private static void AddDefaultServices(IServiceCollection services)
     {
-        _options.Token = Configuration["TelegramBotToken"] ?? Configuration["BotToken"] ?? Configuration["Token"];
+        services.AddSingleton<ITelegramBotClient>(s =>
+        {
+            var options = s.GetRequiredService<IOptions<TelegramBotClientOptions>>().Value;
+
+            if (options.Token is null)
+            {
+                throw new InvalidOperationException("Cannot instantiate a bot client without a configured bot token.");
+            }
+
+            var ctorOptions = new Telegram.Bot.TelegramBotClientOptions(options.Token, options.BaseUrl, options.UseTestEnvironment)
+            {
+                RetryCount = options.RetryCount,
+                RetryThreshold = options.RetryThreshold
+            };
+
+            return new TelegramBotClient(ctorOptions);
+        });
+
+        services.AddSingleton<IBotRequestContextAccessor, BotRequestContextAccessor>();
+        services.AddSingleton(new BotApplicationContainer());
+        services.AddSingleton(new WebApplicationConfiguration());
     }
 }

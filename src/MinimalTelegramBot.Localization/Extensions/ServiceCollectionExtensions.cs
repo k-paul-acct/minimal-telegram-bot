@@ -51,8 +51,7 @@ public static class ServiceCollectionExtensions
         var builder = new LocaleStringSetBuilder(locale);
         build(builder);
         var set = builder.Build();
-        var repository = new InMemoryLocaleStringSetRepository();
-        repository.AddLocaleStringSet(set);
+        var repository = new InMemoryLocaleStringSetRepository([set,]);
 
         services.TryAddSingleton<ILocalizer, Localizer>();
         services.TryAddSingleton<ILocaleStringSetRepository>(repository);

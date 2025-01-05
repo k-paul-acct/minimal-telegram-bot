@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore</PackageId>
+    <Version>0.0.40</Version>
+    <Authors>Pavel Kulakov</Authors>
+    <RepositoryUrl>https://github.com/k-paul-acct/minimal-telegram-bot</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>bot framework telegram tg telegram-bot TelegramBot telegram-bot-framework TelegramBotFramework</PackageTags>
+    <Description>
+      Provides states persistence based on Entity Framework Core for the Minimal Telegram Bot Framework State Machine.
+    </Description>
+    <PackageIcon>package-icon.png</PackageIcon>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\StateMachine\MinimalTelegramBot.StateMachine.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\logo\package-icon.png">
+      <Pack>true</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

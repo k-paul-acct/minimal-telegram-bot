@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using MinimalTelegramBot.Settings;
 using Telegram.Bot.Types;
 using File = System.IO.File;
 
@@ -47,8 +49,9 @@ internal abstract class FileResult : IResult
 
     private Task<Message> SendFromUri(BotRequestContext context)
     {
-        var baseUri = (Uri)context._properties["__WebServerUrl"]!;
-        var fullUri = new Uri(baseUri, _uri!);
+        var baseUrl = context.Services.GetRequiredService<WebApplicationConfiguration>().BaseUrl ??
+                      throw new InvalidOperationException("Base URL was not configured.");
+        var fullUri = new Uri(baseUrl, _uri!);
         var file = new InputFileUrl(fullUri);
         return Send(context, file);
     }

@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Builder;
 using MinimalTelegramBot.Settings;
 
 namespace MinimalTelegramBot.Builder;
@@ -7,8 +6,8 @@ internal sealed class WebhookBuilder : IWebhookBuilder
 {
     private readonly WebhookOptions _options;
     private string _listenPath;
-    private WebApplication? _webApplication;
     private bool _webhookResponseEnabled;
+    private bool _skipWebhookSettingOnStartup;
     private bool _deleteWebhookOnShutdown;
 
     public WebhookBuilder(WebhookOptions options)
@@ -30,16 +29,15 @@ internal sealed class WebhookBuilder : IWebhookBuilder
         return this;
     }
 
-    public IWebhookBuilder DeleteWebhookOnShutdown()
+    public IWebhookBuilder SkipWebhookSettingOnStartup()
     {
-        _deleteWebhookOnShutdown = true;
+        _skipWebhookSettingOnStartup = true;
         return this;
     }
 
-    public IWebhookBuilder UseWebApplication(WebApplication app)
+    public IWebhookBuilder DeleteWebhookOnShutdown()
     {
-        ArgumentNullException.ThrowIfNull(app);
-        _webApplication = app;
+        _deleteWebhookOnShutdown = true;
         return this;
     }
 
@@ -49,8 +47,8 @@ internal sealed class WebhookBuilder : IWebhookBuilder
         {
             Options = _options,
             ListenPath = _listenPath,
-            WebApplication = _webApplication,
             WebhookResponseEnabled = _webhookResponseEnabled,
+            SkipWebhookSettingOnStartup = _skipWebhookSettingOnStartup,
             DeleteWebhookOnShutdown = _deleteWebhookOnShutdown,
         };
     }

@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <PackageId>MinimalTelegramBot</PackageId>
-    <Version>0.0.32</Version>
+    <Version>0.0.40</Version>
     <Authors>Pavel Kulakov</Authors>
     <RepositoryUrl>https://github.com/k-paul-acct/minimal-telegram-bot</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Telegram.Bot" Version="22.0.0"/>
+    <PackageReference Include="Telegram.Bot" Version="22.3.0"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -32,7 +32,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MinimalTelegramBot.Localization.Abstractions\MinimalTelegramBot.Localization.Abstractions.csproj"/>
-    <ProjectReference Include="..\MinimalTelegramBot.StateMachine.Abstractions\MinimalTelegramBot.StateMachine.Abstractions.csproj"/>
   </ItemGroup>
 
   <ItemGroup>

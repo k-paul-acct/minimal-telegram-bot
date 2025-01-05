@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-
 namespace MinimalTelegramBot.Builder;
 
 /// <summary>
@@ -21,15 +19,14 @@ public interface IWebhookBuilder
     IWebhookBuilder ListenOnPath(string path);
 
     /// <summary>
+    ///     Configures the webhook to skip setting via Telegram API when the application starts.
+    /// </summary>
+    /// <returns>The current instance of <see cref="IWebhookBuilder"/>.</returns>
+    IWebhookBuilder SkipWebhookSettingOnStartup();
+
+    /// <summary>
     ///     Configures the webhook to be deleted when the application shuts down.
     /// </summary>
     /// <returns>The current instance of <see cref="IWebhookBuilder"/>.</returns>
     IWebhookBuilder DeleteWebhookOnShutdown();
-
-    /// <summary>
-    ///     Configures the webhook to use the custom web application.
-    /// </summary>
-    /// <param name="app">The web application to use for the webhook.</param>
-    /// <returns>The current instance of <see cref="IWebhookBuilder"/>.</returns>
-    IWebhookBuilder UseWebApplication(WebApplication app);
 }

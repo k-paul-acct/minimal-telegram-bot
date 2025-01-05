@@ -1,3 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 namespace MinimalTelegramBot.Handling;
 
 /// <summary>
@@ -6,35 +9,32 @@ namespace MinimalTelegramBot.Handling;
 public sealed class HandlerBuilder : IHandlerConventionBuilder
 {
     private readonly List<Action<HandlerBuilder>> _conventions;
-    private readonly IHandlerDispatcher _handlerDispatcher;
     private readonly Delegate _handler;
+    private readonly IHandlerDispatcher _handlerDispatcher;
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="HandlerBuilder"/>.
     /// </summary>
-    /// <param name="handlerDispatcher"></param>
-    /// <param name="handler"></param>
-    /// <param name="botRequestDelegate"></param>
-    public HandlerBuilder(IHandlerDispatcher handlerDispatcher, Delegate handler, BotRequestDelegate? botRequestDelegate)
+    /// <param name="handlerDispatcher">The dispatcher responsible for handling the bot requests.</param>
+    /// <param name="handler">The delegate that represents the handler method.</param>
+    public HandlerBuilder(IHandlerDispatcher handlerDispatcher, Delegate handler)
     {
         _handlerDispatcher = handlerDispatcher;
         _handler = handler;
         _conventions = [];
         Metadata = [];
-        BotRequestDelegate = botRequestDelegate;
         FilterFactories = [];
 
         _handlerDispatcher.HandlerSources.Add(new SingleHandlerHandlerSource(this));
     }
 
     /// <summary>
+    ///    Gets the metadata associated with the handler.
     /// </summary>
     public List<object> Metadata { get; }
 
     /// <summary>
-    /// </summary>
-    public BotRequestDelegate? BotRequestDelegate { get; set; }
-
-    /// <summary>
+    ///     Gets the filter factories that will be used to create the filtering pipeline for the handler.
     /// </summary>
     public List<Func<BotRequestFilterFactoryContext, BotRequestFilterDelegate, BotRequestFilterDelegate>> FilterFactories { get; }
 
@@ -52,9 +52,9 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
             _handlerBuilder = handlerBuilder;
         }
 
-        public IReadOnlyList<Handler> GetHandlers(IReadOnlyList<Action<HandlerBuilder>> conventions)
+        public IReadOnlyCollection<Handler> GetHandlers(IReadOnlyCollection<Action<HandlerBuilder>> conventions)
         {
-            IEnumerable<Action<HandlerBuilder>> fullConventions = [..conventions, .._handlerBuilder._conventions];
+            IEnumerable<Action<HandlerBuilder>> fullConventions = [..conventions, .._handlerBuilder._conventions,];
 
             foreach (var convention in fullConventions)
             {
@@ -62,7 +62,8 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
             }
 
             var metadata = ConstructHandlerMetadata();
-            var handlerDelegate = HandlerDelegateBuilder.Build(_handlerBuilder._handler);
+            var builderOptions = _handlerBuilder._handlerDispatcher.Services.GetRequiredService<IOptions<HandlerDelegateBuilderOptions>>();
+            var handlerDelegate = HandlerDelegateBuilder.Build(_handlerBuilder._handler, builderOptions.Value.Interceptors);
             var options = new BotRequestDelegateFactoryOptions
             {
                 Services = _handlerBuilder._handlerDispatcher.Services,

@@ -33,7 +33,7 @@ public sealed class HandlerGroupBuilder : IHandlerDispatcher, IHandlerConvention
             _groupBuilder = groupBuilder;
         }
 
-        public IReadOnlyList<Handler> GetHandlers(IReadOnlyList<Action<HandlerBuilder>> conventions)
+        public IReadOnlyCollection<Handler> GetHandlers(IReadOnlyCollection<Action<HandlerBuilder>> conventions)
         {
             var handlers = new List<Handler>();
             IHandlerDispatcher handlerDispatcher = _groupBuilder;

@@ -1,5 +1,5 @@
+using MinimalTelegramBot.Extensions;
 using MinimalTelegramBot.Localization.Abstractions;
-using MinimalTelegramBot.StateMachine.Abstractions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -11,30 +11,19 @@ namespace MinimalTelegramBot;
 public sealed class BotRequestContext
 {
     private readonly List<IDisposable> _disposables;
-    internal readonly IDictionary<string, object?> _properties;
 
-    internal BotRequestContext(IServiceProvider services, Update update, ITelegramBotClient client, IDictionary<string, object?> properties)
+    internal BotRequestContext(IServiceProvider services, Update update, ITelegramBotClient client)
     {
         Services = services;
         Update = update;
         Client = client;
-        _properties = properties;
         _disposables = [];
         UserLocale = Locale.Default;
         Data = new Dictionary<string, object?>();
 
         var messageText = update.Message?.Text;
         var callbackData = update.CallbackQuery?.Data;
-        var chatId = update.Message?.Chat.Id ??
-                     update.CallbackQuery?.Message?.Chat.Id ??
-                     update.EditedMessage?.Chat.Id ??
-                     update.ChannelPost?.Chat.Id ??
-                     update.EditedChannelPost?.Chat.Id ??
-                     update.MessageReaction?.Chat.Id ??
-                     update.MessageReactionCount?.Chat.Id ??
-                     update.ChatBoost?.Chat.Id ??
-                     update.RemovedChatBoost?.Chat.Id ??
-                     0;
+        var chatId = update.GetChatId();
 
         MessageText = messageText;
         CallbackData = callbackData;
@@ -83,11 +72,6 @@ public sealed class BotRequestContext
     ///     Gets the locale of the user associated with current bot request. Defaults to <see cref="Locale.Default"/> locale.
     /// </summary>
     public Locale UserLocale { get; set; }
-
-    /// <summary>
-    ///     Gets the state of the user associated with current bot request. Defaults to null.
-    /// </summary>
-    public State? UserState { get; set; }
 
     /// <summary>
     ///     Registers a disposable object to be disposed of after the current bot request is processed.
