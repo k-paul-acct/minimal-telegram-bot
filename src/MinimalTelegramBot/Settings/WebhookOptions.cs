@@ -2,6 +2,7 @@ using Telegram.Bot.Types;
 
 namespace MinimalTelegramBot.Settings;
 
+// TODO: Docs.
 /// <summary>
 /// </summary>
 public sealed class WebhookOptions

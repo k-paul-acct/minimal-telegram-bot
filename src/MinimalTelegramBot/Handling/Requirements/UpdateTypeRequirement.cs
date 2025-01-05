@@ -2,6 +2,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace MinimalTelegramBot.Handling.Requirements;
 
+// TODO: Docs.
 /// <summary>
 /// </summary>
 public sealed class UpdateTypeRequirement

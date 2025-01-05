@@ -52,6 +52,11 @@ public sealed class BotApplicationBuilder : IHostApplicationBuilder
     /// <inheritdoc cref="Microsoft.AspNetCore.Builder.WebApplicationBuilder.WebHost"/>
     public ConfigureWebHostBuilder WebHost => _hostBuilder.WebHost;
 
+    /// <summary>
+    ///     Provides access to the <see cref="WebApplicationBuilder"/> under the <see cref="BotApplicationBuilder"/>.
+    /// </summary>
+    public WebApplicationBuilder WebApplicationBuilderAccessor => _hostBuilder;
+
     IDictionary<object, object> IHostApplicationBuilder.Properties => ((IHostApplicationBuilder)_hostBuilder).Properties;
     IConfigurationManager IHostApplicationBuilder.Configuration => _hostBuilder.Configuration;
     IHostEnvironment IHostApplicationBuilder.Environment => _hostBuilder.Environment;

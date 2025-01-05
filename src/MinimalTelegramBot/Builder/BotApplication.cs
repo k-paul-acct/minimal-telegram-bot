@@ -54,6 +54,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
     public ILogger Logger => _host.Logger;
 
     /// <summary>
+    ///     Provides access to the <see cref="WebApplication"/> under the <see cref="BotApplication"/>.
     /// </summary>
     public WebApplication WebApplicationAccessor => _host;
 

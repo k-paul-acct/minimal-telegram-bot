@@ -12,6 +12,7 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
     private readonly Delegate _handler;
     private readonly IHandlerDispatcher _handlerDispatcher;
 
+    // TODO: Docs.
     /// <summary>
     /// </summary>
     /// <param name="handlerDispatcher"></param>
