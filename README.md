@@ -3,7 +3,7 @@
 # Welcome to the Minimal Telegram Bot project
 
 [![latest version](https://img.shields.io/nuget/v/MinimalTelegramBot)](https://www.nuget.org/packages/MinimalTelegramBot)
-[![Telegram Bot API](https://img.shields.io/badge/Telegram_Bot_API-7.11-blue)](https://core.telegram.org/bots/api-changelog#october-31-2024)
+[![Telegram Bot API](https://img.shields.io/badge/Telegram_Bot_API-8.2-blue)](https://core.telegram.org/bots/api#january-1-2025)
 
 Minimal Telegram Bot is a modern .NET framework for building Telegram Bots using simple and concise syntax inspired by
 ASP.NET Core Minimal APIs.
@@ -48,8 +48,9 @@ Future plans are to create more public API methods for user convenience, tailor 
   configuration and logging from ASP.NET Core
 
 ### Extensions
-- Support for the Finite State Machine concept for Telegram bots using StateMachine extension (WIP)
-- Built-in bot localization features using Localization extension (WIP)
+- Support for the Finite State Machine concept for Telegram bots using StateMachine extension packages
+  with various persistence models and extendable configuration.
+- Built-in bot localization features using Localization extension packages
 
 ### Getting updates from Telegram
 - Support [getting updates](https://core.telegram.org/bots/faq#how-do-i-get-updates) via both webhook and polling
@@ -59,12 +60,13 @@ Future plans are to create more public API methods for user convenience, tailor 
 ## Getting started
 ### Prerequisites
 This project is using .NET 8 for now, so be sure to [install](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
-the appropriate version of .NET, and that's all you need to start developing.
+the appropriate version of .NET, and that's all you need to start developing. Note that this does not restrict you
+from using newer versions of .NET.
 
 ### New project
 Start by creating an "Empty" ASP.NET Core application using the command line:
 ```sh
-dotnet new web -n MyBot -f net8.0
+dotnet new web -n MyBot -f net9.0
 ```
 Or create a new ASP.NET Core web application in your IDE, and choose "Empty" for the project template.
 
