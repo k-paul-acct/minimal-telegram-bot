@@ -12,11 +12,11 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
     private readonly Delegate _handler;
     private readonly IHandlerDispatcher _handlerDispatcher;
 
-    // TODO: Docs.
     /// <summary>
+    ///     Initializes a new instance of the <see cref="HandlerBuilder"/>.
     /// </summary>
-    /// <param name="handlerDispatcher"></param>
-    /// <param name="handler"></param>
+    /// <param name="handlerDispatcher">The dispatcher responsible for handling the bot requests.</param>
+    /// <param name="handler">The delegate that represents the handler method.</param>
     public HandlerBuilder(IHandlerDispatcher handlerDispatcher, Delegate handler)
     {
         _handlerDispatcher = handlerDispatcher;
@@ -29,10 +29,12 @@ public sealed class HandlerBuilder : IHandlerConventionBuilder
     }
 
     /// <summary>
+    ///    Gets the metadata associated with the handler.
     /// </summary>
     public List<object> Metadata { get; }
 
     /// <summary>
+    ///     Gets the filter factories that will be used to create the filtering pipeline for the handler.
     /// </summary>
     public List<Func<BotRequestFilterFactoryContext, BotRequestFilterDelegate, BotRequestFilterDelegate>> FilterFactories { get; }
 
