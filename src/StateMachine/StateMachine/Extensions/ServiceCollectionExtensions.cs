@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -48,7 +49,20 @@ public static class ServiceCollectionExtensions
             return new ConfigureOptions<HandlerDelegateBuilderOptions>(options => options.Interceptors.Add(interceptor));
         });
 
-        services.TryAddSingleton<IStateMachine, StateMachine>();
+        services.TryAddSingleton<IStateMachine>(s =>
+        {
+            var cachingOptions = s.GetRequiredService<IOptions<StateCachingOptions>>();
+            var stateManagementOptions = s.GetRequiredService<IOptions<StateManagementOptions>>();
+
+            if (!cachingOptions.Value.UseCaching)
+            {
+                return new BareStateMachine(stateManagementOptions);
+            }
+
+            var cache = s.GetRequiredService<HybridCache>();
+
+            return new CachingStateMachine(cache, stateManagementOptions, cachingOptions);
+        });
 
         return new StateMachineBuilder(services);
     }
