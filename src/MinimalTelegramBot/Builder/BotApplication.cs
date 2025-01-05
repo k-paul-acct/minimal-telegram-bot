@@ -235,6 +235,11 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
 
         return ct =>
         {
+            if (webhookConfiguration.SkipWebhookSettingOnStartup)
+            {
+                return Task.CompletedTask;
+            }
+
             var botClient = this.Services.GetRequiredService<ITelegramBotClient>();
             var options = this.Services.GetRequiredService<IOptions<ReceiverOptions>>().Value;
 

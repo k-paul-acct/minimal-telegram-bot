@@ -7,6 +7,7 @@ internal sealed class WebhookBuilder : IWebhookBuilder
     private readonly WebhookOptions _options;
     private string _listenPath;
     private bool _webhookResponseEnabled;
+    private bool _skipWebhookSettingOnStartup;
     private bool _deleteWebhookOnShutdown;
 
     public WebhookBuilder(WebhookOptions options)
@@ -28,6 +29,12 @@ internal sealed class WebhookBuilder : IWebhookBuilder
         return this;
     }
 
+    public IWebhookBuilder SkipWebhookSettingOnStartup()
+    {
+        _skipWebhookSettingOnStartup = true;
+        return this;
+    }
+
     public IWebhookBuilder DeleteWebhookOnShutdown()
     {
         _deleteWebhookOnShutdown = true;
@@ -41,6 +48,7 @@ internal sealed class WebhookBuilder : IWebhookBuilder
             Options = _options,
             ListenPath = _listenPath,
             WebhookResponseEnabled = _webhookResponseEnabled,
+            SkipWebhookSettingOnStartup = _skipWebhookSettingOnStartup,
             DeleteWebhookOnShutdown = _deleteWebhookOnShutdown,
         };
     }

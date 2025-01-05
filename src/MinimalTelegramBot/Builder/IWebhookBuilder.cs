@@ -19,6 +19,12 @@ public interface IWebhookBuilder
     IWebhookBuilder ListenOnPath(string path);
 
     /// <summary>
+    ///     Configures the webhook to skip setting via Telegram API when the application starts.
+    /// </summary>
+    /// <returns>The current instance of <see cref="IWebhookBuilder"/>.</returns>
+    IWebhookBuilder SkipWebhookSettingOnStartup();
+
+    /// <summary>
     ///     Configures the webhook to be deleted when the application shuts down.
     /// </summary>
     /// <returns>The current instance of <see cref="IWebhookBuilder"/>.</returns>
