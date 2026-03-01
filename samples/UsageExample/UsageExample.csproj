@@ -4,6 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <UserSecretsId>6bd6f67f-e2b3-42a8-969e-b70b8d355eed</UserSecretsId>
+    <IsPackable>false</IsPackable>
+    <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
   </PropertyGroup>
 
   <ItemGroup>
