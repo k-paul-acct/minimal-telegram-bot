@@ -19,13 +19,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Install DocFX
         run: dotnet tool install --global docfx
       - name: Build docs
         run: docfx ./docs/docfx.json
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./docs/_site
       - name: Deploy to GitHub Pages

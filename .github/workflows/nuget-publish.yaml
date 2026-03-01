@@ -1,0 +1,61 @@
+name: NuGet publish
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+jobs:
+  publish:
+    if: |
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'v') &&
+      contains(github.event.pull_request.head.ref, '.')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Extract version
+        id: version
+        run: |
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+          VERSION="${BRANCH#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Setup
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore
+      - name: Pack
+        run: |
+          dotnet pack \
+            --no-build \
+            --output ./artifacts \
+            --version ${{ steps.version.outputs.version }}
+      - name: List packages
+        run: ls -lh ./artifacts/*.nupkg
+      - name: Publish
+        run: |
+          for pkg in ./artifacts/*.nupkg; do
+            echo "Publishing $pkg..."
+            dotnet nuget push "$pkg" \
+              --api-key ${{ secrets.NUGET_API_KEY }} \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          done
+      - name: Create tag
+        run: |
+          TAG="v${{ steps.version.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"
