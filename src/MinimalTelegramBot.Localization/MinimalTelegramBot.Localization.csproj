@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <PackageId>MinimalTelegramBot.Localization</PackageId>
-    <Version>0.0.40</Version>
     <Authors>Pavel Kulakov</Authors>
     <RepositoryUrl>https://github.com/k-paul-acct/minimal-telegram-bot</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

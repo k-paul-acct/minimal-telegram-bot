@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <PackageId>MinimalTelegramBot.StateMachine</PackageId>
-    <Version>0.0.40</Version>
     <NoWarn>NU5104</NoWarn>
     <Authors>Pavel Kulakov</Authors>
     <RepositoryUrl>https://github.com/k-paul-acct/minimal-telegram-bot</RepositoryUrl>
