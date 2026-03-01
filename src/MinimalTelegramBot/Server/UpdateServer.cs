@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MinimalTelegramBot.Client;
+using MinimalTelegramBot.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -18,7 +19,7 @@ internal sealed partial class UpdateServer
         _services = services;
         _pipeline = pipeline;
         var loggerFactory = _services.GetRequiredService<ILoggerFactory>();
-        _logger = loggerFactory.CreateLogger("MinimalTelegramBot.Runner");
+        _logger = InfrastructureLog.CreateLogger(loggerFactory);
         _client = _services.GetRequiredService<ITelegramBotClient>();
     }
 
@@ -47,14 +48,8 @@ internal sealed partial class UpdateServer
             }
             catch (Exception ex)
             {
-                Log.ApplicationError(_logger, ex);
+                InfrastructureLog.ApplicationError(_logger, ex);
             }
         }
-    }
-
-    private static partial class Log
-    {
-        [LoggerMessage(1, LogLevel.Error, "An unhandled exception was thrown by the application", EventName = nameof(ApplicationError))]
-        public static partial void ApplicationError(ILogger logger, Exception ex);
     }
 }

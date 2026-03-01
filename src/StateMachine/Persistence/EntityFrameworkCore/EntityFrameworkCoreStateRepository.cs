@@ -5,11 +5,11 @@ using MinimalTelegramBot.StateMachine.Abstractions;
 
 namespace MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore;
 
-internal sealed class EntityFrameworkCoreStateRepository<TContext, TEntity> : IStateRepository
+internal sealed partial class EntityFrameworkCoreStateRepository<TContext, TEntity> : IStateRepository
     where TContext : DbContext, IStateMachineDbContext<TEntity>
     where TEntity : class, IMinimalTelegramBotState, new()
 {
-    private readonly ILogger<EntityFrameworkCoreStateRepository<TContext, TEntity>> _logger;
+    private readonly ILogger _logger;
     private readonly IServiceProvider _serviceProvider;
 
     public EntityFrameworkCoreStateRepository(IServiceProvider serviceProvider)
@@ -24,7 +24,7 @@ internal sealed class EntityFrameworkCoreStateRepository<TContext, TEntity> : IS
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
 
-        _logger.LogInformation("Getting state with context {StateEntryContext}.", entryContext);
+        Log.GettingState(_logger, entryContext);
 
         var state = await dbContext.MinimalTelegramBotStates.AsNoTracking().FirstOrDefaultAsync(
             x => x.UserId == entryContext.UserId &&
@@ -43,7 +43,7 @@ internal sealed class EntityFrameworkCoreStateRepository<TContext, TEntity> : IS
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
 
-        _logger.LogInformation("Setting state with context {StateEntryContext}.", entryContext);
+        Log.SettingState(_logger, entryContext);
 
         var affected = await dbContext.MinimalTelegramBotStates
             .Where(x => x.UserId == entryContext.UserId &&
@@ -78,12 +78,24 @@ internal sealed class EntityFrameworkCoreStateRepository<TContext, TEntity> : IS
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
 
-        _logger.LogInformation("Deleting state with context {StateEntryContext}.", entryContext);
+        Log.DeletingState(_logger, entryContext);
 
         await dbContext.MinimalTelegramBotStates
             .Where(x => x.UserId == entryContext.UserId &&
                         x.ChatId == entryContext.ChatId &&
                         x.MessageThreadId == entryContext.MessageThreadId)
             .ExecuteUpdateAsync(setters => setters.SetProperty(state => state.StateData, ""), cancellationToken);
+    }
+
+    private static partial class Log
+    {
+        [LoggerMessage(1, LogLevel.Debug, "Getting state with context {stateEntryContext}")]
+        public static partial void GettingState(ILogger logger, StateEntryContext stateEntryContext);
+
+        [LoggerMessage(2, LogLevel.Debug, "Setting state with context {stateEntryContext}")]
+        public static partial void SettingState(ILogger logger, StateEntryContext stateEntryContext);
+
+        [LoggerMessage(3, LogLevel.Debug, "Deleting state with context {stateEntryContext}")]
+        public static partial void DeletingState(ILogger logger, StateEntryContext stateEntryContext);
     }
 }

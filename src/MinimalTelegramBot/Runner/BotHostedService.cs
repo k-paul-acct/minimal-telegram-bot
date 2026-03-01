@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MinimalTelegramBot.Logging;
 using Telegram.Bot;
 
 namespace MinimalTelegramBot.Runner;
@@ -13,7 +14,7 @@ internal sealed partial class BotHostedService : IHostedService
     public BotHostedService(BotApplicationContainer applicationContainer, ILoggerFactory loggerFactory)
     {
         _applicationContainer = applicationContainer;
-        _logger = loggerFactory.CreateLogger("MinimalTelegramBot.Runner");
+        _logger = InfrastructureLog.CreateLogger(loggerFactory);
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -29,7 +30,7 @@ internal sealed partial class BotHostedService : IHostedService
         await dispatch(cancellationToken);
 
         var botInfo = await GetBotStartupInfo(app, cancellationToken);
-        Log.GettingUpdateStarted(_logger, isWebhook ? "Webhook" : "Polling", botInfo.Username, botInfo.FullName, botInfo.Id);
+        InfrastructureLog.GettingUpdateStarted(_logger, isWebhook ? "Webhook" : "Polling", botInfo.Username, botInfo.FullName, botInfo.Id);
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
@@ -51,11 +52,5 @@ internal sealed partial class BotHostedService : IHostedService
             LastName = bot.LastName,
             Username = bot.Username ?? "N/A",
         };
-    }
-
-    private static partial class Log
-    {
-        [LoggerMessage(0, LogLevel.Information, "Getting updates via {gettingUpdatesVia} started for bot @{botUsername} ({botFullName}) with ID = {botId}", EventName = nameof(GettingUpdateStarted))]
-        public static partial void GettingUpdateStarted(ILogger logger, string gettingUpdatesVia, string botUsername, string botFullName, long botId);
     }
 }

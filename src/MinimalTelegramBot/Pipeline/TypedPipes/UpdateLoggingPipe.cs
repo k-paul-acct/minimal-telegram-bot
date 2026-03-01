@@ -3,18 +3,18 @@ using Microsoft.Extensions.Logging;
 
 namespace MinimalTelegramBot.Pipeline;
 
-internal sealed class UpdateLoggingPipe : IPipe
+internal sealed partial class UpdateLoggingPipe : IPipe
 {
-    private readonly ILogger<UpdateLoggingPipe> _logger;
+    private readonly ILogger _logger;
 
-    public UpdateLoggingPipe(ILogger<UpdateLoggingPipe> logger)
+    public UpdateLoggingPipe(ILoggerFactory loggerFactory)
     {
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger("MinimalTelegramBot.UpdateHandling");
     }
 
     public async Task InvokeAsync(BotRequestContext context, BotRequestDelegate next)
     {
-        _logger.LogInformation(0, "Received update with ID = {UpdateId}", context.Update.Id);
+        Log.UpdateReceived(_logger, context.Update.Id);
 
         var startingTimestamp = Stopwatch.GetTimestamp();
 
@@ -24,11 +24,23 @@ internal sealed class UpdateLoggingPipe : IPipe
 
         if (context.Data.ContainsKey("__UpdateHandlingStarted"))
         {
-            _logger.LogInformation(200, "Update with ID = {UpdateId} is handled. Duration: {Milliseconds} ms", context.Update.Id, (long)elapsed.TotalMilliseconds);
+            Log.UpdateHandled(_logger, context.Update.Id, (long)elapsed.TotalMilliseconds);
         }
         else
         {
-            _logger.LogInformation(404, "Update with ID = {UpdateId} is not handled", context.Update.Id);
+            Log.UpdateNotHandled(_logger, context.Update.Id);
         }
+    }
+
+    private static partial class Log
+    {
+        [LoggerMessage(0, LogLevel.Debug, "Received update with ID = {updateId}")]
+        public static partial void UpdateReceived(ILogger logger, int updateId);
+
+        [LoggerMessage(200, LogLevel.Debug, "Update with ID = {updateId} is handled. Duration: {milliseconds} ms")]
+        public static partial void UpdateHandled(ILogger logger, int updateId, long milliseconds);
+
+        [LoggerMessage(404, LogLevel.Debug, "Update with ID = {updateId} is not handled")]
+        public static partial void UpdateNotHandled(ILogger logger, int updateId);
     }
 }

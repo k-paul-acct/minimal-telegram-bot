@@ -1,11 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
   <PropertyGroup>
     <PackageId>MinimalTelegramBot</PackageId>
@@ -23,22 +20,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Telegram.Bot" Version="22.3.0"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\MinimalTelegramBot.Localization.Abstractions\MinimalTelegramBot.Localization.Abstractions.csproj"/>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\..\logo\package-icon.png">
       <Pack>true</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Telegram.Bot" Version="22.9.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MinimalTelegramBot.Localization.Abstractions\MinimalTelegramBot.Localization.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

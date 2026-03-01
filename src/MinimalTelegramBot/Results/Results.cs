@@ -19,7 +19,7 @@ public static class Results
     /// <param name="message">Message text.</param>
     /// <param name="keyboard">Message keyboard.</param>
     /// <returns>Created <see cref="IResult"/>.</returns>
-    public static IResult Message(string message, IReplyMarkup? keyboard = null)
+    public static IResult Message(string message, ReplyMarkup? keyboard = null)
     {
         ArgumentNullException.ThrowIfNull(message);
 
@@ -44,7 +44,7 @@ public static class Results
     /// <param name="message">New message text.</param>
     /// <param name="keyboard">New message keyboard.</param>
     /// <returns>Created <see cref="IResult"/>.</returns>
-    public static IResult MessageEdit(string message, IReplyMarkup? keyboard = null)
+    public static IResult MessageEdit(string message, ReplyMarkup? keyboard = null)
     {
         ArgumentNullException.ThrowIfNull(message);
 
