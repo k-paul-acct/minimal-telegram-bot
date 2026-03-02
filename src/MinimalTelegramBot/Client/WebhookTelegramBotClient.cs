@@ -2,6 +2,7 @@ using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Requests.Abstractions;
+using Telegram.Bot.Types;
 
 namespace MinimalTelegramBot.Client;
 
@@ -50,6 +51,11 @@ internal sealed class WebhookTelegramBotClient : ITelegramBotClient
     public Task DownloadFile(string filePath, Stream destination, CancellationToken cancellationToken = default)
     {
         return _client.DownloadFile(filePath, destination, cancellationToken);
+    }
+
+    public Task DownloadFile(TGFile file, Stream destination, CancellationToken cancellationToken = default)
+    {
+        return _client.DownloadFile(file, destination, cancellationToken);
     }
 
     public bool LocalBotServer => _client.LocalBotServer;

@@ -166,7 +166,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
             var botClient = this.Services.GetRequiredService<ITelegramBotClient>();
             var options = this.Services.GetRequiredService<IOptions<ReceiverOptions>>().Value;
             var loggerFactory = this.Services.GetRequiredService<ILoggerFactory>();
-            var logger = new InfrastructureLogger(loggerFactory);
+            var logger = InfrastructureLog.CreateLogger(loggerFactory);
 
             botClient.StartReceiving(UpdateHandler, PollingErrorHandler, options, CancellationToken.None);
 
@@ -181,7 +181,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
 
             Task PollingErrorHandler(ITelegramBotClient client, Exception ex, CancellationToken cancellationToken)
             {
-                logger.PollingError(ex);
+                InfrastructureLog.PollingError(logger, ex);
                 return Task.CompletedTask;
             }
         };
@@ -268,7 +268,7 @@ public sealed class BotApplication : IBotApplicationBuilder, IHandlerDispatcher,
 
     private static void UseDefaultPipes(PipelineBuilder pipeline, IServiceProvider services)
     {
-        pipeline.UsePipe(new UpdateLoggingPipe(services.GetRequiredService<ILogger<UpdateLoggingPipe>>()));
+        pipeline.UsePipe(new UpdateLoggingPipe(services.GetRequiredService<ILoggerFactory>()));
         pipeline.UsePipe(new BotRequestContextAccessorPipe(services.GetRequiredService<IBotRequestContextAccessor>()));
     }
 

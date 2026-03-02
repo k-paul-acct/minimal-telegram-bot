@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/UsageExample.MinimalSetup/UsageExample.MinimalSetup.csproj" />
+    <Project Path="samples/UsageExample.StateMachine.EntityFrameworkCore/UsageExample.StateMachine.EntityFrameworkCore.csproj" />
+    <Project Path="samples/UsageExample.StateMachine/UsageExample.StateMachine.csproj" />
+    <Project Path="samples/UsageExample/UsageExample.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/MinimalTelegramBot/MinimalTelegramBot.csproj" />
+    <Project Path="src/MinimalTelegramBot.Localization.Abstractions/MinimalTelegramBot.Localization.Abstractions.csproj" />
+    <Project Path="src/MinimalTelegramBot.Localization/MinimalTelegramBot.Localization.csproj" />
+    <Project Path="src/StateMachine/Abstractions/MinimalTelegramBot.StateMachine.Abstractions.csproj" />
+    <Project Path="src/StateMachine/StateMachine/MinimalTelegramBot.StateMachine.csproj" />
+    <Project Path="src/StateMachine/Persistence/EntityFrameworkCore/MinimalTelegramBot.StateMachine.Persistence.EntityFrameworkCore.csproj" />
+  </Folder>
+</Solution>

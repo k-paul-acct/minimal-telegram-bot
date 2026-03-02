@@ -9,9 +9,9 @@ internal sealed class MessageResult : IResult
     private readonly bool _edit;
     private readonly string _message;
     private readonly bool _reply;
-    private readonly IReplyMarkup? _replyMarkup;
+    private readonly ReplyMarkup? _replyMarkup;
 
-    public MessageResult(string message, IReplyMarkup? keyboard = null, bool reply = false, bool edit = false)
+    public MessageResult(string message, ReplyMarkup? keyboard = null, bool reply = false, bool edit = false)
     {
         _message = message;
         _replyMarkup = keyboard;

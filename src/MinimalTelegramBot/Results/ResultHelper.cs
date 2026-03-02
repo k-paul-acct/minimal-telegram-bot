@@ -20,7 +20,7 @@ internal sealed class ResultHelper
             return x =>
             {
                 var t = (ITuple)x;
-                return Results.Message((string)t[0]!, (IReplyMarkup)t[1]!);
+                return Results.Message((string)t[0]!, (ReplyMarkup)t[1]!);
             };
         }
 

@@ -80,8 +80,6 @@ public sealed class BotApplicationBuilder : IHostApplicationBuilder
 
     private static void ApplyDefaultConfiguration(ConfigurationManager configuration, IServiceCollection services, BotApplicationOptions options)
     {
-        services.Configure<JsonOptions>(o => JsonBotAPI.Configure(o.SerializerOptions));
-
         services.Configure<ReceiverOptions>(o =>
         {
             o.DropPendingUpdates = true;

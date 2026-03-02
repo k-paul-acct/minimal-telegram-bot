@@ -1,4 +1,4 @@
-﻿using MinimalTelegramBot.Builder;
+using MinimalTelegramBot.Builder;
 using MinimalTelegramBot.Handling;
 using MinimalTelegramBot.Handling.Filters;
 using MinimalTelegramBot.Localization.Abstractions;

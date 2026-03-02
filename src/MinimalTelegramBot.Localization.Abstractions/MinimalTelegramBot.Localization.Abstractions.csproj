@@ -1,15 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <PackageId>MinimalTelegramBot.Localization.Abstractions</PackageId>
-    <Version>0.0.40</Version>
     <Authors>Pavel Kulakov</Authors>
     <RepositoryUrl>https://github.com/k-paul-acct/minimal-telegram-bot</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -20,13 +12,12 @@
     <PackageIcon>package-icon.png</PackageIcon>
     <IsPackable>true</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>PACKAGE_README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\logo\package-icon.png">
-      <Pack>true</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
+    <None Include="PACKAGE_README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\logo\package-icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
