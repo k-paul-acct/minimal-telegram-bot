@@ -31,9 +31,14 @@ jobs:
             8.x
             9.x
             10.x
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
       - name: Pack
         run: |
           dotnet pack \
+            --no-build \
             --output ./artifacts \
             --version ${{ steps.version.outputs.version }}
       - name: List packages
